@@ -18,7 +18,7 @@ const initialState = {
 		Bernie: 'M4a'
 	},
 	loggedIn:true,
-	game: true,
+	game: false,
 	gameOver: false,
 	score: .6,
 	difficulty: 1,

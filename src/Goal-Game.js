@@ -52,6 +52,14 @@ function GoalGame({ difficulty, changeDifficulty, goals, addGoal, removeGoal, us
       <Goal goal={item.name} />
     )
   }
+
+  const getDate = () => {
+    const today = new Date();
+    const month = constants.MONTHS[today.getMonth()],
+    date = today.getDate(),
+    day = constants.DAYS[today.getDay()];
+    return "Today is " + day + ", " + month + ' ' + date + '.';
+  }
   
   let extractKey = ( { id } ) => id.toString();
   if ( !loggedIn ){
@@ -87,6 +95,8 @@ function GoalGame({ difficulty, changeDifficulty, goals, addGoal, removeGoal, us
         renderItem={renderItem} 
         keyExtractor={extractKey}
         data={goals}/>
+
+        <Text style={styles.date}>{getDate()}</Text>
         
         <TouchableOpacity 
         style={{backgroundColor:GREEN,padding: 5}}
@@ -124,6 +134,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
     fontSize:18,
     padding: 10
+  },
+  date:{
+    fontSize: 18,
   }
 });
 
