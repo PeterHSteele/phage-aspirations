@@ -1,14 +1,16 @@
-import Matter, { Bodies, Body, Bounds, Composite, Detector } from 'matter-js';
+import Matter, { Bodies, Body, Bounds, Composite, Detector, Engine } from 'matter-js';
 import Rect from '../Rect';
-
+import constants from '../constants';
+const { BUBBLER } = constants;
 
 export default class SetUpBodies {
 
-	constructor( world, height, width, bubbleR ){
-		this.world = world;
+	constructor(  height, width ){
+		this.engine = Engine.create({ enableSleeping: false});
+		this.world = this.engine.world;
+		this.world.gravity.y = 0;
 		this.height = height;
 		this.width = width
-		this.bubbleR = bubbleR;
 	}
 
 	getWalls(){
@@ -79,7 +81,7 @@ export default class SetUpBodies {
 	matterBubble( index ){
 		let bubbleX = 25 + 134*index,//i == 0 ? 20 : Math.trunc( destControlR + Math.random() * ( width - 60 )),
 		bubbleY = 224 + 5 * index,//100 + Math.random() * (height - 2 * bubbleR - stagingHeight - 10 - controlsHeight - 100),
-		mBubble = Matter.Bodies.circle( bubbleX, bubbleY, this.bubbleR, {
+		mBubble = Matter.Bodies.circle( bubbleX, bubbleY, BUBBLER, {
 			collisionFilter: this.getBubbleFilter(),
 			isStatic: true,
 			id: 'bubble'

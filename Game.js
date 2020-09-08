@@ -29,26 +29,6 @@ const { MIDNIGHTBLUE , GREEN, GERMR, GRAYGREEN, SEAGREEN , CONTROLSHEIGHT, STAGI
 //prevent germs from ever overflowing container ( might need to alter collision filter )
 //make it easier for bubbles to reach the center
 
-let   width = Dimensions.get('window').width,
-	  height = Dimensions.get('window').height;
-
-const matterFunctions = new SetUpBodies();
-
-const germs = {};
-const germY = 20;
-const mGerms = [];
-
-const leuks = {};
-const leukY = height - 65;
-const mLeuks = [];
-
-const bubbles = {};
-const mBubbles = [];
-
-const engine = Matter.Engine.create( {enableSleeping:false} );
-const world = engine.world;
-engine.world.gravity.y = 0;
-
 const startRealignment = (entities) => {
 	let { controls, physics, draw, modal } = entities
 	modal.message = 'You get ' + controls.newLeuks + ' new leuks!';
@@ -88,11 +68,9 @@ class Game extends React.PureComponent{
 
 		this.width = Dimensions.get('window').width;
 		this.height = Dimensions.get('window').height;
-		this.world = world;
-		this.engine = engine;
 
-		this.setUpBodies = new SetUpBodies( this.world, this.height, this.width, BUBBLER );
-		this.setUpEntities = new SetUpEntities(this.width, this.height, this.engine, this.world, this.setUpBodies)
+		this.setUpBodies = new SetUpBodies( this.height, this.width, BUBBLER );
+		this.setUpEntities = new SetUpEntities(this.width, this.height, this.setUpBodies)
 	}
 
 	handleEvent = ( e ) => {
@@ -137,19 +115,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: GRAYGREEN,
   }, 
-  modalStyle:{
-  	width: width,
-  	height: height
-  },
-  bubbleControl:{
-  	width: width*.8,
-  	marginLeft: width*.1,
-  	backgroundColor: '#fff',
-  	borderRadius: 5,
-  	padding: 5,
-  	top: .4 * height
-  }
-});
+})
 
 /*animationIn={this.state.bubbleControl.location === 'bottom' ? 'slideInBottom' : 'slideInLeft' }>
 				animationOut={this.state.bubbleControl.location === 'bottom' ? 'slideOutBottom' : 'slideOutLeft' }*/

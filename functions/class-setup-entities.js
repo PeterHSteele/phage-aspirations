@@ -9,19 +9,28 @@ import { Body, World, Bodies, Vector, Composite } from 'matter-js';
 import StatusModal from '../Modal';
 
 export default class SetUpEntities {
-	constructor( width, height, engine, world, setUpBodies ){
-		Object.assign( this, { width, height, engine, world, setUpBodies })
+	constructor( width, height, setUpBodies ){
+		Object.assign( this, { width, height, setUpBodies })
 	}
 
 	initGetEntities = ( leuks, germs, entities = {} ) => {
-		const { width, height, engine, world, setUpBodies } = this;
-		const controlsBody = Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT );
-		
-		const stagingAreaHeight = STAGINGHEIGHT,
-			stagingAreaWidth = .8 * width,
-			stagingAreaY = height - CONTROLSHEIGHT - ( stagingAreaHeight + 10 );
+		const { width, height, setUpBodies } = this,
+		{ engine, world } 					 = setUpBodies,
+		controlsBody 						 = Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT ),
+		stagingAreaWidth 					 = .8 * width,
+		stagingAreaY 						 = height - CONTROLSHEIGHT - ( STAGINGHEIGHT + 10 );
 
-		const stagingBody = Bodies.rectangle( width/2, stagingAreaY + stagingAreaHeight/2, stagingAreaWidth, stagingAreaHeight, { collisionFilter: { group: 2 } } );
+		const stagingBody = Bodies.rectangle( 
+			width/2, 
+			stagingAreaY + STAGINGHEIGHT/2, 
+			stagingAreaWidth, 
+			STAGINGHEIGHT, 
+			{ 
+				collisionFilter: { 
+					group: 2 
+				} 
+			} 
+		);
 
 		return {
 						physics: {
@@ -31,7 +40,7 @@ export default class SetUpEntities {
 						staging:{
 							type: 'staging',
 							body: stagingBody,
-							height: stagingAreaHeight,
+							height: STAGINGHEIGHT,
 							width: stagingAreaWidth,
 							offset: { x: 0, y: 0 },
 							y: stagingAreaY,
@@ -95,7 +104,7 @@ export default class SetUpEntities {
 		let bubbles = {};
 		if ( init ){
 			bubbles = this.getBubbles( controls.bubbleCount );
-			entities.controls.bubbleState = getBubbleState( bubbles ); 
+			//entities.controls.bubbleState = getBubbleState( bubbles ); 
 		}
 		
 		let cellsToAdd = controls.leuks + controls.germs;
@@ -153,7 +162,6 @@ export default class SetUpEntities {
 	getBubbles( bubbleCount, bubbles = {} ){
 		let mBubbles= [];
 			new Array( bubbleCount ).fill(false).map((e,i)=>i).forEach((e,i)=>{
-				
 					const setup = this.setUpBodies,
 						  mComposite = setup.matterBubble( i );
 	
@@ -177,7 +185,7 @@ export default class SetUpEntities {
 						renderer: <Bubble />
 					}
 	
-					World.add( this.world, mComposite )
+					World.add( this.setUpBodies.world, mComposite )
 			})
 		return bubbles;
 	}
