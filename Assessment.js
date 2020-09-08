@@ -24,14 +24,13 @@ function Assessment({ goals, submitAssessment }){
             score,
             name: goal.name
         })
-        console.log('newScores', newScores)
         setScore( newScores );
     } 
 
     const renderItem = ({ item }) => <AssessmentInput updateScore={updateScore} goal={item}/>
 
     const submit = () => {
-        const leuks = scores.reduce( 0, (a,b) => a.score + b.score );
+        const leuks = scores.reduce((a,b) => a + b.score, 0 );
         submitAssessment( leuks );
     }
       
@@ -43,7 +42,7 @@ function Assessment({ goals, submitAssessment }){
                 keyExtractor={item=>item.id.toString()}
             />
             <View>
-                <TouchableOpacity onPress={submit} >
+                <TouchableOpacity style={styles.button} onPress={submit} >
                     <Text style={[styles.text, styles.buttonText]}>Submit Assessment</Text>
                 </TouchableOpacity>
             </View>

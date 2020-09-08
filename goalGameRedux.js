@@ -25,7 +25,7 @@ const initialState = {
 	loggedIn:true,
 	game: false,
 	gameOver: false,
-	assessment: true,
+	assessment: false,
 	score: .6,
 	difficulty: 1,
 };
@@ -41,7 +41,7 @@ const actionCreators = {
 	addGoal: function( goal ){
 		return {
 			type: types.ADD,
-			data: goal
+			data: goal.nativeEvent.text
 		}
 	},
 	authenticate: function( username, password ){
@@ -135,6 +135,7 @@ export const reducer = function( state = initialState, action ){
 			return{
 				...state,
 				assessment: false,
+				game: true,
 				leuks: action.data
 			}
 		default:

@@ -14,6 +14,8 @@ import constants from './constants';
 import Rect from './Rect';
 import InscribedOctagon from './InscribedOctagon';
 import SetUpBodies from './functions/class-setup-bodies';
+import { connect } from 'react-redux';
+import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 const { MIDNIGHTBLUE , GREEN, GRAYGREEN, SEAGREEN , MAUVE, LIGHTBLUE, DARKPURPLE, ORANGE, PURPLE, GERM , BUBBLE, LEUK, DESTCONTROL, LEUKS, GERMS, WIN, LOSE, BUBBLEPRESS, CONTROLS } = constants;
 
 //simplify allocations algorithm
@@ -599,7 +601,7 @@ const Physics = (entities, { time }) => {
 
 
 	
-export default class Game extends React.PureComponent{
+class Game extends React.PureComponent{
 	constructor(props){
 		super(props);
 		this.state = {
@@ -657,7 +659,7 @@ export default class Game extends React.PureComponent{
 
 	render(){	
 		width = Dimensions.get('window').width;
-	 	height = Dimensions.get('window').height;	
+		height = Dimensions.get('window').height;	
 		//alert( mGerms[0].type);
 		return (
 			<GameEngine
@@ -665,7 +667,7 @@ export default class Game extends React.PureComponent{
 				systems={ [ Physics, PressGerm, MoveLeuk, MoveGerm, Fight, this.phaseChanges, ToggleModal, DoubleGerms, CheckContainerClose ] }
 				ref='engine'
 				onEvent={this.handleEvent}
-				entities={newLeuksAndGerms(initGetEntities( this.props.leuks, this.props.germs, this.props.bubbles, this.handleFinishAlignment, width, height ), true)} >
+				entities={newLeuksAndGerms(initGetEntities( this.props.leuks, this.props.difficulty+7, 3, this.handleFinishAlignment, width, height ), true)} >
 
 				<StatusBar hidden={true} />
 				
@@ -673,6 +675,8 @@ export default class Game extends React.PureComponent{
 		);
 	}
 }
+
+export default connect( mapStateToProps, mapDispatchToProps )( Game );
 
 const styles = StyleSheet.create({
   container: {
