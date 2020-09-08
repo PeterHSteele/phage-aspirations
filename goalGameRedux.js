@@ -25,7 +25,7 @@ const initialState = {
 	loggedIn:true,
 	game: false,
 	gameOver: false,
-	assessment: false,
+	assessment: true,
 	score: .6,
 	difficulty: 1,
 };

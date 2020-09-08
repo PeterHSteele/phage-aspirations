@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, StatusBar, Dimensions } from 'react-native';
+import { AppRegistry, StyleSheet, StatusBar, Dimensions, useWindowDimensions } from 'react-native';
 import { GameEngine } from 'react-native-game-engine';
-import { PressGerm, MoveGerm, MoveLeuk, Fight, ToggleModal, DoubleGerms, Start, CheckContainerClose } from './systems';
+import { PressGerm, MoveGerm, MoveLeuk, Fight, ToggleModal, DoubleGerms, Start, CheckContainerClose, Physics } from './systems';
 import { Bubble } from './Bubble';
 import DestinationControl from './DestinationControl';
 import { Germ } from './Germ';
 import Matter from 'matter-js';
 import Controls from './Controls';
-import StatusModal from './Modal';
 import GameOver from './GameOver';
 import BubbleControl from './BubbleControl';
 import constants from './constants';
@@ -16,6 +15,7 @@ import InscribedOctagon from './InscribedOctagon';
 import SetUpBodies from './functions/class-setup-bodies';
 import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
+import SetUpEntities from './functions/class-setup-entities';
 const { MIDNIGHTBLUE , GREEN, GERMR, GRAYGREEN, SEAGREEN , CONTROLSHEIGHT, STAGINGHEIGHT, BUBBLER, MAUVE, LIGHTBLUE, DARKPURPLE, ORANGE, PURPLE, GERM , BUBBLE, LEUK, DESTCONTROL, LEUKS, GERMS, WIN, LOSE, BUBBLEPRESS, CONTROLS } = constants;
 
 //simplify allocations algorithm
@@ -68,222 +68,6 @@ const startRealignment = (entities) => {
 	return draw.newLeuksAndGerms( entities );
 }
 
-const doubleGerms = ( radius, color, world, entities, n = 2 ) => {
-
-	let balls = {};
-	let bodies = [];
-
-	new Array( n ).fill(false).forEach((e,i)=>{
-		let { x, y } = entities[i].body.position;
-
-		let body = Matter.Bodies.circle( x, y, radius, {
-			collisionFilter:{
-				group: 1,
-				mask: 1
-			}
-		})
-
-		let negX = Math.random() < .5,
-			negY = Math.random() < .5
-
-		let xpos = Math.random() * width * negX ? -1 : 1;
-		let ypos = Math.random() * width * negY ? -1 : 1;
-
-		Matter.Body.applyForce( body, { x:  xpos, y: ypos }, {x: .00015, y: .00015} )
-
-		bodies.push( body )
-
-		balls[ i +n ] = {
-			background: color,
-			body: body,
-			radius,
-			renderer: Germ 
-		}
-
-	})
-
-	Matter.World.add( world, bodies);
-	return balls;
-}
-
-const getGameOverEntities = ( gameOverFn, color = MIDNIGHTBLUE, radius = width/30 ) => {
-	Matter.World.clear( world, false, true );
-	let newEntities = {
-		draw: {
-			doubleGerms
-		},
-		physics:{
-			engine, 
-			world
-		}
-	}
-
-	let options = {collisionFilter: { group: 1}, isStatic: true};
-
-	const bounds = Matter.Bodies.rectangle(0, 0 , width, height);
-	
-	const rect = Matter.Bodies.rectangle( width/4, height/4, width/2, height/2, options)
-
-	rect.render.strokeStyle="#ff4500"
-	rect.render.lineWidth=4
-
-	newEntities.gameOver =  {
-		handlePress: gameOverFn,
-		radius,
-		doubleTime: null,
-		width: width/2,
-		height: height/2,
-		count: 2,
-		message:'game over',
-		body: rect,
-		renderer: GameOver,
-		offset: Matter.Vector.sub(rect.bounds.min, rect.position)
-	}
-
-	let left, right, top, bottom;
-
-	left = Matter.Bodies.rectangle(-1,0,1,height,options);
-	right = Matter.Bodies.rectangle(width, 0,1, height, options);
-	top = Matter.Bodies.rectangle( 0, -1, width, 1, options);
-	bottom = Matter.Bodies.rectangle(0,height, width, 1, options)
-
-	newEntities.left = {
-		type: 'bound',
-		radius,
-		body: left,
-		height: height,
-		width: 1,
-		color: 'purple',
-		renderer: Rect,
-		offset: Matter.Vector.sub(left.bounds.min, left.position)
-	}
-	newEntities.top = {
-		type: 'bound',
-		radius,
-		body: top,
-		height: 1,
-		width: width,
-		color: '#ff4500',
-		renderer: Rect,
-		offset: Matter.Vector.sub(top.bounds.min, top.position)
-	}
-	newEntities.right = {
-		type: 'bound',
-		radius,
-		body: right,
-		height: height,
-		width: 1,
-		color: '#ff4500',
-		renderer: Rect,
-		offset: Matter.Vector.sub(right.bounds.min, right.position)
-	}
-
-	newEntities.bottom = {
-		type: 'bound',
-		radius,
-		body: right,
-		height: 1,
-		width: width,
-		color: '',
-		renderer: Rect,
-		offset: Matter.Vector.sub(bottom.bounds.min, bottom.position)
-	}
-
-	let bodies = [rect, left, right, top, bottom];
-
-	bodies.forEach(body=>{
-		let offset = Matter.Vector.sub(body.bounds.min, body.position)
-		Matter.Body.setPosition(body, { x: body.position.x - offset.x - radius, y: body.position.y - offset.y-radius});
-		Matter.World.add( world, body );
-	})
-
-	new Array( 2 ).fill(false).forEach((e,i)=>{
-		let x = Math.random() * width - radius,
-		//y = i == 0 ? .125 * height - radius : .875 * height - radius ;
-		y = ( .125 * height ) + ( .75 * height * i ) - radius;
-
-		let body = Matter.Bodies.circle( x, y, radius, {
-			collisionFilter:{
-				group: 1,
-			},
-			render:{
-				lineWidth: 2
-			}
-		})
-
-		bodies.push( body );
-		Matter.World.add( world, body ); 
-
-		newEntities[i] = {
-			background: color,
-			body: body,
-			radius,
-			renderer: Germ 
-		}
-
-	})
-
-
-
-	
-	return newEntities;
-
-}
-/*
-new Array( germCount ).fill(false).map((e,i)=> i + bubbleCount*2 ).forEach(( e , i )=>{
-	let germX = width/2
-	let mGerm = Matter.Bodies.circle( germX, germY, germR, {
-		collisionFilter: {
-			group: 1,
-		},
-		render:{
-			lineWidth: 2,
-			visible: true,
-			strokeStyle: "#ff250f"
-		}
-	});
-	Matter.World.add(world, mGerm);
-		germs[e] = { 
-			pos: [germY, germX],
-			radius: germR,
-			body: mGerm,
-			active: false,
-			type: GERM,
-			bubble: -1,
-			background: MIDNIGHTBLUE,
-			flag: true,
-			moves: 0,
-			freeToMove: true,
-			renderer: <Germ />
-		}
-});
-
-new Array( leukCount ).fill(false).map((e,i)=>i+bubbleCount*2+germCount).forEach((e,i)=>{
-	let leukX = width/2;
-	let mLeuk = Matter.Bodies.circle( leukX, leukY, germR, {
-		collisionFilter:{
-			group: 1
-		},
-		render:{
-			lineWidth:2
-		}
-	} );
-	Matter.World.add(world, mLeuk);
-	leuks[e] = {
-		pos: [leukY, leukX ],
-		radius: germR,
-		body: mLeuk,
-		active: false,
-		type: LEUK,
-		bubble: -1,
-		staged: leukCount,
-		moves: 0,
-		background: LIGHTGREEN,
-		freeToMove: true,
-		renderer: <Germ />
-	}
-})
-*/
 getBubbleState = ( entities ) => {
 	//alert('called');
 	let bubbleState = {}
@@ -409,123 +193,18 @@ const getBubbles = ( bubbleCount, bubbles = {} ) => {
 		})
 	return bubbles;
 }
-
-const initGetEntities = ( leuks, germs, bubbleCount, handleFinishAlignment, screenWidth, screenHeight ) => {
-
-	const controlsBody = Matter.Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT );
-	
-	const stagingAreaHeight = STAGINGHEIGHT,
-		  stagingAreaWidth = .8 * width,
-		  stagingAreaY = height - CONTROLSHEIGHT - ( stagingAreaHeight + 10 );
-
-	const stagingBody = Matter.Bodies.rectangle( width/2, stagingAreaY + stagingAreaHeight/2, stagingAreaWidth, stagingAreaHeight, { collisionFilter: { group: 2 } } );
-	const setup = new SetUpBodies( world, height, width );
-
-	return {
-					physics: {
-						engine: engine,
-						world: world
-					},
-					staging:{
-						type: 'staging',
-						body: stagingBody,
-						height: stagingAreaHeight,
-						width: stagingAreaWidth,
-						offset: { x: 0, y: 0 },
-						y: stagingAreaY,
-						radius: 0,
-						start: false,
-						color: PURPLE,
-						renderer: <Rect />
-					},
-			        controls: { 
-			        	cellRange: [ bubbleCount, bubbleCount + germs + leuks - 1 ],
-			        	type: CONTROLS,
-			        	body: controlsBody,
-			        	width: width,
-			        	y: height - CONTROLSHEIGHT,
-			        	height: CONTROLSHEIGHT,
-			        	leuks: leuks, 
-			        	germs: germs,
-			        	bubbleState: {},
-			        	newLeuks: leuks,
-			        	newGerms: germs,
-			        	germAllocations:{},
-			        	bubbleCount: bubbleCount,
-			        	leuksAreAllocated: false,
-			        	width: screenWidth,
-			        	phase: 'p',
-			        	history: ['p'],
-			        	nextLeuks: 3,
-			        	startRealignment,
-			        	gameOver: false,
-			        	handlePress: handleFinishAlignment,
-			        	renderer: <Controls /> 
-			        },
-			        draw:{
-			        	newLeuksAndGerms
-			        },
-			        modal: {
-			        	message: 'You get ' + leuks + ' leuks!' ,
-			        	visible: false,
-			        	frames: 0,
-			        	renderer: <StatusModal />
-			        },
-			        ...setup.getWalls()
-			        
-	}
-}
-
-const Physics = (entities, { time }) => {
-    let engine = entities["physics"].engine;
-    Matter.Engine.update(engine, time.delta);
-    return entities;
-}
 	
 class Game extends React.PureComponent{
 	constructor(props){
 		super(props);
-		this.state = {
-			phase: 'p',
-			modal: true,
-		}
 
+		this.width = Dimensions.get('window').width;
+		this.height = Dimensions.get('window').height;
+		this.world = world;
+		this.engine = engine;
 
-		this.handleFinishAlignment = this.handleFinishAlignment.bind(this);
-		this.handleModalDismiss    = this.handleModalDismiss.bind(this);
-	}
-
-	 phaseChanges = ( entities ) => {
-		if ( this.state.phase == 'b' && entities.controls.phase != 'b'){
-			entities.controls.phase = 'b'
-			entities.controls.history.push( 'b' );
-			this.setState({
-				phase: 'r'
-			})
-		}
-		
-		return entities;
-	}
-
-	modalDismiss = ( entities ) => {
-		if (! this.state.modal && entities.modal.visible ){
-			
-			entities.modal.visible = false;
-		}
-		
-		return {...entities}
-	}
-
-	handleFinishAlignment(){
-		this.setState({
-			phase: 'b'
-		})
-	}
-
-	handleModalDismiss(){
-		this.setState({
-			modal: false
-		})
+		this.setUpBodies = new SetUpBodies( this.world, this.height, this.width, BUBBLER );
+		this.setUpEntities = new SetUpEntities(this.width, this.height, this.engine, this.world, this.setUpBodies)
 	}
 
 	handleEvent = ( e ) => {
@@ -538,17 +217,23 @@ class Game extends React.PureComponent{
 
 	}
 
-	render(){	
-		width = Dimensions.get('window').width;
-		height = Dimensions.get('window').height;	
+	render(){		
 		//alert( mGerms[0].type);
 		return (
 			<GameEngine
 				style={styles.container}
-				systems={ [ Physics, PressGerm, MoveLeuk, MoveGerm, Fight, this.phaseChanges, ToggleModal, DoubleGerms, CheckContainerClose ] }
+				systems={ [ Physics, PressGerm, MoveLeuk, MoveGerm, Fight, ToggleModal, DoubleGerms, CheckContainerClose ] }
 				ref='engine'
 				onEvent={this.handleEvent}
-				entities={newLeuksAndGerms(initGetEntities( this.props.leuks, this.props.difficulty+7, 3, this.handleFinishAlignment, width, height ), true)} >
+				entities={
+					newLeuksAndGerms(
+						this.setUpEntities.initGetEntities( 
+							this.props.leuks, 
+							this.props.difficulty+7 
+						), 
+						true
+					)
+				}>
 
 				<StatusBar hidden={true} />
 				

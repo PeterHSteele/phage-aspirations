@@ -39,6 +39,14 @@ const modalGameOverStyle = {
 	margin: 0
 }
 */
+const Physics = (entities, { time }) => {
+    let engine = entities["physics"].engine;
+    Matter.Engine.update(engine, time.delta);
+    return entities;
+}
+
+export { Physics };
+
 const PressGerm = (entities, { touches, screen, dispatch }) => {
 	touches.filter( t => t.type === 'press' ).forEach( t => {
 		//alert(Object.keys(t.event.target))
@@ -594,4 +602,3 @@ const ToggleModal = ( entities ) => {
 }
 
 export { ToggleModal }
-
