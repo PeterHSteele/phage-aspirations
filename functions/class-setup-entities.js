@@ -1,9 +1,11 @@
 import React from 'react';
 import constants from '../constants';
-const { CONTROLSHEIGHT, STAGINGHEIGHT, PURPLE, CONTROLS, BUBBLECOUNT } = constants;
+import { Bubble } from '../Bubble';
+const { CONTROLSHEIGHT, STAGINGHEIGHT, LIGHTBLUE, PURPLE, CONTROLS, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE } = constants;
 import Rect from '../Rect';
+import { Germ } from '../Germ';
 import Controls from '../Controls';
-import { Body, World, Bodies, Vector } from 'matter-js';
+import { Body, World, Bodies, Vector, Composite } from 'matter-js';
 import StatusModal from '../Modal';
 
 export default class SetUpEntities {
@@ -23,8 +25,8 @@ export default class SetUpEntities {
 
 		return {
 						physics: {
-							engine: engine,
-							world: world
+							engine,
+							world
 						},
 						staging:{
 							type: 'staging',
@@ -45,8 +47,8 @@ export default class SetUpEntities {
 							width: width,
 							y: height - CONTROLSHEIGHT,
 							height: CONTROLSHEIGHT,
-							leuks: leuks, 
-							germs: germs,
+							leuks, 
+							germs,
 							bubbleState: {},
 							newLeuks: leuks,
 							newGerms: germs,
@@ -69,8 +71,119 @@ export default class SetUpEntities {
 		}
 	}
 
+	newLeuksAndGerms( entities, init = false ){
+		const { controls, physics } = entities;
+		const { width, height } = this;
+		const staging = {
+			//complete:false,
+			germs: {
+				germs:{},
+				x: width/2,
+				y: 20,
+				r: GERMR,
+				bodies: [],
+			},
+			leuks:{
+				leuks:{},
+				x: controls.width/2,
+				r: GERMR,
+				y: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
+				bodies: [],
+			},
+			bubbleCount: controls.bubbleCount,
+		}
+		let bubbles = {};
+		if ( init ){
+			bubbles = this.getBubbles( controls.bubbleCount );
+			entities.controls.bubbleState = getBubbleState( bubbles ); 
+		}
+		
+		let cellsToAdd = controls.leuks + controls.germs;
+		let availableIds = [];
+		let highestCellId = controls.cellRange[1],
+			lowestCellId = controls.cellRange[0];
+	
+		for ( let i = lowestCellId; i <= highestCellId; i++ ){
+			if ( ! entities[i] ){
+				availableIds.push(i);
+				cellsToAdd--;
+			}
+			if ( ! cellsToAdd ){
+				break;
+			}
+		}
+	
+		if ( cellsToAdd ){
+			while ( cellsToAdd ){
+				highestCellId++;
+				availableIds.push( highestCellId );
+				cellsToAdd--;
+			}
+		}
+	
+		let newCells = {};
+	
+		availableIds.forEach( ( e, i ) => {
+			let type = i < controls.newGerms ? GERMS : LEUKS;
+			let { x, y, r, bodies } = staging[type];
+			let mCell = Bodies.circle( x, y, r, {
+				collisionFilter:  this.setUpBodies.getOuterCellFilter(),
+			});
+			World.add( physics.world, mCell);
+			newCells[e] = { 
+				pos: [y, x],
+				radius: r,
+				body: mCell,
+				active: false,
+				destination: [],
+				type: type.slice(0,4),
+				bubble: -1,
+				background: type == GERMS ? DARKPURPLE : LIGHTBLUE,
+				flag: true,
+				moves: 0,
+				freeToMove: true,
+				renderer: <Germ />
+			}
+		});
+		controls.cellRange[1] = highestCellId;
+		return {...entities,...newCells,...bubbles}
+	
+	}
+
+	getBubbles( bubbleCount, bubbles = {} ){
+		let mBubbles= [];
+			new Array( bubbleCount ).fill(false).map((e,i)=>i).forEach((e,i)=>{
+				
+					const setup = this.setUpBodies,
+						  mComposite = setup.matterBubble( i );
+	
+					mBubbles.push( mComposite );
+					
+					bubbles[e] = {
+						size: 0,
+						radius: BUBBLER,
+						body: Composite.get( mBubbles[i], BUBBLE, 'body' ),
+						composite: mBubbles[i],
+						flashFrames: {
+							time: 0,
+							colors:[],
+						},
+						border: PURPLE,
+						dest: false,
+						start: false,
+						germs: [],
+						leuks: [],
+						type:BUBBLE,
+						renderer: <Bubble />
+					}
+	
+					World.add( this.world, mComposite )
+			})
+		return bubbles;
+	}
+
 	getGameOverEntities( gameOverFn, color = MIDNIGHTBLUE, radius = width/30, engine, world ){
-		Matter.World.clear( world, false, true );
+		World.clear( world, false, true );
 		let newEntities = {
 			physics:{
 				engine, 

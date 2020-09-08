@@ -81,118 +81,6 @@ getBubbleState = ( entities ) => {
 	})
 	return bubbleState;
 }
-
-const newLeuksAndGerms = ( entities, init = false ) => {
-	const { controls, physics } = entities
-	const staging = {
-		//complete:false,
-		germs: {
-			germs:{},
-			x: width/2,
-			y: 20,
-			r: GERMR,
-			bodies: [],
-		},
-		leuks:{
-			leuks:{},
-			x: controls.width/2,
-			r: GERMR,
-			y: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
-			bodies: [],
-		},
-		bubbleCount: controls.bubbleCount,
-	}
-	let bubbles = {};
-	if ( init ){
-		bubbles = getBubbles( controls.bubbleCount );
-		entities.controls.bubbleState = getBubbleState( bubbles ); 
-	}
-	
-	let cellsToAdd = controls.newLeuks + controls.newGerms;
-
-	let availableIds = [];
-	let highestCellId = controls.cellRange[1],
-		lowestCellId = controls.cellRange[0];
-
-	for ( let i = lowestCellId; i <= highestCellId; i++ ){
-		if ( ! entities[i] ){
-			availableIds.push(i);
-			cellsToAdd--;
-		}
-		if ( ! cellsToAdd ){
-			break;
-		}
-	}
-
-	if ( cellsToAdd ){
-		while ( cellsToAdd ){
-			highestCellId++;
-			availableIds.push( highestCellId );
-			cellsToAdd--;
-		}
-	}
-
-	let newCells = {};
-
-	availableIds.forEach( ( e, i ) => {
-		let type = i < controls.newGerms ? GERMS : LEUKS;
-		let { x, y, r, bodies } = staging[type];
-		let mCell = Matter.Bodies.circle( x, y, r, {
-			collisionFilter:  matterFunctions.getOuterCellFilter(),
-		});
-		Matter.World.add( physics.world, mCell);
-		newCells[e] = { 
-			pos: [y, x],
-			radius: r,
-			body: mCell,
-			active: false,
-			destination: [],
-			type: type.slice(0,4),
-			bubble: -1,
-			background: type == GERMS ? DARKPURPLE : LIGHTBLUE,
-			flag: true,
-			moves: 0,
-			freeToMove: true,
-			renderer: <Germ />
-		}
-	});
-	controls.cellRange[1] = highestCellId;
-	//staging.complete = true;
-	return {...entities,...newCells,...bubbles}
-
-}
-
-const getBubbles = ( bubbleCount, bubbles = {} ) => {
-	let mBubbles= [];
-		new Array( bubbleCount ).fill(false).map((e,i)=>i).forEach((e,i)=>{
-			
-				const setup = new SetUpBodies( world, height, width, BUBBLER ),
-					  mComposite = setup.matterBubble( i );
-
-				mBubbles.push( mComposite );
-				
-				bubbles[e] = {
-					size: 0,
-					radius: BUBBLER,
-					body: Matter.Composite.get( mBubbles[i], BUBBLE, 'body' ),
-					composite: mBubbles[i],
-					flashFrames: {
-						time: 0,
-						colors:[],
-					},
-					border: PURPLE,
-					dest: false,
-					start: false,
-					germs: [],
-					leuks: [],
-					type:BUBBLE,
-					renderer: <Bubble />
-				}
-
-				Matter.World.add( world, mComposite )
-		})
-	return bubbles;
-}
 	
 class Game extends React.PureComponent{
 	constructor(props){
@@ -210,8 +98,8 @@ class Game extends React.PureComponent{
 	handleEvent = ( e ) => {
 		//alert(this.refs['engine']);
 		switch ( e.type ){
-			case WIN: this.refs.engine.swap( getGameOverEntities( this.props.endGame, LIGHTBLUE )); break;
-			case LOSE: this.refs.engine.swap( getGameOverEntities( this.props.endGame, DARKPURPLE )); break;
+			case WIN: this.refs.engine.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, LIGHTBLUE )); break;
+			case LOSE: this.refs.engine.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, DARKPURPLE )); break;
 			default: return;
 		}
 
@@ -226,7 +114,7 @@ class Game extends React.PureComponent{
 				ref='engine'
 				onEvent={this.handleEvent}
 				entities={
-					newLeuksAndGerms(
+					this.setUpEntities.newLeuksAndGerms(
 						this.setUpEntities.initGetEntities( 
 							this.props.leuks, 
 							this.props.difficulty+7 

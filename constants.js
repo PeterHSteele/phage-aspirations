@@ -22,6 +22,7 @@ export default {
 	  LOSE: 'lose',
 	  CONTROLS: 'controls',
 	  STAGING: 'staging',
+	  BUBBLECOUNT: 3,
 	  BUBBLER: 25,
 	  CONTROLSHEIGHT: 30,
 	  STAGINGHEIGHT: 25,

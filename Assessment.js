@@ -41,7 +41,7 @@ function Assessment({ goals, submitAssessment }){
                 renderItem={renderItem}
                 keyExtractor={item=>item.id.toString()}
             />
-            <View>
+            <View style={styles.buttonRow}>
                 <TouchableOpacity style={styles.button} onPress={submit} >
                     <Text style={[styles.text, styles.buttonText]}>Submit Assessment</Text>
                 </TouchableOpacity>
@@ -58,9 +58,13 @@ const styles = StyleSheet.create({
         color: '#000'
     },
     button:{
+        padding: 5,
         backgroundColor: MAUVE,
     },
     buttonText: {
         color: "#fff"
+    },
+    buttonRow: {
+        padding: 10
     }
 })
