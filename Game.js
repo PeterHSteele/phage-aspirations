@@ -16,7 +16,7 @@ import InscribedOctagon from './InscribedOctagon';
 import SetUpBodies from './functions/class-setup-bodies';
 import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
-const { MIDNIGHTBLUE , GREEN, GRAYGREEN, SEAGREEN , MAUVE, LIGHTBLUE, DARKPURPLE, ORANGE, PURPLE, GERM , BUBBLE, LEUK, DESTCONTROL, LEUKS, GERMS, WIN, LOSE, BUBBLEPRESS, CONTROLS } = constants;
+const { MIDNIGHTBLUE , GREEN, GERMR, GRAYGREEN, SEAGREEN , CONTROLSHEIGHT, STAGINGHEIGHT, BUBBLER, MAUVE, LIGHTBLUE, DARKPURPLE, ORANGE, PURPLE, GERM , BUBBLE, LEUK, DESTCONTROL, LEUKS, GERMS, WIN, LOSE, BUBBLEPRESS, CONTROLS } = constants;
 
 //simplify allocations algorithm
 	//allow for bubble - to - bubble transfers
@@ -36,7 +36,6 @@ const matterFunctions = new SetUpBodies();
 
 const germs = {};
 const germY = 20;
-const germR = 4;
 const mGerms = [];
 
 const leuks = {};
@@ -44,25 +43,7 @@ const leukY = height - 65;
 const mLeuks = [];
 
 const bubbles = {};
-const bubbleR = 25;
 const mBubbles = [];
-
-const ballR = 20
-
-const destControls = {};
-const destControlR = 4;
-const mDestControls = [];
-
-const controlsHeight = 30
-
-const stagingHeight = 25
-
-const bubbleCount = 3,
-	  germCount = 1,
-	  leukCount = 1,
-	  controlsId = 2 * bubbleCount + germCount + leukCount;
-
-
 
 const engine = Matter.Engine.create( {enableSleeping:false} );
 const world = engine.world;
@@ -314,16 +295,6 @@ getBubbleState = ( entities ) => {
 			germs: entities[e].germs.slice()
 		}
 	})
-	/*bubbleState = {
-			0:{
-				germs:[],
-				leuks:[]
-			},
-			2:{
-				germs:[],
-				leuks:[]
-			}
-		};*/
 	return bubbleState;
 }
 
@@ -335,14 +306,14 @@ const newLeuksAndGerms = ( entities, init = false ) => {
 			germs:{},
 			x: width/2,
 			y: 20,
-			r: germR,
+			r: GERMR,
 			bodies: [],
 		},
 		leuks:{
 			leuks:{},
 			x: controls.width/2,
-			r: germR,
-			y: height - controlsHeight - 10 - stagingHeight/2 - 4,
+			r: GERMR,
+			y: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
 			bodies: [],
 		},
 		bubbleCount: controls.bubbleCount,
@@ -411,14 +382,14 @@ const getBubbles = ( bubbleCount, bubbles = {} ) => {
 	let mBubbles= [];
 		new Array( bubbleCount ).fill(false).map((e,i)=>i).forEach((e,i)=>{
 			
-				const setup = new SetUpBodies( world, height, width, bubbleR ),
+				const setup = new SetUpBodies( world, height, width, BUBBLER ),
 					  mComposite = setup.matterBubble( i );
 
 				mBubbles.push( mComposite );
 				
 				bubbles[e] = {
 					size: 0,
-					radius: bubbleR,
+					radius: BUBBLER,
 					body: Matter.Composite.get( mBubbles[i], BUBBLE, 'body' ),
 					composite: mBubbles[i],
 					flashFrames: {
@@ -433,22 +404,6 @@ const getBubbles = ( bubbleCount, bubbles = {} ) => {
 					type:BUBBLE,
 					renderer: <Bubble />
 				}
-				//alert(mDestControl.position.x);
-				/*bubbles[e*2+1] = {
-					pos:[height/2 - destControlR * 2, width/2 - destControlR * 2 ],
-					radius: destControlR,
-					body: mDestControl,
-					type: DESTCONTROL,
-					freeToMove: false,
-					renderer: <DestinationControl />
-				}
-
-				
-
-				let group = Matter.Composite.create({
-					bodies: [ mBubble, mDestControl ],
-					id: e
-				})*/
 
 				Matter.World.add( world, mComposite )
 		})
@@ -457,11 +412,11 @@ const getBubbles = ( bubbleCount, bubbles = {} ) => {
 
 const initGetEntities = ( leuks, germs, bubbleCount, handleFinishAlignment, screenWidth, screenHeight ) => {
 
-	const controlsBody = Matter.Bodies.rectangle( 0, height - controlsHeight, width, controlsHeight );
+	const controlsBody = Matter.Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT );
 	
-	const stagingAreaHeight = stagingHeight,
+	const stagingAreaHeight = STAGINGHEIGHT,
 		  stagingAreaWidth = .8 * width,
-		  stagingAreaY = height - controlsHeight - ( stagingAreaHeight + 10 );
+		  stagingAreaY = height - CONTROLSHEIGHT - ( stagingAreaHeight + 10 );
 
 	const stagingBody = Matter.Bodies.rectangle( width/2, stagingAreaY + stagingAreaHeight/2, stagingAreaWidth, stagingAreaHeight, { collisionFilter: { group: 2 } } );
 	const setup = new SetUpBodies( world, height, width );
@@ -484,12 +439,12 @@ const initGetEntities = ( leuks, germs, bubbleCount, handleFinishAlignment, scre
 						renderer: <Rect />
 					},
 			        controls: { 
-			        	cellRange: [ bubbleCount, bubbleCount + germCount + leukCount - 1 ],
+			        	cellRange: [ bubbleCount, bubbleCount + germs + leuks - 1 ],
 			        	type: CONTROLS,
 			        	body: controlsBody,
 			        	width: width,
-			        	y: height - controlsHeight,
-			        	height: controlsHeight,
+			        	y: height - CONTROLSHEIGHT,
+			        	height: CONTROLSHEIGHT,
 			        	leuks: leuks, 
 			        	germs: germs,
 			        	bubbleState: {},
@@ -511,7 +466,7 @@ const initGetEntities = ( leuks, germs, bubbleCount, handleFinishAlignment, scre
 			        	newLeuksAndGerms
 			        },
 			        modal: {
-			        	message: 'You get ' + leukCount + ' leuks!' ,
+			        	message: 'You get ' + leuks + ' leuks!' ,
 			        	visible: false,
 			        	frames: 0,
 			        	renderer: <StatusModal />
@@ -520,86 +475,12 @@ const initGetEntities = ( leuks, germs, bubbleCount, handleFinishAlignment, scre
 			        
 	}
 }
-/*
-const endOfGame = ( entities, outcome ) => {
 
-	Object.keys(entities ).filter( key => entities[key].body ).forEach( key => {
-		Matter.Composite.remove( entities.physics.world, entities[key].body );
-		delete entities[key];
-	})
-
-	entities.controls.renderer = null;
-	entities.endGame.renderer = <GameOver />;
-
-
-
-	
-
-	Matter.World.add( world, rect );
-	entities.endGame.body = rect;
-	entities.endGame.width = width/2;
-	entities.endGame.height = height/2;
-	
-	return entities.draw.gameOverBodies( 20, outcome == 'win' ? LIGHTGREEN : MIDNIGHTBLUE, entities.physics.world );
-
-}
-*/
-//Matter.World.add(world, germs);
-/*
-new Array( bubbleCount ).fill(false).map((e,i)=>i).forEach((e,i)=>{
-
-
-	let bubbleX = Math.trunc( destControlR + Math.random() * ( width - 60 )),
-		bubbleY = 100 + Math.random() * (height - 200),
-		mBubble = Matter.Bodies.circle( bubbleX, bubbleY, bubbleR, {
-			collisionFilter:{
-				group: 2
-			},
-		} );
-
-		const mDestControl = Matter.Bodies.circle( bubbleX, bubbleY, destControlR);
-		mDestControls.push( mDestControl );
-		
-		mBubbles.push(mBubble);
-		bubbles[e*2] = {
-			pos:[bubbleY, bubbleX],
-			radius: bubbleR,
-			body: mBubbles[i],
-			border: i == 1 ? '#40e0d0' : '#99d548',
-			dest: false,
-			germs: [],
-			leuks: [],
-			type:BUBBLE,
-			waves: 0,
-			renderer: <Bubble />
-		}
-
-		destControls[e*2+1] = {
-			pos:[bubbleY - destControlR * 2, bubbleX - destControlR * 2 ],
-			radius: destControlR,
-			body: mDestControls[i],
-			type: DESTCONTROL,
-			freeToMove: false,
-			renderer: <DestinationControl />
-		}
-
-		Matter.Composite.create({
-			bodies: [ mBubble, mDestControl ],
-			id: e
-		})
-})
-*/
-
-//Matter.World.add(world, mGerms);
 const Physics = (entities, { time }) => {
     let engine = entities["physics"].engine;
     Matter.Engine.update(engine, time.delta);
     return entities;
 }
-
-//alert(Object.keys({...bubbles,...leuks,...germs}))
-
-
 	
 class Game extends React.PureComponent{
 	constructor(props){

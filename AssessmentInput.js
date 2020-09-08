@@ -7,7 +7,7 @@ const { SEAGREEN, GRAYGREEN } = constants;
 export default function AssessmentInput({ goal, updateScore }){
 
     const ratings = new Array(5).fill(false).map( (e,i) => {
-       return i; 
+       return i + 1; 
     });
     
     const renderItem = ({item}) => {
