@@ -34,6 +34,7 @@ function Assessment({ goals, submitAssessment }){
         submitAssessment( leuks );
     }
       
+    const disableSubmit = scores.find( e => e.score === 0) ? true : false;
     return(
         <View>
             <FlatList 
@@ -42,7 +43,13 @@ function Assessment({ goals, submitAssessment }){
                 keyExtractor={item=>item.id.toString()}
             />
             <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.button} onPress={submit} >
+                <TouchableOpacity 
+                disabled={ disableSubmit } 
+                style={[
+                    styles.button, 
+                    { backgroundColor: disableSubmit ? '#ddd' : MAUVE} 
+                ]} 
+                onPress={submit} >
                     <Text style={[styles.text, styles.buttonText]}>Submit Assessment</Text>
                 </TouchableOpacity>
             </View>
@@ -59,7 +66,6 @@ const styles = StyleSheet.create({
     },
     button:{
         padding: 5,
-        backgroundColor: MAUVE,
     },
     buttonText: {
         color: "#fff"

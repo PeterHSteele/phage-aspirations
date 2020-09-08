@@ -6,7 +6,7 @@ under specific conditions.
 
 import { Body, Composite, Detector, Vector } from 'matter-js'
 import constants from '../constants';
-const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE } = constants;
+const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE, BUBBLE } = constants;
 
 export default class SystemsHelpers{
 	constructor( setUpBodies ){
@@ -175,6 +175,19 @@ export default class SystemsHelpers{
 		mover.destination = [];
 	}
 
+	getBubbleState( entities ){
+		let bubbleState = {}
+		let bubbleKeys = Object.keys(entities).filter(key=>entities[key].type==BUBBLE);
+		bubbleKeys.forEach( e => {
+			bubbleState[e] = {
+				...entities[e], 
+				leuks: entities[e].leuks.slice(), 
+				germs: entities[e].germs.slice()
+			}
+		})
+		return bubbleState;
+	}
+
 	scaleBody( bubble, increase ){
 		Body.scale( bubble.body, 1.2, 1.2 );
 		bubble.radius *= 1.2;
@@ -204,6 +217,34 @@ export default class SystemsHelpers{
  			} else {
  				bubble.flashFrames.time += time.delta
  			}
+	}
+
+	totalLeuksInGame( bubbleState ){
+		return Object.keys( bubbleState ).reduce((a,b)=>bubbleState[a].leuks.length + bubbleState[b].leuks.length, 0)
+	}
+
+
+	startRealignment( entities, dispatch ){
+		let { controls, physics, draw, modal } = entities;
+		const bubbleState = this.getBubbleState( entities );
+		if ( this.totalLeuksInGame(bubbleState) < 10 ){
+			dispatch({ type: 'STOP' })
+		}
+		modal.message = 'You get ' + controls.newLeuks + ' new leuks!';
+		Object.keys(entities).filter( key => entities[key].type === BUBBLE ).forEach( bubbleKey => {
+			entities[bubbleKey].flashFrames = {
+				time: 0,
+				colors: []
+			}
+		})
+		controls.phase = 'r';
+		controls.history.push('r');
+		controls.leuksAreAllocated = false;
+		controls.bubbleState=bubbleState
+		controls.germAllocations={};
+		modal.frames = 0;
+		modal.visible = true;
+		return draw.newLeuksAndGerms( entities );
 	}
 
 }

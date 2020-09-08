@@ -9,8 +9,8 @@ import { Body, World, Bodies, Vector, Composite } from 'matter-js';
 import StatusModal from '../Modal';
 
 export default class SetUpEntities {
-	constructor( width, height, setUpBodies ){
-		Object.assign( this, { width, height, setUpBodies })
+	constructor( width, height, setUpBodies, helpers ){
+		Object.assign( this, { width, height, setUpBodies, helpers })
 	}
 
 	initGetEntities = ( leuks, germs, entities = {} ) => {
@@ -37,6 +37,9 @@ export default class SetUpEntities {
 							engine,
 							world
 						},
+						draw:{
+							newLeuksAndGerms: this.newLeuksAndGerms.bind(this),
+						},
 						staging:{
 							type: 'staging',
 							body: stagingBody,
@@ -58,6 +61,8 @@ export default class SetUpEntities {
 							height: CONTROLSHEIGHT,
 							leuks, 
 							germs,
+							newLeuks: leuks,
+							newGerms: germs,
 							bubbleState: {},
 							newLeuks: leuks,
 							newGerms: germs,
@@ -80,9 +85,9 @@ export default class SetUpEntities {
 		}
 	}
 
-	newLeuksAndGerms( entities, init = false ){
+	newLeuksAndGerms( entities, leuks, germs, init = false ){
 		const { controls, physics } = entities;
-		const { width, height } = this;
+		const { width, height, setUpBodies } = this;
 		const staging = {
 			//complete:false,
 			germs: {
@@ -104,10 +109,9 @@ export default class SetUpEntities {
 		let bubbles = {};
 		if ( init ){
 			bubbles = this.getBubbles( controls.bubbleCount );
-			//entities.controls.bubbleState = getBubbleState( bubbles ); 
+			entities.controls.bubbleState = this.helpers.getBubbleState( bubbles ); 
 		}
-		
-		let cellsToAdd = controls.leuks + controls.germs;
+		let cellsToAdd = controls.newLeuks + controls.newGerms;
 		let availableIds = [];
 		let highestCellId = controls.cellRange[1],
 			lowestCellId = controls.cellRange[0];
@@ -134,9 +138,9 @@ export default class SetUpEntities {
 	
 		availableIds.forEach( ( e, i ) => {
 			let type = i < controls.newGerms ? GERMS : LEUKS;
-			let { x, y, r, bodies } = staging[type];
+			let { x, y, r, bodies } = staging[type]; 
 			let mCell = Bodies.circle( x, y, r, {
-				collisionFilter:  this.setUpBodies.getOuterCellFilter(),
+				collisionFilter: setUpBodies.getOuterCellFilter(),
 			});
 			World.add( physics.world, mCell);
 			newCells[e] = { 

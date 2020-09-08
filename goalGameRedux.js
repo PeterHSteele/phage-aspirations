@@ -9,6 +9,7 @@ export const types = {
 	CHANGEBUBBLE:'CHANGEBUBBLE',
 	STARTASSESSMENT: 'STARTASSESSMENT',
 	SUBMITASSESSMENT: 'SUBMITASSESSMENT',
+	SAVEENTITIES: 'SAVEENTITIES'
 }
 
 const initialState = {
@@ -16,12 +17,12 @@ const initialState = {
 		{ id: 0, name: 'revolution' },
 		{ id: 1, name: '12 hours of programming' },
 	],
+	entities: null,
 	completed:[],
 	users:{
 		Bernie: 'M4a'
 	},
 	leuks: 0,
-	//nextGenGerms: 5,
 	loggedIn:true,
 	game: false,
 	gameOver: false,
@@ -84,6 +85,12 @@ const actionCreators = {
 			type: types.SUBMITASSESSMENT,
 			data: leuks,
 		}
+	},
+	saveEntities: function( entities ){
+		return {
+			type: types.SAVEENTITIES,
+			data: entities
+		}
 	}
 }
 
@@ -138,6 +145,11 @@ export const reducer = function( state = initialState, action ){
 				game: true,
 				leuks: action.data
 			}
+		case types.SAVEENTITIES:
+			return {
+				...state,
+				entities: action.data
+			}
 		default:
 			return state;
 	}
@@ -154,7 +166,8 @@ export const mapStateToProps = function({ goals, difficulty, users, loggedIn, ga
 		gameOver: gameOver,
 		score: completed.length/goals.length,
 		assessment,
-		leuks
+		leuks,
+		entities
 	};
 }
 
@@ -168,6 +181,7 @@ export const mapDispatchToProps = function( dispatch ){
 		endGame: () => dispatch( actionCreators.gameOver() ),
 		markComplete: ( id ) => dispatch( actionCreators.markComplete( id )),
 		startAssessment: () => dispatch( actionCreators.startAssessment()),
-		submitAssessment: ( leuks ) => dispatch( actionCreators.submitAssessment( leuks ) )
+		submitAssessment: ( leuks ) => dispatch( actionCreators.submitAssessment( leuks ) ),
+		saveEntities: ( entities ) => dispatch( actionCreators.saveEntities( entities ))
 	}
 }

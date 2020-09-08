@@ -90,7 +90,7 @@ export default class SetUpBodies {
 			  rectLength = Math.sqrt( 2 ) * this.bubbleR,
 			  rectOffset = rectLength/2;
 
-		const octagon = this.octagon( this.bubbleR );
+		const octagon = this.octagon( BUBBLER );
 		/*const left = Bodies.rectangle( bubbleX - .9 * this.bubbleR, bubbleY, 1, rectLength, {
 						collisionFilter: this.getContainerFilter(),
 						isStatic: true,

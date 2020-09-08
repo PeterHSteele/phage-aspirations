@@ -16,6 +16,7 @@ import SetUpBodies from './functions/class-setup-bodies';
 import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 import SetUpEntities from './functions/class-setup-entities';
+import SystemsHelpers from './functions/class-systems-helpers';
 const { MIDNIGHTBLUE , GREEN, GERMR, GRAYGREEN, SEAGREEN , CONTROLSHEIGHT, STAGINGHEIGHT, BUBBLER, MAUVE, LIGHTBLUE, DARKPURPLE, ORANGE, PURPLE, GERM , BUBBLE, LEUK, DESTCONTROL, LEUKS, GERMS, WIN, LOSE, BUBBLEPRESS, CONTROLS } = constants;
 
 //simplify allocations algorithm
@@ -28,39 +29,6 @@ const { MIDNIGHTBLUE , GREEN, GERMR, GRAYGREEN, SEAGREEN , CONTROLSHEIGHT, STAGI
 //velocity varies by distance
 //prevent germs from ever overflowing container ( might need to alter collision filter )
 //make it easier for bubbles to reach the center
-
-const startRealignment = (entities) => {
-	let { controls, physics, draw, modal } = entities
-	modal.message = 'You get ' + controls.newLeuks + ' new leuks!';
-	Object.keys(entities).filter( key => entities[key].type === BUBBLE ).forEach( bubbleKey => {
-		entities[bubbleKey].flashFrames = {
-			time: 0,
-			colors: []
-		}
-	})
-	controls.phase = 'r';
-	controls.history.push('r');
-	controls.leuksAreAllocated = false;
-	controls.bubbleState=getBubbleState( entities );
-	controls.germAllocations={};
-	modal.frames = 0;
-	modal.visible = true;
-	return draw.newLeuksAndGerms( entities );
-}
-
-getBubbleState = ( entities ) => {
-	//alert('called');
-	let bubbleState = {}
-	let bubbleKeys = Object.keys(entities).filter(key=>entities[key].type==BUBBLE);
-	bubbleKeys.forEach( e => {
-		bubbleState[e] = {
-			...entities[e], 
-			leuks: entities[e].leuks.slice(), 
-			germs: entities[e].germs.slice()
-		}
-	})
-	return bubbleState;
-}
 	
 class Game extends React.PureComponent{
 	constructor(props){
@@ -70,7 +38,8 @@ class Game extends React.PureComponent{
 		this.height = Dimensions.get('window').height;
 
 		this.setUpBodies = new SetUpBodies( this.height, this.width, BUBBLER );
-		this.setUpEntities = new SetUpEntities(this.width, this.height, this.setUpBodies)
+		this.helpers = new SystemsHelpers( this.setUpBodies )
+		this.setUpEntities = new SetUpEntities(this.width, this.height, this.setUpBodies, this.helpers )
 	}
 
 	handleEvent = ( e ) => {
@@ -97,6 +66,8 @@ class Game extends React.PureComponent{
 							this.props.leuks, 
 							this.props.difficulty+7 
 						), 
+						this.props.leuks, 
+						this.props.difficulty + 7,
 						true
 					)
 				}>

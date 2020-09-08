@@ -241,7 +241,7 @@ const Fight = ( entities, { touches, time, dispatch } ) => {
 	const bubblesWithBoth = bubblesWithGerms.filter( e => bubblesWithLeuks.indexOf(e) > -1 );
 
 	if (! bubblesWithBoth.length){
-		return controls.startRealignment( entities );
+		return helpers.startRealignment( entities, dispatch );
 	}
 
 	bubblesWithBoth.forEach(( bubbleKey, index ) => {
