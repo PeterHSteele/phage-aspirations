@@ -7,19 +7,25 @@ export const types = {
 	STARTGAME: 'STARTGAME',
 	CHANGEDIFFICULTY: 'CHANGEDIFFICULTY',
 	CHANGEBUBBLE:'CHANGEBUBBLE',
+	STARTASSESSMENT: 'STARTASSESSMENT',
+	SUBMITASSESSMENT: 'SUBMITASSESSMENT',
 }
 
 const initialState = {
 	goals:[
 		{ id: 0, name: 'revolution' },
+		{ id: 1, name: '12 hours of programming' },
 	],
 	completed:[],
 	users:{
 		Bernie: 'M4a'
 	},
+	leuks: 0,
+	//nextGenGerms: 5,
 	loggedIn:true,
 	game: false,
 	gameOver: false,
+	assessment: true,
 	score: .6,
 	difficulty: 1,
 };
@@ -67,8 +73,18 @@ const actionCreators = {
 		return {
 			type: types.STARTGAME
 		}
+	},
+	startAssessment: function(){
+		return {
+			type: types.STARTASSESSMENT
+		}
+	},
+	submitAssessment: function( leuks ){
+		return {
+			type: types.SUBMITASSESSMENT,
+			data: leuks,
+		}
 	}
-
 }
 
 export const reducer = function( state = initialState, action ){
@@ -110,12 +126,23 @@ export const reducer = function( state = initialState, action ){
 				...state,
 				game: true
 			}
+		case types.STARTASSESSMENT:
+			return {
+				...state,
+				assessment: true
+			}
+		case types.SUBMITASSESSMENT:
+			return{
+				...state,
+				assessment: false,
+				leuks: action.data
+			}
 		default:
 			return state;
 	}
 }
 
-export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, bubbleControl, entities }){
+export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, bubbleControl, entities, assessment, leuks }){
 	return {
 		difficulty,
 		goals: goals,
@@ -125,6 +152,8 @@ export const mapStateToProps = function({ goals, difficulty, users, loggedIn, ga
 		game: game,
 		gameOver: gameOver,
 		score: completed.length/goals.length,
+		assessment,
+		leuks
 	};
 }
 
@@ -137,5 +166,7 @@ export const mapDispatchToProps = function( dispatch ){
 		removeGoal: ( id ) => dispatch( actionCreators.remove( id ) ),
 		endGame: () => dispatch( actionCreators.gameOver() ),
 		markComplete: ( id ) => dispatch( actionCreators.markComplete( id )),
+		startAssessment: () => dispatch( actionCreators.startAssessment()),
+		submitAssessment: ( leuks ) => dispatch( actionCreators.submitAssessment( leuks ) )
 	}
 }

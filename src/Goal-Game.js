@@ -11,11 +11,13 @@ import LogIn from '../LogIn.js';
 import Goal from '../Goal.js';
 import { GameEngine } from 'react-native-game-engine';
 import Game from '../Game';
+import Assessment from '../Assessment';
+import AssessmentInput from '../AssessmentInput';
 import constants from '../constants';
 const { GREEN, MAUVE } = constants
 
 
-function GoalGame({ difficulty, changeDifficulty, goals, addGoal, removeGoal, users, loggedIn, authenticate, game, startGame ,endGame, score, completed, markComplete, bubbleControl, entities, openBubble }) {
+function GoalGame({ difficulty, changeDifficulty, goals, addGoal, removeGoal, users, loggedIn, authenticate, game, startGame ,endGame, score, completed, markComplete, bubbleControl, entities, openBubble, startAssessment, assessment }) {
  
   let [ state, updateState ] = useState([ {id:0, name:'bernie'} ] );  
 
@@ -70,6 +72,10 @@ function GoalGame({ difficulty, changeDifficulty, goals, addGoal, removeGoal, us
     )
   }
 
+  if ( assessment ){
+    return <Assessment goals={goals} />
+  }
+
   if ( game ){
     return(
       <Game 
@@ -104,6 +110,12 @@ function GoalGame({ difficulty, changeDifficulty, goals, addGoal, removeGoal, us
           <Text style={{color:'#fff'}}>Game</Text>
         </TouchableOpacity>
 
+        <View style={styles.buttonPanel}>
+          <TouchableOpacity style={[styles.button, styles.panelButton]} onPress={startAssessment}>
+            <Text style={styles.text, styles.panelButtonText}>Assessment</Text>
+          </TouchableOpacity>
+        </View>
+
         <Picker
         selectedValue={difficulty}
         onValueChange={(itemValue, itemIndex) => changeDifficulty(itemValue)}>
@@ -135,9 +147,26 @@ const styles = StyleSheet.create({
     fontSize:18,
     padding: 10
   },
+  text:{
+    fontSize: 18,
+  },
+  button:{
+    padding: 10,
+  },
+  panelButton: {
+    backgroundColor: MAUVE,
+    margin: 5,
+    padding: 10
+  },
+  panelButtonText: {
+    color: '#fff',
+  },
   date:{
     fontSize: 18,
-  }
+  },
+  buttonPanel:{
+
+  },
 });
 
 const theme = {
