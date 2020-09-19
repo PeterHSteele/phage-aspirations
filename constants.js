@@ -20,6 +20,8 @@ export default {
 	  GAMEOVER: 'gameOver',
 	  WIN: 'win',
 	  LOSE: 'lose',
+	  STOP: 'stop',
+	  STOPPED: 'stopped',
 	  CONTROLS: 'controls',
 	  STAGING: 'staging',
 	  BUBBLECOUNT: 3,

@@ -9,7 +9,8 @@ export const types = {
 	CHANGEBUBBLE:'CHANGEBUBBLE',
 	STARTASSESSMENT: 'STARTASSESSMENT',
 	SUBMITASSESSMENT: 'SUBMITASSESSMENT',
-	SAVEENTITIES: 'SAVEENTITIES'
+	SAVEENTITIES: 'SAVEENTITIES',
+	COMPLETEDAY: 'COMPLETEDAY',
 }
 
 const initialState = {
@@ -26,9 +27,10 @@ const initialState = {
 	loggedIn:true,
 	game: false,
 	gameOver: false,
-	assessment: true,
+	assessment: false,
 	score: .6,
 	difficulty: 1,
+	renderGame: true
 };
 
 
@@ -42,7 +44,7 @@ const actionCreators = {
 	addGoal: function( goal ){
 		return {
 			type: types.ADD,
-			data: goal.nativeEvent.text
+			data: goal
 		}
 	},
 	authenticate: function( username, password ){
@@ -90,6 +92,12 @@ const actionCreators = {
 		return {
 			type: types.SAVEENTITIES,
 			data: entities
+		}
+	},
+	completeDay: function(){
+		return {
+			type: types.COMPLETEDAY,
+			game: false,
 		}
 	}
 }
@@ -148,14 +156,22 @@ export const reducer = function( state = initialState, action ){
 		case types.SAVEENTITIES:
 			return {
 				...state,
-				entities: action.data
+				entities: action.data,
+				renderGame: false
 			}
+		case types.COMPLETEDAY: {
+			return {
+				...state,
+				game: false,
+				renderGame: true,
+			}
+		}
 		default:
 			return state;
 	}
 }
 
-export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, bubbleControl, entities, assessment, leuks }){
+export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, bubbleControl, entities, assessment, leuks, renderGame }){
 	return {
 		difficulty,
 		goals: goals,
@@ -167,7 +183,8 @@ export const mapStateToProps = function({ goals, difficulty, users, loggedIn, ga
 		score: completed.length/goals.length,
 		assessment,
 		leuks,
-		entities
+		entities,
+		renderGame
 	};
 }
 
@@ -182,6 +199,7 @@ export const mapDispatchToProps = function( dispatch ){
 		markComplete: ( id ) => dispatch( actionCreators.markComplete( id )),
 		startAssessment: () => dispatch( actionCreators.startAssessment()),
 		submitAssessment: ( leuks ) => dispatch( actionCreators.submitAssessment( leuks ) ),
-		saveEntities: ( entities ) => dispatch( actionCreators.saveEntities( entities ))
+		saveEntities: ( entities ) => dispatch( actionCreators.saveEntities( entities )),
+		completeDay: () => dispatch( actionCreators.completeDay()),
 	}
 }

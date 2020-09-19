@@ -6,15 +6,16 @@ under specific conditions.
 
 import { Body, Composite, Detector, Vector } from 'matter-js'
 import constants from '../constants';
-const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE, BUBBLE } = constants;
+import placeGerms from '../placeGerms';
+const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE, BUBBLE, STOP, LIGHTMAUVE, LIGHTBLUE } = constants;
 
 export default class SystemsHelpers{
 	constructor( setUpBodies ){
 		this.matterFunctions = setUpBodies
 		this.animiationColors = [ 
-			[ GRAYGREEN, BLUE, ORANGE ],
-			[ ORANGE, GRAYGREEN, BLUE ],
-			[ BLUE, ORANGE, GRAYGREEN ]
+			[ GRAYGREEN, LIGHTBLUE, LIGHTMAUVE ],
+			[ LIGHTMAUVE, GRAYGREEN, LIGHTBLUE ],
+			[ LIGHTBLUE, LIGHTMAUVE, GRAYGREEN ]
 		];
 	}
 
@@ -175,6 +176,10 @@ export default class SystemsHelpers{
 		mover.destination = [];
 	}
 
+	getBubbleKeys( entities ){
+		return Object.keys( entities ).filter( key => entities[key].type == BUBBLE );
+	}
+
 	getBubbleState( entities ){
 		let bubbleState = {}
 		let bubbleKeys = Object.keys(entities).filter(key=>entities[key].type==BUBBLE);
@@ -220,31 +225,41 @@ export default class SystemsHelpers{
 	}
 
 	totalLeuksInGame( bubbleState ){
-		return Object.keys( bubbleState ).reduce((a,b)=>bubbleState[a].leuks.length + bubbleState[b].leuks.length, 0)
+		return Object.keys( bubbleState ).reduce((a,b)=>a + bubbleState[b].leuks.length, 0)
 	}
-
+/*
+	initiateFight( entities ){
+		entities.controls.phase = 'b';
+		this.getBubbleKeys( entities ).forEach( key =>  entities[key].active = true );
+	}
+*/
 
 	startRealignment( entities, dispatch ){
 		let { controls, physics, draw, modal } = entities;
 		const bubbleState = this.getBubbleState( entities );
-		if ( this.totalLeuksInGame(bubbleState) < 10 ){
-			dispatch({ type: 'STOP' })
-		}
-		modal.message = 'You get ' + controls.newLeuks + ' new leuks!';
-		Object.keys(entities).filter( key => entities[key].type === BUBBLE ).forEach( bubbleKey => {
+		entities.controls.phase = 'r';
+		/*this.getBubbleKeys( entities ).forEach( key => {
 			entities[bubbleKey].flashFrames = {
 				time: 0,
 				colors: []
 			}
-		})
+			//entities[bubbleKey].active = false;
+		})*/
+		if ( this.totalLeuksInGame(bubbleState) < 10 ){
+			dispatch({ type: STOP })
+			controls.saveEntities( entities )
+			return entities;
+		}
+		modal.message = 'You get ' + controls.newLeuks + ' new leuks!';
 		controls.phase = 'r';
 		controls.history.push('r');
 		controls.leuksAreAllocated = false;
 		controls.bubbleState=bubbleState
-		controls.germAllocations={};
+		controls.germAllocations= placeGerms( controls.newGerms, bubbleState );
 		modal.frames = 0;
 		modal.visible = true;
-		return draw.newLeuksAndGerms( entities );
+		console.log('at the source', entities.controls.germAllocatio)
+		return draw.newLeuksAndGerms( entities , controls.newLeuks, controls.newGerms );
 	}
 
 }

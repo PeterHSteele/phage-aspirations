@@ -10,17 +10,14 @@ import GoalGame from './src/Goal-Game.js';
 
 /*
 Todo: 
-improve physics animations
-  -palpitations during fights
 Bonuses for capturing certain bubbles overnight
-Stop game and start again the following day
-
+Remove goals
+fix game over entities
 improve physics animations
   -bubble
   -Make germ movement more idosyncratic
 
 New Germ/leuk introductions
-Fix germs not in straight line after game over
 Instructions
   Make it clear you can realign
 Come up with singular version of new leuks message

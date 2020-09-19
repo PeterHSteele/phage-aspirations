@@ -7,17 +7,18 @@ export default function Input( props ){
 	const handleChangeText = ( text ) => setState(text);
 
 	const onSubmitEditing = () => {
+		console.log('onsubmit');
 		const onSubmitEditing = props.onSubmitEditing;
 		
 		const text = value;
 		if (!text){
 			return;
 		}
+		setState('');
+		onSubmitEditing(text);
 		
-		onSubmitEditing(text)
-		setState('')
 	}
-
+	console.log('input value', value);
 	return (
 		<View>
 		<TextInput 

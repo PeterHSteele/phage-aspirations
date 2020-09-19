@@ -1,4 +1,4 @@
-import Matter, { Bodies, Body, Bounds, Composite, Detector, Engine } from 'matter-js';
+import Matter, { Bodies, Body, Bounds, Composite, Detector, Engine, World } from 'matter-js';
 import Rect from '../Rect';
 import constants from '../constants';
 const { BUBBLER } = constants;
@@ -11,6 +11,10 @@ export default class SetUpBodies {
 		this.world.gravity.y = 0;
 		this.height = height;
 		this.width = width
+	}
+
+	clearWorld(){
+		World.clear( this.world );
 	}
 
 	getWalls(){

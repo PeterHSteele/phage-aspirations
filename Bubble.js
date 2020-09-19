@@ -5,7 +5,7 @@ import constants from './constants';
 const { MAUVE, ORANGE, SEAGREEN, GRAYGREEN, BLUE } = constants
 
 const RADIUS = 30;
-export const Bubble = function({ body, active, radius, dest, border, start, flashFrames }){
+export const Bubble = function({ body, active, radius, dest, border, start, flashFrames, germs, leuks }){
 	//if ( flashFrames.colors.length ) console.log( flashFrames.colors[0] );
 	return (
 

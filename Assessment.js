@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, FlatList, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, FlatList, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import AssessmentInput from "./AssessmentInput";
 import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
@@ -47,12 +47,14 @@ function Assessment({ goals, submitAssessment }){
                 disabled={ disableSubmit } 
                 style={[
                     styles.button, 
-                    { backgroundColor: disableSubmit ? '#ddd' : MAUVE} 
+                    { backgroundColor: disableSubmit ? '#aaa' : MAUVE} 
                 ]} 
                 onPress={submit} >
                     <Text style={[styles.text, styles.buttonText]}>Submit Assessment</Text>
                 </TouchableOpacity>
             </View>
+
+            <StatusBar hidden={true} />
         </View>
     )
 }

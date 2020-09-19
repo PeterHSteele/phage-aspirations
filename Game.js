@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 import SetUpEntities from './functions/class-setup-entities';
 import SystemsHelpers from './functions/class-systems-helpers';
-const { MIDNIGHTBLUE , GREEN, GERMR, GRAYGREEN, SEAGREEN , CONTROLSHEIGHT, STAGINGHEIGHT, BUBBLER, MAUVE, LIGHTBLUE, DARKPURPLE, ORANGE, PURPLE, GERM , BUBBLE, LEUK, DESTCONTROL, LEUKS, GERMS, WIN, LOSE, BUBBLEPRESS, CONTROLS } = constants;
+const { MIDNIGHTBLUE , STOP, STOPPED, GREEN, GERMR, GRAYGREEN, SEAGREEN , CONTROLSHEIGHT, STAGINGHEIGHT, BUBBLER, MAUVE, LIGHTBLUE, DARKPURPLE, ORANGE, PURPLE, GERM , BUBBLE, LEUK, DESTCONTROL, LEUKS, GERMS, WIN, LOSE, BUBBLEPRESS, CONTROLS } = constants;
 
 //simplify allocations algorithm
 	//allow for bubble - to - bubble transfers
@@ -47,30 +47,50 @@ class Game extends React.PureComponent{
 		switch ( e.type ){
 			case WIN: this.refs.engine.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, LIGHTBLUE )); break;
 			case LOSE: this.refs.engine.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, DARKPURPLE )); break;
+			case STOP: this.refs.engine.stop();
+			case STOPPED: 
+				/*console.log( 'game', this.props.game, 'fn', this.props.completeDay );*/ 
+				this.props.completeDay();
 			default: return;
 		}
 
 	}
 
-	render(){		
-		//alert( mGerms[0].type);
+	render(){	
+		const { leuks } = this.props,
+		germs = this.props.goals.length * 2 + this.props.difficulty;
+		let entities = this.props.entities;
+		if ( ! entities ){
+			entities = this.setUpEntities.newLeuksAndGerms(
+				this.setUpEntities.initGetEntities( 
+					leuks, 
+					germs,
+					this.props.saveEntities 
+				), 
+				leuks, 
+				germs,
+				true
+			)			
+		} else if ( entities && this.props.renderGame ) {
+			//console.log( 'entities prop names', Object.keys( entities) );
+			entities = this.setUpEntities.newLeuksAndGerms(
+				this.setUpEntities.refreshControls( 
+					entities,
+					leuks,
+					germs
+				),
+				leuks,
+				germs,
+			);
+		}
+		
 		return (
 			<GameEngine
 				style={styles.container}
 				systems={ [ Physics, PressGerm, MoveLeuk, MoveGerm, Fight, ToggleModal, DoubleGerms, CheckContainerClose ] }
 				ref='engine'
 				onEvent={this.handleEvent}
-				entities={
-					this.setUpEntities.newLeuksAndGerms(
-						this.setUpEntities.initGetEntities( 
-							this.props.leuks, 
-							this.props.difficulty+7 
-						), 
-						this.props.leuks, 
-						this.props.difficulty + 7,
-						true
-					)
-				}>
+				entities={entities}>
 
 				<StatusBar hidden={true} />
 				

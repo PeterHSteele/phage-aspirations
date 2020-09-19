@@ -67,6 +67,8 @@ const PressGerm = (entities, { touches, screen, dispatch }) => {
 			return entities;
 		}
 
+		//if ( phase == 'r') console.log('press allos', entities.controls.germAllocations )
+
 		let { pageX, pageY } = t.event,
 			center,
 			props,
@@ -220,11 +222,12 @@ const Start = ( entities, { touches} ) => {
 export { Start }
 */
 const Fight = ( entities, { touches, time, dispatch } ) => {
-	
+	//if ( Math.random() < .01 ) console.log(entities.controls.allocations);
 	//if ( keys.find( key => newEntities[key].active ) || keys.find( key => newEntities[key].freeToMove ) ){
 	if ( ! entities.controls || entities.controls.gameOver || entities.controls.phase != 'b' ) {
 		return entities;
 	}
+	//if (Math.random() < .015 ) console.log('right after', entities.controls.germAllocations);
 	const keys = Object.keys( entities )
 	let { controls, modal, endGame } = entities;
 
@@ -274,6 +277,12 @@ const Fight = ( entities, { touches, time, dispatch } ) => {
 			const cells = keys.filter( key => bubble[type].indexOf( key ) != -1 );
 			//if (type === GERMS) alert(bubble[type]);
 			let removed = bubble[type].pop();
+			if ( ! bubble[type].length ){
+				bubble.flashFrames = {
+					time: 0,
+					colors:[],
+				}
+			}
 			
 			//alert(removed);
 
@@ -499,10 +508,12 @@ const MoveGerm = ( entities, {touches} ) => {
 		helpers.applyForceMove( entities, entities[moverId], moverId );
 		return entities
 	}
-	let allocations = germAllocations
+	let allocations = germAllocations;
+	//console.log('allos',allocations)
 	if ( ! Object.keys(allocations).length ) { 
 		//alert( 'leuks: ' + entities.controls.bubbleState[0].leuks );
-		allocations = placeGerms( entities.controls.newGerms, entities.controls.bubbleState );
+		//console.log('inside the conidtional we shouldnt be inside of');
+		allocations = placeGerms( entities.controls.germs, entities.controls.bubbleState );
 		entities.controls.germAllocations = allocations; 
 	}
 	let bubbleKeys = Object.keys( allocations );
@@ -514,7 +525,7 @@ const MoveGerm = ( entities, {touches} ) => {
 		//console.log( destId );
 		if ( ! destId ){ /*alert(Object.keys(allocations).reduce((a,b) => allocations[a] + allocations[b], 0 ))*/ alert(Object.keys(allocations).map( key => allocations[key]))}
 		let dest = entities[destId];
-		
+		//if( !destId)console.log( 'destId', allocations );
 		let newMoverId = newGermKeys[0];
 		let newMover = entities[newMoverId]
 		newMover.active = true;
@@ -537,6 +548,7 @@ const MoveGerm = ( entities, {touches} ) => {
 			newMover.body.collisionFilter = matterFunctions.getInterBubbleCellFilter();
 			helpers.velocityMove( entities, newMover, newMoverId );
 		} else {
+		//console.log('right before', entities.controls.germAllocations)
 		entities.controls.phase = 'b';
 		}
 	} 

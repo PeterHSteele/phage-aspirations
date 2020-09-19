@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, FlatList, Text, StyleSheet, TouchableOpacity, Picker } from 'react-native';
-import{ Input, ListItem } from 'react-native-elements';
+import{ ListItem, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 import constants from './constants';
 const { MAUVE, GRAYGREEN } = constants;
 
 const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, startAssessment }){
+
+    let [ addGoalInputVal, updateInputVal ] = useState('');
 
     const getDate = () => {
         const today = new Date();
@@ -27,20 +29,31 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
 
     const renderItem = ( { item } ) =>{
         return <ListItem 
-            buttonGroup={{
+            /*buttonGroup={{
              buttons:[ 'done' ],
              buttonStyle: {backgroundColor: MAUVE},
              textStyle: {color:'#fff'},
              onPress:()=>markComplete(item.id)
-           }}
+           }}*/
             title={item.name}/>
+    }
+
+    const handleSubmitAddGoal = ({nativeEvent}) =>{
+      addGoal(addGoalInputVal)
+      updateInputVal('')
+    }
+
+    const handleAddGoalInputChange = ( text ) => {
+      updateInputVal( text );
     }
 
     return (
     <View style={styles.container}>
        <Input 
-          onSubmitEditing={ addGoal }
+          onSubmitEditing={handleSubmitAddGoal}
+          onChangeText={handleAddGoalInputChange}
           inputStyle={styles.textInput}
+          value={addGoalInputVal}
           placeholder={'new goal'} />
         <FlatList
         renderItem={renderItem} 
