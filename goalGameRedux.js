@@ -27,9 +27,9 @@ const initialState = {
 	loggedIn:true,
 	game: false,
 	gameOver: false,
-	assessment: false,
+	assessment: true,
 	score: .6,
-	difficulty: 1,
+	difficulty: 3,
 	renderGame: true
 };
 
@@ -112,6 +112,7 @@ export const reducer = function( state = initialState, action ){
 				goals:[...state.goals, {id: state.goals.length, name: action.data}]
 			};
 		case types.CHANGEDIFFICULTY:
+			console.log('difficulty', action.data);
 			return {
 				...state,
 				difficulty: action.data

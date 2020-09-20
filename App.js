@@ -22,6 +22,9 @@ Instructions
   Make it clear you can realign
 Come up with singular version of new leuks message
 Zoom in on parts of battlefield?
+
+BUGS TO FIX:
+computer realignments sometimes fly in the wrong direction
 */
 
 export default function App( props ) {

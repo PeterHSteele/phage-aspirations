@@ -10,7 +10,7 @@ export default class SetUpBodies {
 		this.world = this.engine.world;
 		this.world.gravity.y = 0;
 		this.height = height;
-		this.width = width
+		this.width = width;
 	}
 
 	clearWorld(){

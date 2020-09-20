@@ -475,15 +475,12 @@ const DoubleGerms = ( entities, { time } ) => {
 		return {...entities,gameOver:{...entities.gameOver, doubleTime:time.current}};
 	} else if ( time.current - doubleTime > 3000) {
 		//alert( entities.gameOver.body.position.y);
+		
 		return {
 			...entities,
 			gameOver:{ ...entities.gameOver, count: count * 2, doubleTime: time.current },
-			...entities.draw.doubleGerms(
-				entities[0].radius, 
-				entities[0].background, 
-				entities.physics.world, 
-				entities, 
-				count
+			...helpers.doubleGerms(
+				entities
 			)
 		};
 	} else {

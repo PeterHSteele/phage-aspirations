@@ -4,9 +4,10 @@ Some of these are called each frame as well, but some are utilities called only
 under specific conditions.
 */
 
-import { Body, Composite, Detector, Vector } from 'matter-js'
+import { Body, Bodies, Composite, Detector, Vector, World } from 'matter-js';
 import constants from '../constants';
 import placeGerms from '../placeGerms';
+import SetUpEntities from './class-setup-entities';
 const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE, BUBBLE, STOP, LIGHTMAUVE, LIGHTBLUE } = constants;
 
 export default class SystemsHelpers{
@@ -21,6 +22,14 @@ export default class SystemsHelpers{
 
 	slope = ( [x1,y1], [x2,y2] ) => {
 		return ( y2 - y1 ) / ( x2 - x1 );
+	}
+
+	random( max ){
+		return Math.random() * max;
+	}
+
+	randomBool(){
+		return Math.random() > .49;
 	}
 
 	distance = ( [x1,y1], [x2,y2] ) => {
@@ -106,7 +115,7 @@ export default class SystemsHelpers{
 
 	velocityMove( es, mover ){
 		const { velocity }= mover.body;
-		if ( Math.abs( velocity.x ) > .002 || Math.abs( velocity.y ) > .002 ){
+		if ( Math.abs( velocity.x ) > .005 || Math.abs( velocity.y ) > .005 ){
 			return;
 		}
 
@@ -201,8 +210,8 @@ export default class SystemsHelpers{
 			if ( body.id != 'bubble' ) {
 				Composite.remove( bubble.composite, body );
 			}
-		} )
-		octagon = this.matterFunctions.octagon( bubble.radius );
+		} );
+		const octagon = this.matterFunctions.octagon( bubble.radius ),
 		rects = this.matterFunctions.makeOctagonRects( bubble.body.position.x, bubble.body.position.y, octagon );
 		Composite.add( bubble.composite, rects );
 	}
@@ -260,6 +269,37 @@ export default class SystemsHelpers{
 		modal.visible = true;
 		console.log('at the source', entities.controls.germAllocatio)
 		return draw.newLeuksAndGerms( entities , controls.newLeuks, controls.newGerms );
+	}
+
+	doubleGerms( entities ){
+		const germKeys = Object.keys( entities )
+			.filter( key =>  entities[key].type === 'germ' )
+			.map( key => key * 1),
+		
+			{ random, randomBool } = this;
+		
+		let currentLength = germKeys.length, 
+			newEntities = {}
+		
+		germKeys.forEach( (key,i) => {
+			const { x, y } = entities[key].body.position;
+			const body = Bodies.circle( x, y, entities[0].radius );
+			newEntities[key + currentLength] = SetUpEntities.gameOverGerm( entities[0].background, body, entities[0].radius );
+			World.add( entities.physics.world, body )
+			
+			const xDir = randomBool() ? 1: -1,
+			yDir = randomBool() ? 1 : -1,
+			xMag = random( .0005 ),
+			yMag = random( .0005 ),
+			vector = { 
+				x: xDir * xMag, 
+				y: yDir * yMag
+			}
+			Body.applyForce( body, body.position, vector )
+		})
+		entities.gameOver.count += currentLength;
+		entities.gameOver.doubleTime = 0;
+		return {...entities, ...newEntities };
 	}
 
 }

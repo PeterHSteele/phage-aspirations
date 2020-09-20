@@ -5,8 +5,9 @@ const { CONTROLSHEIGHT, STAGINGHEIGHT, GRAYGREEN, LIGHTBLUE, PURPLE, CONTROLS, B
 import Rect from '../Rect';
 import { Germ } from '../Germ';
 import Controls from '../Controls';
-import { Body, World, Bodies, Vector, Composite } from 'matter-js';
+import Matter, { Body, World, Bodies, Vector, Composite } from 'matter-js';
 import StatusModal from '../Modal';
+import GameOver from '../GameOver';
 
 export default class SetUpEntities {
 	constructor( width, height, setUpBodies, helpers ){
@@ -203,8 +204,12 @@ export default class SetUpEntities {
 		return bubbles;
 	}
 
-	getGameOverEntities( gameOverFn, color = MIDNIGHTBLUE, radius = width/30, engine, world ){
-		World.clear( world, false, true );
+	getGameOverEntities( gameOverFn, color = MIDNIGHTBLUE ){
+		const { width, height, setUpBodies } = this,
+		{ engine, world}  = setUpBodies, 
+		radius = width/30;
+		
+		Matter.World.clear( world, false, true );
 		let newEntities = {
 			physics:{
 				engine, 
@@ -214,7 +219,7 @@ export default class SetUpEntities {
 
 		let options = {collisionFilter: { group: 1}, isStatic: true};
 		
-		const rect = Matter.Bodies.rectangle( width/4, height/4, width/2, height/2, options)
+		const rect = Matter.Bodies.rectangle( width/2, height/2, width/2, height/2, options)
 
 		rect.render.strokeStyle="#ff4500"
 		rect.render.lineWidth=4
@@ -229,15 +234,14 @@ export default class SetUpEntities {
 			message:'game over',
 			body: rect,
 			renderer: GameOver,
-			offset: Vector.sub(rect.bounds.min, rect.position)
 		}
 
 		let left, right, top, bottom;
 
-		left = Bodies.rectangle(-1,0,1,height,options);
-		right = Bodies.rectangle(width, 0,1, height, options);
-		top = Bodies.rectangle( 0, -1, width, 1, options);
-		bottom = Bodies.rectangle(0,height, width, 1, options)
+		left = Matter.Bodies.rectangle(-1,height/2,2,height,options);
+		right = Matter.Bodies.rectangle(width+1, height/2,2, height, options);
+		top = Matter.Bodies.rectangle( width/2, -1, width, 2, options);
+		bottom = Matter.Bodies.rectangle( width/2, height + 1, width, 2, options)
 
 		newEntities.left = {
 			type: 'bound',
@@ -247,7 +251,6 @@ export default class SetUpEntities {
 			width: 1,
 			color: 'purple',
 			renderer: Rect,
-			offset: Vector.sub(left.bounds.min, left.position)
 		}
 		newEntities.top = {
 			type: 'bound',
@@ -257,7 +260,6 @@ export default class SetUpEntities {
 			width: width,
 			color: '#ff4500',
 			renderer: Rect,
-			offset: Vector.sub(top.bounds.min, top.position)
 		}
 		newEntities.right = {
 			type: 'bound',
@@ -267,7 +269,6 @@ export default class SetUpEntities {
 			width: 1,
 			color: '#ff4500',
 			renderer: Rect,
-			offset: Vector.sub(right.bounds.min, right.position)
 		}
 
 		newEntities.bottom = {
@@ -278,18 +279,18 @@ export default class SetUpEntities {
 			width: width,
 			color: '',
 			renderer: Rect,
-			offset: Vector.sub(bottom.bounds.min, bottom.position)
 		}
 
 		let bodies = [rect, left, right, top, bottom];
 
 		bodies.forEach(body=>{
-			let offset = Vector.sub(body.bounds.min, body.position)
-			Body.setPosition(body, { x: body.position.x - offset.x - radius, y: body.position.y - offset.y-radius});
-			World.add( world, body );
+			Matter.World.add( world, body );
 		})
 
+			
+
 		new Array( 2 ).fill(false).forEach((e,i)=>{
+
 			let x = Math.random() * width - radius,
 			//y = i == 0 ? .125 * height - radius : .875 * height - radius ;
 			y = ( .125 * height ) + ( .75 * height * i ) - radius;
@@ -297,25 +298,21 @@ export default class SetUpEntities {
 			let body = Bodies.circle( x, y, radius, {
 				collisionFilter:{
 					group: 1,
-				},
-				render:{
-					lineWidth: 2
 				}
 			})
 
 			bodies.push( body );
 			World.add( world, body ); 
 
-			newEntities[i] = {
-				background: color,
-				body: body,
-				radius,
-				renderer: Germ 
-			}
+			newEntities[i] = this.constructor.gameOverGerm( color, body, radius);
 
 		})
-
+		
 		return newEntities;
+	}
+
+	static gameOverGerm( background, body, radius ){
+		return { background, body, radius, renderer: Germ, type: 'germ' };
 	}
 
 	placeGerms ( newGerms, bubbleState ) {

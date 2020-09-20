@@ -1,13 +1,13 @@
 import React, { Component } from  'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-export default function GameOver({ message, gameOver, body, radius, width, height, offset, handlePress}){
+export default function GameOver({ message, gameOver, body, radius, width, height, handlePress}){
 	//if (Math.random()<.005){alert(/*'x: ' + body.position.x + ' y: '+body.position.y*/body.collisionFilter.group )}
 	return (
 		<View
 		style={[ styles.container ,{ 
-			top: body.position.y + offset.y + radius, 
-			left: body.position.x + offset.x + radius, 
+			top: body.position.y - height/2, 
+			left: body.position.x - width/2, 
 			width: width, 
 			height: height,
 			paddingTop: height/3 - 26,
