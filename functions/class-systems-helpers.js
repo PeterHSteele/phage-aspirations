@@ -36,80 +36,31 @@ export default class SystemsHelpers{
 		return Math.hypot(Math.abs(y2-y1),Math.abs(x2-x1));
 	}
 
-	move( es, mover, moverId ){
-		
-		let dist = this.distance( [mover.body.position.x, mover.body.position.y], [mover.destination[1], mover.destination[0]] );
-		let vector = this.slope( [mover.body.position.x, mover.body.position.y], [mover.destination[1], mover.destination[0]] );
-		let velocity = 4/Math.abs(vector); 
-		
-		let nextCoords = mover.body.position.x < mover.destination[1] ? 
-			[ mover.body.position.y + (velocity * vector), mover.body.position.x + velocity ] :
-			[ mover.body.position.y - (velocity * vector), mover.body.position.x - velocity ];
-		let nextDist = this.distance( [nextCoords[1], nextCoords[0]], [mover.destination[1], mover.destination[0]]);
+	/*
+	Selects the next germ to move and sets its destination
+	and collisionFilter properties to allow it to do so.
 
-		if ( dist > es[0].radius ){
-			Matter.Body.setPosition( mover.body,{
-				x: nextCoords[1],
-				y: nextCoords[0]
-			})
-        
-		}
-		else {
-			Matter.Body.applyForce( mover.body, mover.body.position, {
-				x: nextCoords[1] > mover.body.position.x ? .0001 : -.0001,
-				y: nextCoords[0] > mover.body.position.y ? .0001 : -.0001,
-			})
-			//mover.body.collisionFilter = SetUpBodies.getInnerCellFilter();
+	entities       Object      the game entities
+	bubbleKeys     Array       keys for the bubble entities
+	allocations    Object      Instructions for how many germs should go to each bubble. Takes form of { bubbleKey: int }
+	source 	       Array	   the germs eligible to move
+	fromBubble	   Bool 	   whether germ is already located in a bubble, in which case its collision filter must be changed.
+	*/
 
-			/*Matter.Body.setPosition(mover.body, {
-				x: mover.destination[1],
-				y: mover.destination[0]
-			});*/
-			/*Matter.Body.setVelocity( mover.body, {
-				x: 0,
-				y: 0
-			})*/
-			mover.active = false;
-			
-			//mover.freeToMove = false;
-
-			const destinationId=mover.destination[2];
-			const bubble = es[destinationId];
-			Matter.Composite.add( bubble.composite, mover.body )
-
-			const updateBubbleContents = ( cellType ) => {
-			  if ( mover.bubble > -1 ){
-			  	let inCurrentBubble = es[mover.bubble][cellType];
-			  	let moverIndex = inCurrentBubble.indexOf( moverId );
-			  	inCurrentBubble.splice( moverIndex, 1);
-			
-			  } else {
-			  	 es.controls[cellType]--;
-			  }
-			 
-			  bubble[cellType].push( moverId );
-			  
-			  mover.bubble = destinationId;
-			  //scale body if need be
-			  if ( bubble.leuks.length + bubble.germs.length === SIZES[bubble.size + 1] ){
-				let constraints = Matter.Composite.allConstraints( es.physics.world ).filter( constraint => {
-					return bubble.leuks.indexOf( constraint ) > -1 || bubble.germs.indexOf( constraint ) > -1;
-				})
-			  	scaleBody( bubble, true, constraints );
-			  }
-			}
-
-			updateBubbleContents( mover.type + 's' );
-
-			if ( es.controls.phase == 'p' && es.controls.leuks + es.controls.germs == 0 ){
-				es.controls.phase = 'b';
-				es.controls.history.push('b')
-			}
-			
-			mover.destination = []
-			
-			es.controls.leuksAreAllocated = checkIfLeuksAreAllocated( es, Object.keys( es ) );
-			
+	prepareMover( entities, bubbleKeys, allocations, source, fromBubble ){
+		let destId = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length < allocations[bubbleKey] )
+		//console.log( destId );
+		if ( ! destId ){ /*alert(Object.keys(allocations).reduce((a,b) => allocations[a] + allocations[b], 0 ))*/ alert(Object.keys(allocations).map( key => allocations[key]))}
+		let dest = entities[destId];
+		//if( !destId)console.log( 'destId', allocations );
+		let newMoverId = source[0];
+		let newMover = entities[newMoverId]
+		newMover.active = true;
+		let { x, y } = dest.body.position;
+		newMover.destination = [ y , x , destId ];
+		this.velocityMove( entities, newMover, newMoverId);
+		if (fromBubble){
+			newMover.collisionFilter = matterFunctions.getInterBubbleCellFilter();
 		}
 	}
 
@@ -236,12 +187,31 @@ export default class SystemsHelpers{
 	totalLeuksInGame( bubbleState ){
 		return Object.keys( bubbleState ).reduce((a,b)=>a + bubbleState[b].leuks.length, 0)
 	}
-/*
-	initiateFight( entities ){
-		entities.controls.phase = 'b';
-		this.getBubbleKeys( entities ).forEach( key =>  entities[key].active = true );
+
+	/*
+	removeCell
+
+	removes a cell killed during battle phase from the board
+
+	entities 	Object 		The game entities
+	keys	 	Object		keys for game entities
+	bubble	   	Object	 	Bubble entity in which fight is occuring
+	type		String      type of cell to remove
+	*/
+
+	removeCell( entities, keys, bubble, type ){
+		const cells = keys.filter( key => bubble[type].indexOf( key ) != -1 );
+		let removed = bubble[type].pop();
+		if ( ! bubble[type].length ){
+			bubble.flashFrames = {
+				time: 0,
+				colors:[],
+			}
+		}
+		Composite.remove( entities.physics.world, entities[removed].body );
+		delete entities[removed];
+		return entities;
 	}
-*/
 
 	startRealignment( entities, dispatch ){
 		let { controls, physics, draw, modal } = entities;

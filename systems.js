@@ -270,41 +270,14 @@ const Fight = ( entities, { touches, time, dispatch } ) => {
 		else{
 			threshold = germPercentage;
 		}
+		
+		//pick whether to remove germ or leuk
+		const type = Math.round( Math.random() * 100 ) ? GERMS : LEUKS;
+		helpers.removeCell( entities, keys, bubble, type );
 
-		const seed = Math.round( Math.random() * 100 );
-
-		const removeCell = ( type ) => {
-			const cells = keys.filter( key => bubble[type].indexOf( key ) != -1 );
-			//if (type === GERMS) alert(bubble[type]);
-			let removed = bubble[type].pop();
-			if ( ! bubble[type].length ){
-				bubble.flashFrames = {
-					time: 0,
-					colors:[],
-				}
-			}
-			
-			//alert(removed);
-
-			/*if ( entities.controls.history.filter( e => e == 'b').length == 2 ){
-				
-				alert(removed)
-			} */
-			
-			Matter.Composite.remove( entities.physics.world, entities[removed].body );
-			
-			delete entities[removed];
-		}
-
-		if ( seed > threshold ){
-			removeCell( GERMS );
-		} else {
-			removeCell( LEUKS );
-		}
 	})
 
 	return entities;
-
 } 
 
 export { Fight }
@@ -352,109 +325,7 @@ const MoveLeuk = ( es, {touches} ) => {
 
 	if ( mover ){
 		helpers.velocityMove( es, mover, moverId );
-		/*
-		let prevConstraint = Matter.Composite.allConstraints( es.physics.world ).find( constraint => constraint.id === moverId );
-		
-		if ( prevConstraint ){
-			Matter.Composite.remove( es.physics.world, prevConstraint );
-		}
-
-		//alert('inside');
-		/*let destPos = [dest.body.position.y, dest.body.position.x];
-		let destCoordY = destPos[0] + dest.radius - mover.radius 
-		let destCoordX = destPos[1] + dest.radius - mover.radius;*/
-		//alert('destcoordx: ' +destCoordX);
-		//if ( mover.flag) alert(mover.pos[0]);
-		/*let dist = distance( [mover.body.position.x, mover.body.position.y], [mover.destination[1], mover.destination[0]] );
-		let vector = slope( [mover.body.position.x, mover.body.position.y], [mover.destination[1], mover.destination[0]] );
-		let velocity = 4/Math.abs(vector); */
-		/*if ( Math.abs(vector) > 2 ){
-			velocity = .8;
-		} else if ( Math.abs( vector ) < 1 ){
-			velocity = 1.6;
-		} else {
-			velocity = 2.4;
-		}*/
-		//alert('vector: ' + vector)
-		/*let nextCoords = mover.body.position.x < mover.destination[1] ? 
-			[ mover.body.position.y + (velocity * vector), mover.body.position.x + velocity ] :
-			[ mover.body.position.y - (velocity * vector), mover.body.position.x - velocity ];
-		let nextDist = distance( [nextCoords[1], nextCoords[0]], [mover.destination[1], mover.destination[0]]);
-		
-		if ( dist > nextDist ){
-			Matter.Body.setPosition( mover.body,{
-				x: nextCoords[1],
-				y: nextCoords[0]
-			})
-        
-		}
-		else {
-			//alert( 'destination bodyY: ' + es[mover.destination[2]].body.position.y + ' mover destinationY: ' + mover.destination[0]);
-			Matter.Body.setPosition(mover.body, {
-				x: mover.destination[1],
-				y: mover.destination[0]
-			});
-			mover.active = false;
-			//mover.freeToMove = false;
-			mover.moves++;
-
-			const destinationId=mover.destination[2];
-			const bubble = es[destinationId];
-
-			const updateBubbleContents = ( cellType ) => {
-			  if ( mover.bubble > -1 ){
-			  	let inCurrentBubble = es[mover.bubble][cellType];
-			  	let moverIndex = inCurrentBubble.indexOf( moverId );
-			  	inCurrentBubble.splice( moverIndex, 1);
-			
-			  } else {
-			  	 es.controls[cellType]--;
-			  }
-			  
-			  es[destinationId][cellType].push( moverId );
-			  mover.bubble = destinationId;
-			  if ( es[destinationId].leuks.length + es[destinationId].germs.length === SIZES[bubble.size + 1] ){
-			  	let constraints = Matter.Composite.allConstraints( es.physics.world ).filter( constraint => {
-					return bubble.leuks.indexOf( constraint ) > -1 || bubble.germs.indexOf( constraint ) > -1;
-				})
-			  	scaleBody( bubble, true, constraints );
-			  }
-			}
-
-			
-
-			updateBubbleContents( mover.type + 's' );
-
-			if ( es.controls.phase == 'p' && es.controls.leuks + es.controls.germs == 0 ){
-				es.controls.phase = 'b';
-				es.controls.history.push('b')
-			}
-
-			var bubbleConstraint = Matter.Constraint.create(
-			{
-				bodyA: mover.body,
-				bodyB: bubble.body,
-				pointA: { x: mover.radius, y: mover.radius},
-				pointB: { x: bubble.radius, y: bubble.radius},
-				length: mover.radius * 2 - 1,//placeholder, should change this to something that makes more sense,
-				stiffness: .2,
-				id: moverId
-			}
-		)
-			/*let constraints = Matter.Composite.allConstraints( es.physics.world );
-			if (constraints.length){
-				alert(constraints[constraints.length-1].id)
-			}*/
-			
-			//Matter.World.add(es.physics.world, bubbleConstraint)
-		
-		//}
-
-
 	}
-	//})
-
-	
 	
 	return es;
 }
@@ -501,10 +372,6 @@ const MoveGerm = ( entities, {touches} ) => {
 	const germs = keys.filter( key => entities[key].type == GERM );
 	//return if destination already set
 	let moverId = germs.find( germ => entities[germ].active );
-	if ( moverId ){
-		helpers.applyForceMove( entities, entities[moverId], moverId );
-		return entities
-	}
 	let allocations = germAllocations;
 	//console.log('allos',allocations)
 	if ( ! Object.keys(allocations).length ) { 
@@ -518,22 +385,12 @@ const MoveGerm = ( entities, {touches} ) => {
 	let newGermKeys = keys.filter( key => entities[key].type == GERM && entities[key].bubble < 0 )
 
 	if ( newGermKeys.length ){
-		let destId = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length < allocations[bubbleKey] )
-		//console.log( destId );
-		if ( ! destId ){ /*alert(Object.keys(allocations).reduce((a,b) => allocations[a] + allocations[b], 0 ))*/ alert(Object.keys(allocations).map( key => allocations[key]))}
-		let dest = entities[destId];
-		//if( !destId)console.log( 'destId', allocations );
-		let newMoverId = newGermKeys[0];
-		let newMover = entities[newMoverId]
-		newMover.active = true;
-		let { x, y } = dest.body.position;
-		let adjustment = dest.radius - newMover.radius
-		newMover.destination = [ y , x , destId ];
-		helpers.velocityMove( entities, newMover, newMoverId);
+		helpers.prepareMover( entities, bubbleKeys, allocations, newGermKeys, false );
 	} else {
 		let overflowBubble = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length > allocations[bubbleKey] );
 		if ( overflowBubble ){
-			let destId = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length < allocations[bubbleKey] )
+			helpers.prepareMover( entities, bubbleKeys, allocations, overflowBubble.germs, true );
+			/*let destId = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length < allocations[bubbleKey] )
 			let dest = entities[destId];
 			let newMoverId = entities[overflowBubble].germs[0]
 			let newMover = entities[newMoverId]
@@ -543,7 +400,7 @@ const MoveGerm = ( entities, {touches} ) => {
 			let adjustment = dest.radius - newMover.radius;
 			newMover.destination = [ y + adjustment, x + adjustment, destId ];
 			newMover.body.collisionFilter = matterFunctions.getInterBubbleCellFilter();
-			helpers.velocityMove( entities, newMover, newMoverId );
+			helpers.velocityMove( entities, newMover, newMoverId );*/
 		} else {
 		//console.log('right before', entities.controls.germAllocations)
 		entities.controls.phase = 'b';
@@ -572,16 +429,6 @@ const CheckContainerClose = ( entities ) => {
 		return entities;
 	}
 	const active = entities[activeKey];
-	//if ( Math.random() < .005 ) console.log( 'this far', Matter.Detector.canCollide( matterFunctions.getBubbleFilter(), SetUpBodies.getOuterCellFilter() ));
-	/*const bubbleKeys = keys.filter( key => entities[key].type === BUBBLE );
-	bubbleKeys.forEach( bubbleKey => {
-		//console.log( 'detector body', matterFunctions.getBody(entities[bubbleKey].composite, 'detector') );
-		if ( matterFunctions.isInside( entities[bubbleKey].body , entities[activeKey].body ) ){
-			console.log('setting',/* Matter.Detector.canCollide( matterFunctions.getContainerFilter(), SetUpBodies.getInnerCellFilter() ))
-			entities[activeKey].body.collisionFilter = SetUpBodies.getInnerCellFilter();
-		}
-	});
-	*/
 	const destinationId = active.destination[2],
 		  destination 	= entities[destinationId];
 
