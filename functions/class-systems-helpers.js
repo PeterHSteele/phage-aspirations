@@ -141,8 +141,8 @@ export default class SystemsHelpers{
 	}
 
 	getBubbleState( entities ){
-		let bubbleState = {}
-		let bubbleKeys = Object.keys(entities).filter(key=>entities[key].type==BUBBLE);
+		let bubbleState = {},
+			bubbleKeys = this.getBubbleKeys(entities);
 		bubbleKeys.forEach( e => {
 			bubbleState[e] = {
 				...entities[e], 

@@ -1,7 +1,7 @@
 import React from 'react';
 import constants from '../constants';
 import { Bubble } from '../Bubble';
-const { CONTROLSHEIGHT, STAGINGHEIGHT, GRAYGREEN, LIGHTBLUE, PURPLE, CONTROLS, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE } = constants;
+const { CONTROLSHEIGHT, STAGINGHEIGHT, GRAYGREEN, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
 import Controls from '../Controls';
@@ -112,67 +112,61 @@ export default class SetUpEntities {
 
 	newLeuksAndGerms( entities, leuks, germs, init = false ){
 		const { controls, physics } = entities;
-		const { width, height, setUpBodies } = this;
+		const { width, height, setUpBodies } = this;;
 		const staging = {
 			//complete:false,
 			germs: {
 				germs:{},
 				x: width/2,
 				y: 20,
-				r: GERMR,
-				bodies: [],
 			},
 			leuks:{
 				leuks:{},
 				x: width/2,
-				r: GERMR,
 				y: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
-				bodies: [],
-			},
-			bubbleCount: BUBBLECOUNT,
+			}
 		}
-		let bubbles = {};
+		let bubbles = {},
+			bonusCells = {};
 		if ( init ){
 			bubbles = this.getBubbles( BUBBLECOUNT );
 			entities.controls.bubbleState = this.helpers.getBubbleState( bubbles ); 
 		} else {
-
+			//console.log('bubbleState', controls.bubbleState);
+			bonusCells = this.bonusCells( 
+				entities,
+				this.getAvailableIds( 
+					Object.keys(entities), 
+					BUBBLECOUNT 
+				)
+			)
+			
+			entities={
+				...entities,
+				...bonusCells
+			}
+			entities.controls.bubbleState = this.helpers.getBubbleState(entities);
 		}
 		let cellsToAdd = leuks + germs;
-		let availableIds = [];
-		let highestCellId = controls.cellRange[1],
-			lowestCellId = controls.cellRange[0];
-	
-		for ( let i = lowestCellId; i <= highestCellId; i++ ){
-			if ( ! entities[i] ){
-				availableIds.push(i);
-				cellsToAdd--;
-			}
-			if ( ! cellsToAdd ){
-				break;
-			}
-		}
-	
-		if ( cellsToAdd ){
-			while ( cellsToAdd ){
-				highestCellId++;
-				availableIds.push( highestCellId );
-				cellsToAdd--;
-			}
-		}
-	
+		//console.log('es',Object.keys(entities).filter(e => new Number(e) * 1 < 20 ));
+		let availableIds = this.getAvailableIds(
+			Object.keys(entities),
+			cellsToAdd
+		);
+		//console.log('aid', availableIds);
 		let newCells = {};
 		//if ( ! init ) console.log( 'availableIds', availableIds );
 		availableIds.forEach( ( e, i ) => {
 			let type = i < controls.newGerms ? GERMS : LEUKS;
-			let { x, y, r, bodies } = staging[type]; 
-			let mCell = Bodies.circle( x, y, r, {
+			let { x, y } = staging[type]; 
+			let mCell = Bodies.circle( x, y, GERMR, {
 				collisionFilter: setUpBodies.getOuterCellFilter(),
 			});
 			World.add( physics.world, mCell);
-			newCells[e] = { 
+			newCells[e] = this.newCell( GERMR, mCell, type.slice(0,4), -1);
+			/*newCells[e] = { 
 				pos: [y, x],
-				radius: r,
+				radius: GERMR,
 				body: mCell,
 				active: false,
 				destination: [],
@@ -182,24 +176,77 @@ export default class SetUpEntities {
 				flag: true,
 				moves: 0,
 				freeToMove: true,
-				renderer: <Germ />
-			}
+				renderer: <Germ /
+			}>*/
 		});
-		controls.cellRange[1] = highestCellId;
-		return {...entities,...newCells,...bubbles}
+		return {...entities,...newCells,...bubbles,}
 	
 	}
 
-	bonusCells(){
+	newCell( radius, body, type, bubble ){
+		return {
+			pos: [50, 50],
+			radius,
+			body,
+			active: false,
+			destination: [],
+			type,
+			bubble,
+			background: type == GERM ? DARKPURPLE : LIGHTBLUE,
+			renderer: <Germ />
+		}
+	}
 
+	/*
+	getAvailableIds
+
+	Finds lowest `count` integers with no game entity assigned to them.
+
+	keys 	Array		game entity keys
+	count 	Number 		number of new ids needed
+	*/
+
+	getAvailableIds( keys, count ){
+		let ids = [], 
+			id = BUBBLECOUNT; 
+		while ( count ){
+			if ( keys.indexOf('' + id) < 0 ){
+				ids.push(id);
+				count--;;
+			}
+			id++;
+		}
+		return ids;
+	}
+
+	bonusCells( entities, ids ){
+		const bonusCells = {},
+			  { bubbleState } = entities.controls, 
+			  collisionFilter = this.setUpBodies.getInnerCellFilter(),
+			  options = { collisionFilter };
+		Object.keys(bubbleState).forEach( (key, index) => {
+			const bubble = bubbleState[key],
+			{ x, y } = bubble.body.position,
+			mCell = Bodies.circle( x -GERMR, y -GERMR, GERMR, options ),
+			id = ids[index],
+			type = bubble.germs.length > bubble.leuks.length ? GERM : LEUK;
+			console.log('germ length', bubble.germs, 'leuk length', bubble.leuks, 'type', type)
+			bonusCells[id] = this.newCell( GERMR, mCell, type, key );
+			World.add( entities.physics.world, mCell );
+			//console.log('bubbleprops', Object.keys(bubble));
+			bubble[type+'s'].push(id);
+		});
+		return bonusCells;
 	}
 
 	refreshControls( entities, leuks, germs ){
 		entities.controls.germs = germs;
 		entities.controls.leuks = leuks;
-		const bubbleState = this.helpers.getBubbleState( entities );
-		entities.controls.bubbleState = bubbleState;
-		entities.controls.germAllocations = this.placeGerms( germs, bubbleState );
+		/*const bubbleState = this.helpers.getBubbleState( entities );
+		entities.controls.bubbleState = bubbleState;*/
+		entities.modal.visible = true;
+		entities.modal.message = "Bonuses awarded for holding a bubble overnight";
+		entities.controls.germAllocations = {};
 		return entities;
 	}
 

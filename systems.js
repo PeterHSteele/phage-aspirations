@@ -231,8 +231,8 @@ const Fight = ( entities, { touches, time, dispatch } ) => {
 		}
 		
 		//pick whether to remove germ or leuk
-		const type = Math.round( Math.random() * 100 ) ? GERMS : LEUKS;
-		helpers.removeCell( entities, keys, bubble, type );
+		const type = Math.round( Math.random() * 100 ) < threshold ? GERMS : LEUKS;
+		entities = helpers.removeCell( entities, keys, bubble, type );
 
 	})
 
@@ -274,7 +274,6 @@ const MoveLeuk = ( es, {touches} ) => {
 			setDestCoords( next, dest, destId );
 		}
 	} else if ( dest && !mover ){
-		
 		let next = es[ids.find( id =>es[id].type === LEUK && es[id].bubble < 0 )];
 		if (! next){
 			return es;
@@ -402,6 +401,7 @@ const ToggleModal = ( entities ) => {
 		if ( modal.frames < 80 ){
 			modal.frames++
 		} else {
+			modal.frames = 0;
 			modal.visible = false
 		}
 
