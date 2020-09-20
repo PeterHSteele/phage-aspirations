@@ -49,25 +49,10 @@ export { Physics };
 
 const PressGerm = (entities, { touches, screen, dispatch }) => {
 	touches.filter( t => t.type === 'press' ).forEach( t => {
-		//alert(Object.keys(t.event.target))
-		//alert( 'press' );
-		/*if ( entities.controls.history.filter( e => e==='b').length > 1){
-			alert(Object.keys(entities).filter( key => entities[key].type === 'bubble' && entities[key].germs.length && entities[key].leuks.length ).length)
-		}*/
-		//alert(entities[0].body.render.fillStyle)
-		/*alert( Matter.Detector.canCollide(entities[0].body.collisionFilter, entities[4].body.collisionFilter))
-		const body = entities[Object.keys(entities).find(key => entities[key].type == BUBBLE )].body;
-		const { min, max } = body.bounds;
-		const { position } = body;
-		console.log( [min.x, min.y, max.x, max.y] )
-		console.log( [position.x, position.y] )*/
-
 		let { phase } = entities.controls ;
 		if ( phase == 'b' || phase == 'c' || entities.modal.visible ){
 			return entities;
 		}
-
-		//if ( phase == 'r') console.log('press allos', entities.controls.germAllocations )
 
 		let { pageX, pageY } = t.event,
 			center,
@@ -108,28 +93,12 @@ const PressGerm = (entities, { touches, screen, dispatch }) => {
 			}
 		}
 
-		/*
-		const bubbles = keys.filter(e => entities[e].status === 'bubble' );
-
-		bubbles.forEach(e=>{
-			Matter.Body.set( entities[e].body, {
-				collisionFilter: {
-					group: 2
-				}
-			})
-		})
-		*/
 		const destination = keys.find( id => entities[id].dest);
 		const active = keys.find( id => entities[id].active );
 		const freeToMove = keys.find( id => entities[id].freeToMove )
-		/*if ( active && destination || ! freeToMove ) {
-			return entities;
-		}*/
 
 		let closestEntityId = 0;
 		let closest = null;
-
-		
 
 		let included = [ BUBBLE, CONTROLS ];
 		for (let entity in entities){
@@ -148,7 +117,6 @@ const PressGerm = (entities, { touches, screen, dispatch }) => {
 					closest = eventDistance;
 					closestEntityId = entity;
 				}
-
 
 			}
 		}
@@ -211,16 +179,7 @@ const PressGerm = (entities, { touches, screen, dispatch }) => {
 }
 
 export { PressGerm };
-/*
-const Start = ( entities, { touches} ) => {
-	touches.filter( t => t.type === 'start' ).forEach( t => {
-		alert('start')
-	})
-	return entities
-}
 
-export { Start }
-*/
 const Fight = ( entities, { touches, time, dispatch } ) => {
 	//if ( Math.random() < .01 ) console.log(entities.controls.allocations);
 	//if ( keys.find( key => newEntities[key].active ) || keys.find( key => newEntities[key].freeToMove ) ){
@@ -338,27 +297,22 @@ const DoubleGerms = ( entities, { time } ) => {
 		return entities;
 	}
 
-	let { count, renderer, doubleTime } = entities.gameOver;
+	let { count, doubleTime } = entities.gameOver;
 
 	if ( ! doubleTime ){
-		//if (Math.random()<.005){alert(entities.gameOver.doubleTime)};
-		//doubleTime = time.current;
 		return {...entities,gameOver:{...entities.gameOver, doubleTime:time.current}};
 	} else if ( time.current - doubleTime > 3000) {
-		//alert( entities.gameOver.body.position.y);
-		
 		return {
 			...entities,
 			gameOver:{ ...entities.gameOver, count: count * 2, doubleTime: time.current },
-			...helpers.doubleGerms(
-				entities
-			)
+			...helpers.doubleGerms( entities )
 		};
 	} else {
 		return entities;
 	}
-
 }
+
+export { DoubleGerms };
 
 const MoveGerm = ( entities, {touches} ) => {
 	if (entities.gameOver){
@@ -410,10 +364,7 @@ const MoveGerm = ( entities, {touches} ) => {
 	return entities;
 }
 
-
-
 export { MoveGerm }
-export { DoubleGerms };
 
 const CheckContainerClose = ( entities ) => {
 	if (! entities.controls ){
