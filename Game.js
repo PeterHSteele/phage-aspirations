@@ -57,31 +57,13 @@ class Game extends React.PureComponent{
 	}
 
 	render(){	
-		const { leuks } = this.props,
+		const { leuks, difficulty, saveEntities } = this.props,
 		germs = this.props.goals.length * 2 + this.props.difficulty;
 		let entities = this.props.entities;
 		if ( ! entities ){
-			entities = this.setUpEntities.newLeuksAndGerms(
-				this.setUpEntities.initGetEntities( 
-					leuks, 
-					germs,
-					this.props.saveEntities 
-				), 
-				leuks, 
-				germs,
-				true
-			)			
+			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs, saveEntities );
 		} else if ( entities && this.props.renderGame ) {
-			//console.log( 'entities prop names', Object.keys( entities) );
-			entities = this.setUpEntities.newLeuksAndGerms(
-				this.setUpEntities.refreshControls( 
-					entities,
-					leuks,
-					germs
-				),
-				leuks,
-				germs,
-			);
+			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs );
 		}
 		
 		return (

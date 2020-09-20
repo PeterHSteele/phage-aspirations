@@ -12,7 +12,6 @@ import GoalGame from './src/Goal-Game.js';
 Todo: 
 Bonuses for capturing certain bubbles overnight
 Remove goals
-fix game over entities
 improve physics animations
   -bubble
   -Make germ movement more idosyncratic

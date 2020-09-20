@@ -14,6 +14,31 @@ export default class SetUpEntities {
 		Object.assign( this, { width, height, setUpBodies, helpers })
 	}
 
+	buildEntitiesObject( entities, leuks, germs, saveEntities ){
+		if ( !entities ){
+			return this.newLeuksAndGerms(
+				this.initGetEntities( 
+					leuks, 
+					germs,
+					saveEntities 
+				), 
+				leuks, 
+				germs,
+				true
+			);
+		} else {
+			return this.newLeuksAndGerms(
+				this.refreshControls( 
+					entities,
+					leuks,
+					germs
+				),
+				leuks,
+				germs,
+			);
+		}
+	}
+
 	initGetEntities( leuks, germs, saveEntities, entities = {} ){
 		const { width, height, setUpBodies } = this,
 		{ engine, world } 					 = setUpBodies,
@@ -110,6 +135,8 @@ export default class SetUpEntities {
 		if ( init ){
 			bubbles = this.getBubbles( BUBBLECOUNT );
 			entities.controls.bubbleState = this.helpers.getBubbleState( bubbles ); 
+		} else {
+
 		}
 		let cellsToAdd = leuks + germs;
 		let availableIds = [];
@@ -161,6 +188,10 @@ export default class SetUpEntities {
 		controls.cellRange[1] = highestCellId;
 		return {...entities,...newCells,...bubbles}
 	
+	}
+
+	bonusCells(){
+
 	}
 
 	refreshControls( entities, leuks, germs ){
