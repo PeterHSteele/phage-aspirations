@@ -48,11 +48,11 @@ export default class SystemsHelpers{
 	*/
 
 	prepareMover( entities, bubbleKeys, allocations, source, fromBubble ){
-		let destId = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length < allocations[bubbleKey] )
+		let destId = bubbleKeys.find( bubbleKey =>  entities[bubbleKey].germs.length < allocations[bubbleKey] );
 		//console.log( destId );
-		if ( ! destId ){ /*alert(Object.keys(allocations).reduce((a,b) => allocations[a] + allocations[b], 0 ))*/ alert(Object.keys(allocations).map( key => allocations[key]))}
+		//if ( ! destId ){ /*alert(Object.keys(allocations).reduce((a,b) => allocations[a] + allocations[b], 0 ))*/ alert(Object.keys(allocations).map( key => allocations[key]))}
 		let dest = entities[destId];
-		//if( !destId)console.log( 'destId', allocations );
+		//if( !destId)console.log( 'germslength', entities[destId].germs );
 		let newMoverId = source[0];
 		let newMover = entities[newMoverId]
 		newMover.active = true;
@@ -200,7 +200,6 @@ export default class SystemsHelpers{
 	*/
 
 	removeCell( entities, keys, bubble, type ){
-		const cells = keys.filter( key => bubble[type].indexOf( key ) != -1 );
 		let removed = bubble[type].pop();
 		if ( ! bubble[type].length ){
 			bubble.flashFrames = {
@@ -238,7 +237,7 @@ export default class SystemsHelpers{
 		modal.frames = 0;
 		modal.visible = true;
 		console.log('at the source', entities.controls.germAllocatio)
-		return draw.newLeuksAndGerms( entities , controls.newLeuks, controls.newGerms );
+		return draw.newLeuksAndGerms( controls.newLeuks, controls.newGerms );
 	}
 
 	doubleGerms( entities ){

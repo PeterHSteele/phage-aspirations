@@ -16,7 +16,7 @@ export default class SetUpEntities {
 
 	buildEntitiesObject( entities, leuks, germs, saveEntities ){
 		if ( !entities ){
-			return this.newLeuksAndGerms(
+			/*return this.newLeuksAndGerms(
 				this.initGetEntities( 
 					leuks, 
 					germs,
@@ -25,21 +25,52 @@ export default class SetUpEntities {
 				leuks, 
 				germs,
 				true
-			);
-		} else {
-			return this.newLeuksAndGerms(
-				this.refreshControls( 
-					entities,
-					leuks,
-					germs
+			);*/
+			const bubbles = this.getBubbles( BUBBLECOUNT );
+			return {
+				...this.getMetaEntities( 
+					leuks, 
+					germs,
+					saveEntities,
+					bubbles 
 				),
-				leuks,
-				germs,
-			);
+				...bubbles,
+				...this.newLeuksAndGerms( 
+					leuks, 
+					germs, 
+					new Array( BUBBLECOUNT )
+						.fill(false)
+						.map((e,i) => i )),
+			}
+		} else {
+			const keys = Object.keys(entities),
+				  bonusIds = this.getAvailableIds(
+					//keys.map(e=>e-0).filter(e=>e).sort((a,b)=>a-b), 
+					keys,
+					BUBBLECOUNT
+				  );
+			entities.controls.bubbleState = this.helpers.getBubbleState( entities );
+			const bonusCells = this.bonusCells( entities, bonusIds )
+			//console.log('bonusIds', Object.keys(bonusCells));
+			//this.mapLog(bonusCells,'type')
+			//const keysArg = keys.map(e=>e-0).filter(e=>e).concat(bonusIds).sort((a,b)=>a-b);
+			//console.log('keysArg',keysArg)
+			entities = {
+				...entities,
+				
+				...bonusCells,
+				...this.newLeuksAndGerms( leuks, germs, keys.concat(bonusIds), entities.physics.world )
+			}
+			//console.log(Object.keys(entities).map( key => entities[key].type));
+			return entities;
 		}
 	}
 
-	initGetEntities( leuks, germs, saveEntities, entities = {} ){
+	mapLog(obj,prop){
+		console.log(Object.keys(obj).map( key => obj[key][prop]));
+	}
+
+	getMetaEntities( leuks, germs, saveEntities, bubbles ){
 		const { width, height, setUpBodies } = this,
 		{ engine, world } 					 = setUpBodies,
 		controlsBody 						 = Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT ),
@@ -60,10 +91,12 @@ export default class SetUpEntities {
 
 		return {
 						physics: {
+							type: 'physics',
 							engine,
 							world
 						},
 						draw:{
+							type: 'draw',
 							newLeuksAndGerms: this.newLeuksAndGerms.bind(this),
 						},
 						staging:{
@@ -79,7 +112,6 @@ export default class SetUpEntities {
 							renderer: <Rect />
 						},
 						controls: { 
-							cellRange: [ BUBBLECOUNT, BUBBLECOUNT + germs + leuks - 1 ],
 							type: CONTROLS,
 							body: controlsBody,
 							width: width,
@@ -89,7 +121,7 @@ export default class SetUpEntities {
 							germs,
 							newLeuks: leuks,
 							newGerms: germs,
-							bubbleState: {},
+							bubbleState: this.helpers.getBubbleState( bubbles ),
 							germAllocations:{},
 							bubbleCount: BUBBLECOUNT,
 							leuksAreAllocated: false,
@@ -101,6 +133,7 @@ export default class SetUpEntities {
 							renderer: <Controls /> 
 						},
 						modal: {
+							type: 'modal',
 							message: 'You get ' + leuks + ' leuks!' ,
 							visible: false,
 							frames: 0,
@@ -110,76 +143,33 @@ export default class SetUpEntities {
 		}
 	}
 
-	newLeuksAndGerms( entities, leuks, germs, init = false ){
-		const { controls, physics } = entities;
-		const { width, height, setUpBodies } = this;;
-		const staging = {
-			//complete:false,
-			germs: {
-				germs:{},
-				x: width/2,
-				y: 20,
-			},
-			leuks:{
-				leuks:{},
-				x: width/2,
-				y: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
-			}
+	newLeuksAndGerms( leuks, germs, keys, world = this.setUpBodies.world ){
+		const { width, height, setUpBodies } = this;
+		const yS = {
+			germs: 20,
+			leuks: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
 		}
-		let bubbles = {},
-			bonusCells = {};
-		if ( init ){
-			bubbles = this.getBubbles( BUBBLECOUNT );
-			entities.controls.bubbleState = this.helpers.getBubbleState( bubbles ); 
-		} else {
-			//console.log('bubbleState', controls.bubbleState);
-			bonusCells = this.bonusCells( 
-				entities,
-				this.getAvailableIds( 
-					Object.keys(entities), 
-					BUBBLECOUNT 
-				)
-			)
 			
-			entities={
-				...entities,
-				...bonusCells
-			}
-			entities.controls.bubbleState = this.helpers.getBubbleState(entities);
-		}
 		let cellsToAdd = leuks + germs;
-		//console.log('es',Object.keys(entities).filter(e => new Number(e) * 1 < 20 ));
+		console.log('keys',keys)
 		let availableIds = this.getAvailableIds(
-			Object.keys(entities),
+			keys,
 			cellsToAdd
 		);
-		//console.log('aid', availableIds);
+		console.log('aids',availableIds);
 		let newCells = {};
-		//if ( ! init ) console.log( 'availableIds', availableIds );
+		
 		availableIds.forEach( ( e, i ) => {
-			let type = i < controls.newGerms ? GERMS : LEUKS;
-			let { x, y } = staging[type]; 
+			let type = i < germs ? GERMS : LEUKS;
+			let x = width/2,
+			y = yS[type]; 
 			let mCell = Bodies.circle( x, y, GERMR, {
 				collisionFilter: setUpBodies.getOuterCellFilter(),
 			});
-			World.add( physics.world, mCell);
+			World.add( world, mCell);
 			newCells[e] = this.newCell( GERMR, mCell, type.slice(0,4), -1);
-			/*newCells[e] = { 
-				pos: [y, x],
-				radius: GERMR,
-				body: mCell,
-				active: false,
-				destination: [],
-				type: type.slice(0,4),
-				bubble: -1,
-				background: type == GERMS ? DARKPURPLE : LIGHTBLUE,
-				flag: true,
-				moves: 0,
-				freeToMove: true,
-				renderer: <Germ /
-			}>*/
 		});
-		return {...entities,...newCells,...bubbles,}
+		return newCells;
 	
 	}
 
@@ -207,10 +197,17 @@ export default class SetUpEntities {
 	*/
 
 	getAvailableIds( keys, count ){
+		keys=keys
+				/*attempt to convert keys to numbers*/
+				.map(e=>e-0)
+				/*remove non-numeric keys by filtering those that couldn't be converted*/
+				.filter(e=>e)
+				/*sort ascending*/
+				.sort((a,b)=>a-b);
 		let ids = [], 
 			id = BUBBLECOUNT; 
 		while ( count ){
-			if ( keys.indexOf('' + id) < 0 ){
+			if ( keys.indexOf(id) < 0 ){
 				ids.push(id);
 				count--;;
 			}
@@ -230,7 +227,7 @@ export default class SetUpEntities {
 			mCell = Bodies.circle( x -GERMR, y -GERMR, GERMR, options ),
 			id = ids[index],
 			type = bubble.germs.length > bubble.leuks.length ? GERM : LEUK;
-			console.log('germ length', bubble.germs, 'leuk length', bubble.leuks, 'type', type)
+			//console.log('germ length', bubble.germs, 'leuk length', bubble.leuks, 'type', type)
 			bonusCells[id] = this.newCell( GERMR, mCell, type, key );
 			World.add( entities.physics.world, mCell );
 			//console.log('bubbleprops', Object.keys(bubble));
@@ -239,14 +236,14 @@ export default class SetUpEntities {
 		return bonusCells;
 	}
 
-	refreshControls( entities, leuks, germs ){
+	refreshMetaEntities( entities, leuks, germs ){
 		entities.controls.germs = germs;
 		entities.controls.leuks = leuks;
-		/*const bubbleState = this.helpers.getBubbleState( entities );
-		entities.controls.bubbleState = bubbleState;*/
+		//const bubbleState = this.helpers.getBubbleState( entities );
+		//entities.controls.bubbleState = bubbleState;
 		entities.modal.visible = true;
 		entities.modal.message = "Bonuses awarded for holding a bubble overnight";
-		entities.controls.germAllocations = {};
+		entities.controls.germAllocations = this.placeGerms( germs, entities.controls.bubbleState );
 		return entities;
 	}
 

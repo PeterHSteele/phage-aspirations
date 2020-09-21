@@ -40,7 +40,7 @@ const modalGameOverStyle = {
 }
 */
 const Physics = (entities, { time }) => {
-    let engine = entities["physics"].engine;
+    let engine = entities.physics.engine;
     Matter.Engine.update(engine, time.delta);
     return entities;
 }
@@ -229,7 +229,6 @@ const Fight = ( entities, { touches, time, dispatch } ) => {
 		else{
 			threshold = germPercentage;
 		}
-		
 		//pick whether to remove germ or leuk
 		const type = Math.round( Math.random() * 100 ) < threshold ? GERMS : LEUKS;
 		entities = helpers.removeCell( entities, keys, bubble, type );
