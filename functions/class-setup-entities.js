@@ -16,16 +16,6 @@ export default class SetUpEntities {
 
 	buildEntitiesObject( entities, leuks, germs, saveEntities ){
 		if ( !entities ){
-			/*return this.newLeuksAndGerms(
-				this.initGetEntities( 
-					leuks, 
-					germs,
-					saveEntities 
-				), 
-				leuks, 
-				germs,
-				true
-			);*/
 			const bubbles = this.getBubbles( BUBBLECOUNT );
 			return {
 				...this.getMetaEntities( 
@@ -45,24 +35,34 @@ export default class SetUpEntities {
 		} else {
 			const keys = Object.keys(entities),
 				  bonusIds = this.getAvailableIds(
-					//keys.map(e=>e-0).filter(e=>e).sort((a,b)=>a-b), 
 					keys,
 					BUBBLECOUNT
 				  );
+			
+			const [ bonusCells, cellArrays ] =  this.bonusCells(
+				entities,
+				bonusIds,
+			)
+			Object.assign(
+				entities,
+				bonusCells,
+				this.newLeuksAndGerms( leuks, germs, keys.concat(bonusIds), entities.physics.world )	
+			);
+			Object.keys(cellArrays).forEach( bubbleKey => {
+					  const type = cellArrays[bubbleKey][0],
+					  id = cellArrays[bubbleKey][1]
+				entities[bubbleKey][type].push(id);
+			});
 			entities.controls.bubbleState = this.helpers.getBubbleState( entities );
-			const bonusCells = this.bonusCells( entities, bonusIds )
-			//console.log('bonusIds', Object.keys(bonusCells));
-			//this.mapLog(bonusCells,'type')
-			//const keysArg = keys.map(e=>e-0).filter(e=>e).concat(bonusIds).sort((a,b)=>a-b);
-			//console.log('keysArg',keysArg)
-			entities = {
-				...entities,
-				
-				...bonusCells,
-				...this.newLeuksAndGerms( leuks, germs, keys.concat(bonusIds), entities.physics.world )
-			}
-			//console.log(Object.keys(entities).map( key => entities[key].type));
-			return entities;
+			/*const testBubbleState = this.helpers.getBubbleState( entities );
+			Object.keys(testBubbleState).forEach( key => {
+				if (bubbleState[key].leuks.length){
+					console.log('leuks lenght',bubbleState[key].leuks.length)
+				} else {
+					console.log('germs length', bubbleState[key].germs.length);
+				}
+			})*/
+			return this.refreshMetaEntities(entities, leuks, germs);
 		}
 	}
 
@@ -144,20 +144,18 @@ export default class SetUpEntities {
 	}
 
 	newLeuksAndGerms( leuks, germs, keys, world = this.setUpBodies.world ){
-		const { width, height, setUpBodies } = this;
-		const yS = {
-			germs: 20,
-			leuks: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
-		}
+		const { width, height, setUpBodies } = this,
+			  yS = {
+				germs: 20,
+				leuks: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
+			  }
 			
-		let cellsToAdd = leuks + germs;
-		console.log('keys',keys)
-		let availableIds = this.getAvailableIds(
-			keys,
-			cellsToAdd
-		);
-		console.log('aids',availableIds);
-		let newCells = {};
+		let cellsToAdd = leuks + germs,
+			availableIds = this.getAvailableIds(
+				keys,
+				cellsToAdd
+			),
+			newCells = {};
 		
 		availableIds.forEach( ( e, i ) => {
 			let type = i < germs ? GERMS : LEUKS;
@@ -194,6 +192,8 @@ export default class SetUpEntities {
 
 	keys 	Array		game entity keys
 	count 	Number 		number of new ids needed
+
+	@return ids 	Array		the lowest ids available for assignment
 	*/
 
 	getAvailableIds( keys, count ){
@@ -218,7 +218,9 @@ export default class SetUpEntities {
 
 	bonusCells( entities, ids ){
 		const bonusCells = {},
-			  { bubbleState } = entities.controls, 
+			  bubbleState = this.helpers.getBubbleState(entities),
+			  bubbleIds = Object.keys(bubbleState),
+			  cellArrays = Object.fromEntries(bubbleIds.map(e=>[e,null])),
 			  collisionFilter = this.setUpBodies.getInnerCellFilter(),
 			  options = { collisionFilter };
 		Object.keys(bubbleState).forEach( (key, index) => {
@@ -231,19 +233,41 @@ export default class SetUpEntities {
 			bonusCells[id] = this.newCell( GERMR, mCell, type, key );
 			World.add( entities.physics.world, mCell );
 			//console.log('bubbleprops', Object.keys(bubble));
-			bubble[type+'s'].push(id);
+			//ie, cellArrays[0]=[germs,9]
+			cellArrays[key]=[type+'s',id]
 		});
-		return bonusCells;
+		return [
+			bonusCells,
+			cellArrays
+		]
 	}
 
+	/*
+	Restores the inital values of some meta entities
+	at the beginning of a new day's session.
+
+	entities	Object		the game entities
+	leuks		Number		amount of new leuks for the day
+	germs		Number		amount of new germs for the day
+
+	@return entities	Object		the updated game entities
+	*/
+
 	refreshMetaEntities( entities, leuks, germs ){
-		entities.controls.germs = germs;
-		entities.controls.leuks = leuks;
-		//const bubbleState = this.helpers.getBubbleState( entities );
-		//entities.controls.bubbleState = bubbleState;
-		entities.modal.visible = true;
-		entities.modal.message = "Bonuses awarded for holding a bubble overnight";
-		entities.controls.germAllocations = this.placeGerms( germs, entities.controls.bubbleState );
+		const controls = {
+			germs,
+			leuks,
+			leuksAreAllocated: false,
+			germAllocations: {}
+		};
+
+		const modal = {
+			visible: true,
+			message: "Bonuses awarded for holding a bubble overnight"
+		};
+
+		Object.assign( entities.controls, controls);
+		Object.assign( entities.modal, modal )
 		return entities;
 	}
 

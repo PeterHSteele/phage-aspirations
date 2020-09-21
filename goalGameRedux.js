@@ -29,7 +29,7 @@ const initialState = {
 	gameOver: false,
 	assessment: true,
 	score: .6,
-	difficulty: 3,
+	difficulty: 1,
 	renderGame: true
 };
 

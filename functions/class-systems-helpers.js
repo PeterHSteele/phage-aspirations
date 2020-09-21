@@ -50,7 +50,7 @@ export default class SystemsHelpers{
 	prepareMover( entities, bubbleKeys, allocations, source, fromBubble ){
 		let destId = bubbleKeys.find( bubbleKey =>  entities[bubbleKey].germs.length < allocations[bubbleKey] );
 		//console.log( destId );
-		//if ( ! destId ){ /*alert(Object.keys(allocations).reduce((a,b) => allocations[a] + allocations[b], 0 ))*/ alert(Object.keys(allocations).map( key => allocations[key]))}
+		if ( ! destId ){ /*alert(Object.keys(allocations).reduce((a,b) => allocations[a] + allocations[b], 0 ))*/ alert(Object.keys(allocations).map( key => allocations[key]))}
 		let dest = entities[destId];
 		//if( !destId)console.log( 'germslength', entities[destId].germs );
 		let newMoverId = source[0];

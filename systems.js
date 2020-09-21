@@ -328,7 +328,7 @@ const MoveGerm = ( entities, {touches} ) => {
 	//console.log('allos',allocations)
 	if ( ! Object.keys(allocations).length ) { 
 		//alert( 'leuks: ' + entities.controls.bubbleState[0].leuks );
-		//console.log('inside the conidtional we shouldnt be inside of');
+		console.log(entities.controls.germs, Object.keys(entities.controls.bubbleState).map( key => entities[key].germs.length));
 		allocations = placeGerms( entities.controls.germs, entities.controls.bubbleState );
 		entities.controls.germAllocations = allocations; 
 	}

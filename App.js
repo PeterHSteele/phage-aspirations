@@ -11,6 +11,7 @@ import GoalGame from './src/Goal-Game.js';
 /*
 Todo: 
 Bonuses for capturing certain bubbles overnight
+  * +1 animation for bonus bubbles
 Remove goals
 improve physics animations
   -bubble
