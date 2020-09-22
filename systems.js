@@ -231,7 +231,7 @@ const Fight = ( entities, { touches, time, dispatch } ) => {
 		}
 		//pick whether to remove germ or leuk
 		const type = Math.round( Math.random() * 100 ) > threshold ? GERMS : LEUKS;
-		entities = helpers.removeCell( entities, bubble, type );
+		helpers.removeCell( entities, bubble, type );
 
 	})
 

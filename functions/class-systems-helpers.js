@@ -209,7 +209,6 @@ export default class SystemsHelpers{
 		}
 		Composite.remove( entities.physics.world, entities[removed].body );
 		delete entities[removed];
-		return entities;
 	}
 
 	startRealignment( entities, dispatch ){
@@ -217,7 +216,7 @@ export default class SystemsHelpers{
 		const bubbleState = this.getBubbleState( entities );
 		entities.controls.phase = 'r';
 		
-		if ( this.totalLeuksInGame(bubbleState) < 4 ){
+		if ( this.totalLeuksInGame(bubbleState) < 10 ){
 			dispatch({ type: STOP })
 			controls.saveEntities( entities )
 			return entities;

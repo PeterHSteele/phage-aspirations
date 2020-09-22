@@ -7,6 +7,9 @@ const { MAUVE, ORANGE, SEAGREEN, GRAYGREEN, BLUE } = constants
 const RADIUS = 30;
 export const Bubble = function({ body, active, radius, dest, border, start, flashFrames, germs, leuks }){
 	//if ( flashFrames.colors.length ) console.log( flashFrames.colors[0] );
+	const dimensionsBubble = radius * 2.4,
+		  dimensionsInner  = radius * 2.8,
+		  dimensionsOuter  = radius * 3.2; 
 	return (
 
 		<View style={[
@@ -14,10 +17,10 @@ export const Bubble = function({ body, active, radius, dest, border, start, flas
 			{
 				top: body.position.y - radius * 1.5,
 				left: body.position.x - radius * 1.5,
-				width: radius * 3,
-				height: radius * 3,
-				radius: radius * 3,
-				borderRadius: radius * 3,
+				width: dimensionsOuter,
+				height: dimensionsOuter,
+				radius: dimensionsOuter,
+				borderRadius: dimensionsOuter,
 				borderColor: flashFrames.colors[0] || GRAYGREEN
 			}
 		]}>
@@ -26,10 +29,10 @@ export const Bubble = function({ body, active, radius, dest, border, start, flas
 			{
 				top: .2* radius -5,//.1 * radius  -2.5,
 				left: .2* radius -5,//.1 * radius  -2.5,
-				width: radius * 2.6,
-				height: radius * 2.6,
-				radius: radius * 2.6,
-				borderRadius: radius * 2.6,
+				width: dimensionsInner,
+				height: dimensionsInner,
+				radius: dimensionsInner,
+				borderRadius: dimensionsInner,
 				borderColor: flashFrames.colors[1] || GRAYGREEN
 			}]}>
 				<View 
@@ -38,9 +41,9 @@ export const Bubble = function({ body, active, radius, dest, border, start, flas
 					{
 						top: .2* radius -5,//.2 * radius,//m
 						left: .2 * radius -5,//.2 * radius,
-						width: radius * 2.2,
-						height: radius * 2.2,
-						borderRadius: radius * 2.2,
+						width: dimensionsBubble,
+						height: dimensionsBubble,
+						borderRadius: dimensionsBubble,
 						borderColor: dest ? SEAGREEN : start ? MAUVE : border,
 					}
 				]} />

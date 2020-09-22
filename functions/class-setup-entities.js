@@ -294,7 +294,7 @@ export default class SetUpEntities {
 						start: false,
 						germs: [],
 						leuks: [],
-						type:BUBBLE,
+						type: BUBBLE,
 						renderer: <Bubble />
 					}
 	
