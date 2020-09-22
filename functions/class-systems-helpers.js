@@ -188,15 +188,14 @@ export default class SystemsHelpers{
 		return Object.keys( bubbleState ).reduce((a,b)=>a + bubbleState[b].leuks.length, 0)
 	}
 
-	/*
-	removeCell
+	/** 
+	* removeCell
+	* removes a cell killed during battle phase from the board
 
-	removes a cell killed during battle phase from the board
-
-	entities 	Object 		The game entities
-	keys	 	Object		keys for game entities
-	bubble	   	Object	 	Bubble entity in which fight is occuring
-	type		String      type of cell to remove
+	@param entities 	Object 		The game entities
+	@param bubble	   	Object	 	Bubble entity in which fight is occuring
+	@param type			String      type of cell to remove
+	@return void
 	*/
 
 	removeCell( entities, bubble, type ){
@@ -212,11 +211,14 @@ export default class SystemsHelpers{
 	}
 
 	startRealignment( entities, dispatch ){
-		let { controls, physics, draw, modal } = entities;
-		const bubbleState = this.getBubbleState( entities );
-		entities.controls.phase = 'r';
+		const { controls, physics, draw, modal } = entities,
+			  bubbleState = this.getBubbleState( entities ),
+		 	  leuksInGame = this.totalLeuksInGame( bubbleState );
 		
-		if ( this.totalLeuksInGame(bubbleState) < 10 ){
+		entities.controls.phase = 'r';
+
+		/*if number of leuks has decreased or increased by 40% today, end today's session.*/
+		if ( leuksInGame <= controls.pauseThreshold[0] || leuksInGame >= controls.pauseThreshold[1] ){
 			dispatch({ type: STOP })
 			controls.saveEntities( entities )
 			return entities;

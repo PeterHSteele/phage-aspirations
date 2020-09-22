@@ -49,7 +49,7 @@ class Game extends React.PureComponent{
 			case LOSE: this.refs.engine.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, DARKPURPLE )); break;
 			case STOP: this.refs.engine.stop();
 			case STOPPED: 
-				/*console.log( 'game', this.props.game, 'fn', this.props.completeDay );*/ 
+				console.log( 'stopped' ); 
 				this.props.completeDay();
 			default: return;
 		}
@@ -60,10 +60,8 @@ class Game extends React.PureComponent{
 		const { leuks, difficulty, saveEntities } = this.props,
 		germs = this.props.goals.length * 2 + this.props.difficulty;
 		let entities = this.props.entities;
-		if ( ! entities ){
+		if ( this.props.renderGame ){
 			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs, saveEntities );
-		} else if ( entities && this.props.renderGame ) {
-			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs );
 		}
 		
 		return (

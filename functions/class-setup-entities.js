@@ -54,15 +54,7 @@ export default class SetUpEntities {
 				entities[bubbleKey][type].push(id);
 			});
 			entities.controls.bubbleState = this.helpers.getBubbleState( entities );
-			/*const testBubbleState = this.helpers.getBubbleState( entities );
-			Object.keys(testBubbleState).forEach( key => {
-				if (bubbleState[key].leuks.length){
-					console.log('leuks lenght',bubbleState[key].leuks.length)
-				} else {
-					console.log('germs length', bubbleState[key].germs.length);
-				}
-			})*/
-			return this.constructor.refreshMetaEntities(entities, leuks, germs);
+			return this.refreshMetaEntities(entities, leuks, germs);
 		}
 	}
 
@@ -112,6 +104,7 @@ export default class SetUpEntities {
 							renderer: <Rect />
 						},
 						controls: { 
+							pauseThreshold: this.getPauseThreshold( leuks ),
 							type: CONTROLS,
 							body: controlsBody,
 							width: width,
@@ -242,23 +235,43 @@ export default class SetUpEntities {
 		]
 	}
 
-	/*
-	Restores the inital values of some meta entities
-	at the beginning of a new day's session.
+	/**
+	* Calculates the bounds below which or above which the game will be 
+	* paused for the day. 
+	
+	* The bounds represent a 40% increase or decrease in leuks
+	* compared to start of the day.
 
-	entities	Object		the game entities
-	leuks		Number		amount of new leuks for the day
-	germs		Number		amount of new germs for the day
+
+	@param leuks 	Number 		Total leuks in game at beginning of day
+	@return a length two array representing the lower and upper threshold.
+	*/
+
+	getPauseThreshold( leuks ){
+		return [ 
+			Math.floor( .6 * leuks ),
+			Math.ceil( 1.4 * leuks )
+		];
+	}
+
+	/** 
+	* Restores the inital values of some meta entities
+	* at the beginning of a new day's session.
+
+	@param entities		Object		the game entities
+	@param leuks		Number		amount of new leuks for the day
+	@param germs		Number		amount of new germs for the day
 
 	@return entities	Object		the updated game entities
 	*/
 
-	static refreshMetaEntities( entities, leuks, germs ){
+	refreshMetaEntities( entities, leuks, germs ){
 		const controls = {
 			germs,
 			leuks,
 			newGerms: germs,
 			newLeuks: leuks,
+			pauseThreshold: this.getPauseThreshold( leuks + this.helpers.totalLeuksInGame(entities.controls.bubbleState)),
 			leuksAreAllocated: false,
 			germAllocations: {}
 		};
