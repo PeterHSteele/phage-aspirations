@@ -10,7 +10,7 @@ import SetUpBodies from './functions/class-setup-bodies';
 import SystemsHelpers from './functions/class-systems-helpers';
 
 import constants from './constants';
-const { GERM , GERMS, LEUK, LEUKS, LIGHTGREEN, DESTCONTROL, BUBBLE, WIN, LOSE, BUBBLEPRESS, CONTROLS, STAGING, SIZES } = constants;
+const { GERM , GERMS, LEUK, LEUKS, LIGHTGREEN, DESTCONTROL, BUBBLE, WIN, LOSE, BUBBLEPRESS, CONTROLS, STAGING, SIZES, STOP } = constants;
 
 const distance = ( [x1,y1], [x2,y2] ) => {
 	return Math.hypot(Math.abs(y2-y1),Math.abs(x2-x1));
@@ -397,10 +397,9 @@ const ToggleModal = ( entities ) => {
 	if ( ! modal || ! modal.visible){
 		return entities;
 	}
-		if ( modal.frames < 80 ){
-			modal.frames++
+		if ( modal.frames > 0 ){
+			modal.frames--
 		} else {
-			modal.frames = 0;
 			modal.visible = false
 		}
 
@@ -408,3 +407,19 @@ const ToggleModal = ( entities ) => {
 }
 
 export { ToggleModal }
+
+const Transition = ( entities, { dispatch } ) => {
+	if ( entities.controls.phase != 't' ){
+		return entities;
+	}
+	
+	if ( entities.controls.transitionFrames == 1){
+		dispatch({ type: STOP });
+		entities.controls.saveEntities( entities );
+	}
+
+	entities.controls.transitionFrames--;
+	return entities;
+}
+
+export { Transition };

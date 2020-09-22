@@ -104,6 +104,7 @@ export default class SetUpEntities {
 							renderer: <Rect />
 						},
 						controls: { 
+							transitionFrames: 0,
 							pauseThreshold: this.getPauseThreshold( leuks ),
 							type: CONTROLS,
 							body: controlsBody,
@@ -244,12 +245,14 @@ export default class SetUpEntities {
 
 
 	@param leuks 	Number 		Total leuks in game at beginning of day
-	@return a length two array representing the lower and upper threshold.
+	@return a length three array representing the lower threshold, starting 
+			number of leuks, and upper threshold.
 	*/
 
 	getPauseThreshold( leuks ){
 		return [ 
 			Math.floor( .6 * leuks ),
+			leuks,
 			Math.ceil( 1.4 * leuks )
 		];
 	}
@@ -278,7 +281,8 @@ export default class SetUpEntities {
 
 		const modal = {
 			visible: true,
-			message: "Bonuses awarded for holding a bubble overnight"
+			message: "Bonuses awarded for holding a bubble overnight",
+			frames: 120
 		};
 
 		Object.assign( entities.controls, controls);
@@ -328,6 +332,9 @@ export default class SetUpEntities {
 			physics:{
 				engine, 
 				world
+			},
+			controls: {
+				phase: 'g'
 			}
 		}
 

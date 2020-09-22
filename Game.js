@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { AppRegistry, StyleSheet, StatusBar, Dimensions, useWindowDimensions } from 'react-native';
 import { GameEngine } from 'react-native-game-engine';
-import { PressGerm, MoveGerm, MoveLeuk, Fight, ToggleModal, DoubleGerms, Start, CheckContainerClose, Physics } from './systems';
+import { PressGerm, MoveGerm, MoveLeuk, Fight, ToggleModal, DoubleGerms, CheckContainerClose, Physics, Transition } from './systems';
 import { Bubble } from './Bubble';
 import DestinationControl from './DestinationControl';
 import { Germ } from './Germ';
@@ -49,7 +49,6 @@ class Game extends React.PureComponent{
 			case LOSE: this.refs.engine.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, DARKPURPLE )); break;
 			case STOP: this.refs.engine.stop();
 			case STOPPED: 
-				console.log( 'stopped' ); 
 				this.props.completeDay();
 			default: return;
 		}
@@ -67,7 +66,7 @@ class Game extends React.PureComponent{
 		return (
 			<GameEngine
 				style={styles.container}
-				systems={ [ Physics, PressGerm, MoveLeuk, MoveGerm, Fight, ToggleModal, DoubleGerms, CheckContainerClose ] }
+				systems={ [ Physics, PressGerm, MoveLeuk, MoveGerm, Fight, ToggleModal, DoubleGerms, CheckContainerClose, Transition ] }
 				ref='engine'
 				onEvent={this.handleEvent}
 				entities={entities}>

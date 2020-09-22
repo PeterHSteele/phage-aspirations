@@ -8,6 +8,7 @@ import { Body, Bodies, Composite, Detector, Vector, World } from 'matter-js';
 import constants from '../constants';
 import placeGerms from '../placeGerms';
 import SetUpEntities from './class-setup-entities';
+import { ListViewComponent } from 'react-native';
 const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE, BUBBLE, STOP, LIGHTMAUVE, LIGHTBLUE } = constants;
 
 export default class SystemsHelpers{
@@ -211,22 +212,26 @@ export default class SystemsHelpers{
 	}
 
 	startRealignment( entities, dispatch ){
-		const { controls, physics, draw, modal } = entities,
+		const { controls, draw } = entities,
 			  bubbleState = this.getBubbleState( entities ),
 		 	  leuksInGame = this.totalLeuksInGame( bubbleState );
 		
 		entities.controls.phase = 'r';
 
 		/*if number of leuks has decreased or increased by 40% today, end today's session.*/
-		if ( leuksInGame <= controls.pauseThreshold[0] || leuksInGame >= controls.pauseThreshold[1] ){
-			dispatch({ type: STOP })
-			controls.saveEntities( entities )
+		if ( leuksInGame <= controls.pauseThreshold[0] || leuksInGame >= controls.pauseThreshold[2] ){
+			const [modal, newControls] = this.prepareGamePauseTransition( controls, leuksInGame );
+			Object.assign(entities.modal, modal), 
+			Object.assign(entities.controls,newControls)
+			entities.controls.phase = 't';
+			//console.log('tFrames', entities.controls.transitionFrames);
 			return entities;
 		}
 
 		const newModal = {
 			message: 'You get ' + controls.newLeuks + ' new leuks!',
-			visible: true
+			visible: true, 
+			frames: 120
 		}
 
 		const newControls = {
@@ -244,6 +249,30 @@ export default class SystemsHelpers{
 			entities,
 			draw.newLeuksAndGerms( controls.newLeuks, controls.newGerms, Object.keys(entities) )
 		);
+	}
+
+	prepareGamePauseTransition( controls, leuksInGame ){
+		const start = controls.pauseThreshold[1],
+			  dir = start < leuksInGame ? 'up' : 'down',
+			  message = `Leuks have gone ${dir} today, from ${start} to ${leuksInGame}. We\'ll pick this up tomorrow.`;
+
+		const modal = {
+			message,
+			visible: true,
+			frames: 150 
+		};
+
+		const newControls = {
+			transitionFrames: 200,
+			phase: 't'
+		}
+
+		return [modal, newControls];
+	}
+
+	handleEndOfDay( data, dispatch, eodFn ){
+		dispatch({ type: STOP })
+		eodFn( data )
 	}
 
 	doubleGerms( entities ){
