@@ -26,7 +26,6 @@ Zoom in on parts of battlefield?
 
 BUGS TO FIX:
 computer realignments sometimes fly in the wrong direction
-Germs sometimes poke outside bubble
 */
 
 export default function App( props ) {

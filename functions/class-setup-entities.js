@@ -257,6 +257,8 @@ export default class SetUpEntities {
 		const controls = {
 			germs,
 			leuks,
+			newGerms: germs,
+			newLeuks: leuks,
 			leuksAreAllocated: false,
 			germAllocations: {}
 		};
