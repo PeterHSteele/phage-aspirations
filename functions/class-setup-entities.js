@@ -62,7 +62,7 @@ export default class SetUpEntities {
 					console.log('germs length', bubbleState[key].germs.length);
 				}
 			})*/
-			return this.refreshMetaEntities(entities, leuks, germs);
+			return this.constructor.refreshMetaEntities(entities, leuks, germs);
 		}
 	}
 
@@ -253,7 +253,7 @@ export default class SetUpEntities {
 	@return entities	Object		the updated game entities
 	*/
 
-	refreshMetaEntities( entities, leuks, germs ){
+	static refreshMetaEntities( entities, leuks, germs ){
 		const controls = {
 			germs,
 			leuks,

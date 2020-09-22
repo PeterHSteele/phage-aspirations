@@ -199,7 +199,7 @@ export default class SystemsHelpers{
 	type		String      type of cell to remove
 	*/
 
-	removeCell( entities, keys, bubble, type ){
+	removeCell( entities, bubble, type ){
 		let removed = bubble[type].pop();
 		if ( ! bubble[type].length ){
 			bubble.flashFrames = {
@@ -216,28 +216,33 @@ export default class SystemsHelpers{
 		let { controls, physics, draw, modal } = entities;
 		const bubbleState = this.getBubbleState( entities );
 		entities.controls.phase = 'r';
-		/*this.getBubbleKeys( entities ).forEach( key => {
-			entities[bubbleKey].flashFrames = {
-				time: 0,
-				colors: []
-			}
-			//entities[bubbleKey].active = false;
-		})*/
-		if ( this.totalLeuksInGame(bubbleState) < 10 ){
+		
+		if ( this.totalLeuksInGame(bubbleState) < 4 ){
 			dispatch({ type: STOP })
 			controls.saveEntities( entities )
 			return entities;
 		}
-		modal.message = 'You get ' + controls.newLeuks + ' new leuks!';
-		controls.phase = 'r';
-		controls.history.push('r');
-		controls.leuksAreAllocated = false;
-		controls.bubbleState=bubbleState
-		controls.germAllocations= placeGerms( controls.newGerms, bubbleState );
-		modal.frames = 0;
-		modal.visible = true;
-		console.log('at the source', entities.controls.germAllocatio)
-		return draw.newLeuksAndGerms( controls.newLeuks, controls.newGerms );
+
+		const newModal = {
+			message: 'You get ' + controls.newLeuks + ' new leuks!',
+			visible: true
+		}
+
+		const newControls = {
+			phase: 'r',
+			history: controls.history.concat('r'),
+			leuksAreAllocated: false,
+			bubbleState,
+			germAllocations: placeGerms( controls.newGerms, bubbleState )
+		}
+		
+		Object.assign( entities.controls, newControls );
+		Object.assign( entities.modal, newModal );
+		
+		return Object.assign(
+			entities,
+			draw.newLeuksAndGerms( controls.newLeuks, controls.newGerms, Object.keys(entities) )
+		);
 	}
 
 	doubleGerms( entities ){

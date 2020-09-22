@@ -10,6 +10,7 @@ import GoalGame from './src/Goal-Game.js';
 
 /*
 Todo: 
+more scaling breakpoints
 Bonuses for capturing certain bubbles overnight
   * +1 animation for bonus bubbles
 Remove goals
@@ -25,6 +26,7 @@ Zoom in on parts of battlefield?
 
 BUGS TO FIX:
 computer realignments sometimes fly in the wrong direction
+Germs sometimes poke outside bubble
 */
 
 export default function App( props ) {
