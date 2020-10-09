@@ -21,7 +21,7 @@ export const Bubble = function({ body, active, radius, dest, border, start, flas
 				height: dimensionsOuter,
 				radius: dimensionsOuter,
 				borderRadius: dimensionsOuter,
-				borderColor: flashFrames.colors[0] || GRAYGREEN
+				borderColor: flashFrames.colors[1] || GRAYGREEN
 			}
 		]}>
 			<View style={[
@@ -33,7 +33,7 @@ export const Bubble = function({ body, active, radius, dest, border, start, flas
 				height: dimensionsInner,
 				radius: dimensionsInner,
 				borderRadius: dimensionsInner,
-				borderColor: flashFrames.colors[1] || GRAYGREEN
+				borderColor: flashFrames.colors[0] || GRAYGREEN
 			}]}>
 				<View 
 				style={[

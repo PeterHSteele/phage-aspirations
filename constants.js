@@ -10,6 +10,7 @@ export default {
 	  MAUVE: '#7e172b',
 	  LIGHTMAUVE: '#f4838A',
 	  BLUE: '#1575c8',
+	  LIGHTGRAY: '#777',
 	  GERM :'germ',
 	  GERMS: 'germs',
 	  LEUKS: 'leuks',

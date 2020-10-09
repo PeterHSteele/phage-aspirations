@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FlatList, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import constants from './constants';
+import RadioInput from './RadioInput'
 const { SEAGREEN, GRAYGREEN } = constants;
 
 
@@ -12,12 +13,22 @@ export default function AssessmentInput({ goal, updateScore }){
     
     const renderItem = ({item}) => {
 
-        return (
+        /*return (
             <View style={styles.control}> 
                 <TouchableOpacity style={[styles.bubble, { backgroundColor: item == goal.score ? SEAGREEN : '#fff' }]} onPress={()=>updateScore( goal.id, item )}></TouchableOpacity>
                 <Text style={styles.text}>{item}</Text>
             </View>
-        );
+        );*/
+
+        return (
+            <RadioInput
+            colorTrue={SEAGREEN}
+            colorFalse={'#fff'}
+            checked={item==goal.score}
+            handlePress={()=>updateScore(goal.id, item)}
+            label={item}
+            />
+        )
     }
 
     return (

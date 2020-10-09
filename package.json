@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/picker": "^1.8.1",
     "expo": "~36.0.0",
     "matter-js": "^0.14.2",
     "react": "~16.9.0",

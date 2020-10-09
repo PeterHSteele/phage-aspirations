@@ -4,12 +4,14 @@ import { mapStateToProps, mapDispatchToProps } from '../goalGameRedux.js';
 import Game from '../Game';
 import Assessment from '../Assessment';
 import constants from '../constants';
+import GoalDetail from '../GoalDetail.js';
 import Home from '../Home';
+import { DefaultTouchProcessor } from 'react-native-game-engine';
 const { GREEN, MAUVE } = constants
 
 
 
-function GoalGame({ assessment, game }) {
+function GoalGame({ assessment, game, detail }) {
 
   if ( assessment ){
     return <Assessment />
@@ -17,6 +19,10 @@ function GoalGame({ assessment, game }) {
 
   if ( game ){
     return <Game />
+  }
+
+  if ( detail && detail.id+1 ){
+    return <GoalDetail />
   }
 
   return (

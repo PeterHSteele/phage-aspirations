@@ -1,5 +1,6 @@
 export const types = {
 	ADD: 'ADD',
+	UPDATE: 'UPDATE',
 	REMOVE: 'REMOVE',
 	AUTHENTICATE: 'AUTHENTICATE',
 	GAMEOVER: 'GAMEOVER',
@@ -11,11 +12,12 @@ export const types = {
 	SUBMITASSESSMENT: 'SUBMITASSESSMENT',
 	SAVEENTITIES: 'SAVEENTITIES',
 	COMPLETEDAY: 'COMPLETEDAY',
+	SHOWDETAIL: 'SHOWDETAIL',
 }
 
 const initialState = {
 	goals:[
-		{ id: 0, name: 'revolution' },
+		{ id: 0, name: 'revolution', description: 'leave home', isTimed: false, time: {unit: 'hours', value: 15 } },
 		{ id: 1, name: '12 hours of programming' },
 	],
 	entities: null,
@@ -23,11 +25,12 @@ const initialState = {
 	users:{
 		Bernie: 'M4a'
 	},
+	detail: null,
 	leuks: 0,
 	loggedIn:true,
 	game: false,
 	gameOver: false,
-	assessment: true,
+	assessment: false,
 	score: .6,
 	difficulty: 1,
 	renderGame: true
@@ -47,6 +50,19 @@ const actionCreators = {
 			data: goal
 		}
 	},
+	showDetail: function( id ){
+		console.log('called')
+		return{
+			type: types.SHOWDETAIL,
+			data: id,
+		}
+	},
+	updateGoal: function( goal ){
+		return {
+			type: types.UPDATE,
+			data: goal
+		}
+	},
 	authenticate: function( username, password ){
 		return {
 			type: types.AUTHENTICATE,
@@ -54,7 +70,6 @@ const actionCreators = {
 		}
 	},
 	remove: function( id ){
-		alert(id);
 		return {
 			type: types.REMOVE,
 			data: id
@@ -66,7 +81,6 @@ const actionCreators = {
 		}
 	},
 	markComplete: function( id ){
-		//alert(id);
 		return {
 			type: types.COMPLETE,
 			data: id
@@ -110,6 +124,26 @@ export const reducer = function( state = initialState, action ){
 			return {
 				...state,
 				goals:[...state.goals, {id: state.goals.length, name: action.data}]
+			};
+		case types.UPDATE:
+			return {
+				...state,
+				goals: [
+					...state.goals,
+					state.goals.splice(
+						state.goals.indexOf(
+							state.goals.find( goal => goal.id == action.data.id )
+						),
+						1,
+						action.data
+					)
+				]
+			};
+		case types.SHOWDETAIL:
+			console.log(state.goals.find( goal => goal.id == action.data));
+			return {
+				...state,
+				detail: state.goals.find( goal => goal.id == action.data ),
 			};
 		case types.CHANGEDIFFICULTY:
 			console.log('difficulty', action.data);
@@ -172,7 +206,7 @@ export const reducer = function( state = initialState, action ){
 	}
 }
 
-export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, bubbleControl, entities, assessment, leuks, renderGame }){
+export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, bubbleControl, entities, assessment, leuks, renderGame, detail }){
 	return {
 		difficulty,
 		goals: goals,
@@ -185,7 +219,8 @@ export const mapStateToProps = function({ goals, difficulty, users, loggedIn, ga
 		assessment,
 		leuks,
 		entities,
-		renderGame
+		renderGame,
+		detail,
 	};
 }
 
@@ -202,5 +237,7 @@ export const mapDispatchToProps = function( dispatch ){
 		submitAssessment: ( leuks ) => dispatch( actionCreators.submitAssessment( leuks ) ),
 		saveEntities: ( entities ) => dispatch( actionCreators.saveEntities( entities )),
 		completeDay: () => dispatch( actionCreators.completeDay()),
-	}
+		updateGoal: ( goal ) => dispatch( actionCreators.updateGoal( goal ) ),
+		showDetail: ( id ) => dispatch( actionCreators.showDetail( id )),
+ 	}
 }
