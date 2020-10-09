@@ -3,7 +3,6 @@
     "name": "Blank Template",
     "slug": "goal-game-vtwo",
     "privacy": "public",
-    "sdkVersion": "36.0.0",
     "platforms": [
       "ios",
       "android",
