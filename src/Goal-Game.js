@@ -5,8 +5,10 @@ import Game from '../Game';
 import Assessment from '../Assessment';
 import AssessmentInput from '../AssessmentInput';
 import constants from '../constants';
-import GoalDetail from '../GoalDetail.js';
+import GoalDetail from '../GoalDetail.js';  
 import Home from '../Home';
+import { Settings } from '../Settings';
+import { GoalList } from '../GoalList';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { DefaultTouchProcessor } from 'react-native-game-engine';
@@ -44,6 +46,7 @@ function GoalGame({ assessment, game, detail }) {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name={'Home'} component={Home} title={'Home'}/>
         <Stack.Screen name={'Detail'} component={GoalDetail} options={({route}) => ({title: route.params.name}) }/>
+        <Stack.Screen name={'Goals'}  component={GoalList} options={{title: 'Edit/Add Goals'}} />
         <Stack.Screen 
         name="Assessment" 
         component={Assessment}
@@ -53,6 +56,7 @@ function GoalGame({ assessment, game, detail }) {
         }}
         />
         <Stack.Screen name={'AssessmentInput'} component={AssessmentInput} options={({route}) => ({title: route.params.goal.name}) }/>
+        <Stack.Screen name={'Settings'} component={Settings} />
       </Stack.Navigator>
     </NavigationContainer>
   )

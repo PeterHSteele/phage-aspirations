@@ -98,7 +98,7 @@ function AssessmentInput({ navigation, route, updateGoal, goals }){
                 </View>
             </View>}
             <View style={[styles.row]}>
-                <Text style={[styles.text]}>Score:</Text>
+                <Text style={[styles.text]}>Score {scoreSyncedToTime ? '(suggested)' : ''}</Text>
             </View>
             <View style={styles.row}>
                 <FlatList

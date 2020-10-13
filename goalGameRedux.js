@@ -27,6 +27,7 @@ const initialState = {
 	users:{
 		Bernie: 'M4a'
 	},
+	user: 'Bernie',
 	detail: null,
 	leuks: 0,
 	loggedIn:true,
@@ -226,7 +227,7 @@ export const reducer = function( state = initialState, action ){
 	}
 }
 
-export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, entities, assessment, leuks, detail, dayComplete}){
+export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, entities, assessment, leuks, detail, dayComplete, user}){
 	return {
 		difficulty,
 		goals: goals,
@@ -241,6 +242,7 @@ export const mapStateToProps = function({ goals, difficulty, users, loggedIn, ga
 		entities,
 		dayComplete,
 		detail,
+		user,
 	};
 }
 
