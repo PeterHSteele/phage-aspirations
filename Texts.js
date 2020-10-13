@@ -8,7 +8,7 @@ const Label = ({ children, style}) => <Text style={[styles.label, style]}>{child
 
 const Subtitle = ({ children, style}) => <Text style={[styles.subtitle, style]}>{children}</Text>;
 
-const AnimatedTitle = ({y, style, children}) => {
+/*const AnimatedTitle = ({y, style, children}) => {
     const translateUp = useRef( Animated.Value(y)).current;
 
     useEffect(()=>{
@@ -28,7 +28,36 @@ const AnimatedTitle = ({y, style, children}) => {
         +1
         </Animated.Text>
     )
-}
+}*/
+
+const AnimatedTitle = (props) => {
+    const translateUp= useRef(new Animated.Value(props.y)).current  // Initial value for opacity: 0
+  
+    React.useEffect(() => {
+      Animated.timing(
+        translateUp,
+        {
+          useNativeDriver: true,
+          toValue: props.y-50,
+          duration: 3000,
+        }
+      ).start();
+    }, [translateUp])
+  
+    return (
+      <Animated.Text                 // Special animatable View
+        style={[
+        styles.title,
+        {
+          ...props.style,
+          transform: [{
+              translateY: translateUp         // Bind opacity to animated value
+        }]}]}
+      >
+        +1
+      </Animated.Text>
+    );
+  }
 
 export { Title, Label, Subtitle, AnimatedTitle };
 

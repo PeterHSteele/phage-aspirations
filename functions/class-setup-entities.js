@@ -305,14 +305,14 @@ export default class SetUpEntities {
 			
 			const style = {
 				position: 'absolute',
-				top: y - BUBBLER, 
+				top: 0, 
 				left: x + BUBBLER,
 				color: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE
 			}
 
 			alerts['alerts'+i]={
 				style,
-				y,
+				y: y - 2 * BUBBLER,
 				//renderer: () => <AnimatedTitle y={y} style={style}>{'+1'}</AnimatedTitle>
 				renderer: <AnimatedTitle />
 			}
