@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 import { HomeButton } from './Inputs';
 import { Title, Subtitle } from './Texts';
+import { Row } from './Views';
 import constants from './constants';
 const { MAUVE, GRAYGREEN, SEAGREEN, DARKPURPLE, LIGHTMAUVE, LIGHTGRAY, ORANGE } = constants;
 
@@ -66,72 +67,35 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
     );
     return (
     <View style={styles.container}>
-      {/*
-      <View style={[styles.row, styles.listItemWrap]}>
-        <FlatList
-        ListHeaderComponent = {nulllistHeaderComponent}
-        renderItem={renderItem} 
-        keyExtractor={extractKey}
-        ListFooterComponent={nulllistFooterComponent}
-        data={goals}/>
-      </View>
-      */}
-      <View>
-        <View style={[styles.row, /*styles.dateRow,styles.greetingRow*/]}>
-            <Title style={[styles.date]}>Welcome, {user}.{/*</Text><Text style={[styles.text,styles.userText]}>{user}</Text><Text>.*/}</Title>
-        </View>
-
-        <View style={[styles.row, styles.dateRow]}>
-            <Subtitle style={styles.date}>{getDate()} You { dayComplete ? 'have already': 'haven\'t' } played the game today.</Subtitle>
-        </View>
-
-          {/*
-          <View style={styles.row}>
-            <TouchableOpacity style={[styles.button, styles.panelButton]} onPress={()=>navigation.navigate('Assessment')}>
-              <Text style={[styles.text, styles.panelButtonText]}>Start Assessment</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.row}>
-            <TouchableOpacity style={[styles.button, styles.panelButton]} onPress={newDay}>
-              <Text style={[styles.text, styles.panelButtonText]}>Edit/Add Goals</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.row}>
-            <TouchableOpacity style={[styles.button, styles.panelButton]} onPress={newDay}>
-              <Text style={[styles.text, styles.panelButtonText]}>New Day</Text>
-            </TouchableOpacity>
-          </View>
-          */}
-          <HomeButton 
-          text="Edit/Add Goals" 
-          backgroundColor={SEAGREEN} 
-          handlePress={()=>navigation.navigate('Goals')}
-          /> 
-
-          <HomeButton 
-          text="Start Assessment" 
-          backgroundColor={dayComplete ? '#aaa' : MAUVE} 
-          disabled={dayComplete}
-          handlePress={()=>navigation.navigate('Assessment')}
-          />
-
-          <HomeButton 
-          text="New Day" 
-          backgroundColor={DARKPURPLE} 
-          handlePress={newDay}
-          />  
-
-          <HomeButton 
-          text="Game Settings" 
-          backgroundColor={LIGHTMAUVE} 
-          handlePress={()=>navigation.navigate("Settings")}
-          />  
-          
-        </View>
-        <StatusBar hidden={true} />
-      </View>
+      <Row>
+        <Title style={[styles.date]}>Welcome, {user}.{/*</Text><Text style={[styles.text,styles.userText]}>{user}</Text><Text>.*/}</Title>
+      </Row>
+      <Row>
+        <Subtitle style={styles.date}>{getDate()} You { dayComplete ? 'have already': 'haven\'t' } played the game today.</Subtitle>
+      </Row>
+      <HomeButton 
+      text="Edit/Add Goals" 
+      backgroundColor={SEAGREEN} 
+      handlePress={()=>navigation.navigate('Goals')}
+      /> 
+      <HomeButton 
+      text="Start Assessment" 
+      backgroundColor={dayComplete ? '#aaa' : MAUVE} 
+      disabled={dayComplete}
+      handlePress={()=>navigation.navigate('Assessment')}
+      />
+      <HomeButton 
+      text="New Day" 
+      backgroundColor={DARKPURPLE} 
+      handlePress={newDay}
+      />  
+      <HomeButton 
+      text="Game Settings" 
+      backgroundColor={LIGHTMAUVE} 
+      handlePress={()=>navigation.navigate("Settings")}
+      />  
+      <StatusBar hidden={true} />
+    </View>
     )
 }
 
