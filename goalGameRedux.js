@@ -201,8 +201,11 @@ export const reducer = function( state = initialState, action ){
 				dayComplete: true
 			}
 		case types.COMPLETEDAY: {
+			const goals = [...state.goals];
+			goals.forEach( e => e.score = 0 );
 			return {
 				...state,
+				goals,
 				game: false,
 			}
 		}

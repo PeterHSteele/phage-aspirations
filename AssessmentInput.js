@@ -3,15 +3,17 @@ import { FlatList, View, Text, StyleSheet, TouchableOpacity } from 'react-native
 import { TextInput } from 'react-native-gesture-handler';
 import constants from './constants';
 import RadioInput from './RadioInput';
+import { connect } from 'react-redux';
+import { mapStateToProps, mapDispatchToProps } from './goalGameRedux';
 import { ListItem } from 'react-native-elements';
 import NumericInput from 'react-native-numeric-input'
 const { SEAGREEN, GRAYGREEN, MAUVE } = constants;
 
 const convertTimeToScore = ( time, duration ) => Math.floor(time/duration * 5);
 
-export default function AssessmentInput({ navigation, route, /*goal, updateScore*/ }){
+function AssessmentInput({ navigation, route, updateGoal, goals }){
     const { goal } = route.params,
-          { isTimed, time } = goal;
+          { isTimed, time, id } = goal;
     
     let initTimeSpent = 0, initScore = 0;
     if ( isTimed ){
@@ -45,7 +47,10 @@ export default function AssessmentInput({ navigation, route, /*goal, updateScore
     }
 
     const handleSubmit = () =>{
-        navigation.navigate('Assessment',{ id: goal.id, score })
+        let goalToUpdate = goals.find( goal  => goal.id == id );
+        let updated = Object.assign({}, goalToUpdate, { score });
+        updateGoal( updated );
+        navigation.navigate('Assessment');
     }
     
     const renderItem = ({item}) => {
@@ -112,6 +117,8 @@ export default function AssessmentInput({ navigation, route, /*goal, updateScore
         </View>
     )
 }
+
+export default connect( mapStateToProps, mapDispatchToProps)(AssessmentInput);
 
 const styles = StyleSheet.create({
     row:{

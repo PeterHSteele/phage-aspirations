@@ -8,11 +8,11 @@ import { ListItem, ListItemChevron } from 'react-native-elements';
 const { MAUVE } = constants;
 import store from './store';
 
-function Assessment({ route, goals, submitAssessment, navigation, dayComplete, updateGoal }){
+function Assessment({ goals, submitAssessment, navigation, dayComplete }){
     //const initScores = Object.fromEntries( goals.map( e => [ e.name, 0 ] ));
     
     /* if we've updated a score, update the store*/
-    const scoreData = route.params,
+    /*const scoreData = route.params,
         id = scoreData?.id,
         score = scoreData?.score;
 
@@ -20,7 +20,7 @@ function Assessment({ route, goals, submitAssessment, navigation, dayComplete, u
         let goal = goals.find( goal  => goal.id == id );
         let updated = Object.assign({}, goal, { score });
         updateGoal( updated );
-    }
+    }*/
     /*
     let [ scores, setScore ] = useState( initScores );
 
@@ -42,14 +42,16 @@ function Assessment({ route, goals, submitAssessment, navigation, dayComplete, u
         <ListItem bottomDivider onPress={()=>navigation.navigate('AssessmentInput', {goal: item})}>
             <ListItem.Content>
                 <ListItem.Title>{item.name}</ListItem.Title>
-                <ListItem.Title>{item.score}</ListItem.Title>
             </ListItem.Content>
-            <ListItem.Chevron color={'#444'}/>
+            <ListItem.Content>
+                <ListItem.Title>Score: {item.score}</ListItem.Title>
+            </ListItem.Content>
+            <ListItem.Chevron color='#444'/>
         </ListItem>
     );
 
     const submit = () => {
-        const leuks = scores.reduce((a,b) => a + b.score, 0 );
+        const leuks = goals.reduce((a,b) => a + b.score, 0 );
         submitAssessment( leuks );
        //navigation.navigate("Game", {width, height});
     }
