@@ -38,7 +38,6 @@ class Game extends React.PureComponent{
 		this.height = props.route.params.height;*/
 		this.width = Dimensions.get('screen').width;
 		this.height = Dimensions.get('screen').height;
-		console.log('height', this.height);
 		this.engine = React.createRef();
 		this.setUpBodies = new SetUpBodies( this.height, this.width, BUBBLER );
 		this.helpers = new SystemsHelpers( this.setUpBodies )
@@ -66,8 +65,6 @@ class Game extends React.PureComponent{
 		if ( !this.props.dayComplete ){ 
 			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs, saveEntities );
 		}
-
-		console.log(this.engine);
 		//console.log(Object.keys(entities).length);
 		//console.log('staging',entities['staging'].body.position)
 		return (
