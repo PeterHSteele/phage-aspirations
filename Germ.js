@@ -10,6 +10,7 @@ export const Germ = function({ background, active, radius, body, freeToMove, typ
 	} else if (type = "leuk" && freeToMove ){
 		backgroundColor = 'pink';
 	}
+	
 	return(
 		<View 
 			style={[

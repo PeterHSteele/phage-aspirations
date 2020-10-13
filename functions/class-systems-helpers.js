@@ -30,7 +30,7 @@ export default class SystemsHelpers{
 	}
 
 	randomBool(){
-		return Math.random() > .49;
+		return Math.random() < .5;
 	}
 
 	distance = ( [x1,y1], [x2,y2] ) => {
@@ -54,6 +54,7 @@ export default class SystemsHelpers{
 		if ( ! destId ){ /*alert(Object.keys(allocations).reduce((a,b) => allocations[a] + allocations[b], 0 ))*/ alert(Object.keys(allocations).map( key => allocations[key]))}
 		let dest = entities[destId];
 		//if( !destId)console.log( 'germslength', entities[destId].germs );
+		//console.log('source', source);
 		let newMoverId = source[0];
 		let newMover = entities[newMoverId]
 		newMover.active = true;
@@ -61,7 +62,7 @@ export default class SystemsHelpers{
 		newMover.destination = [ y , x , destId ];
 		this.velocityMove( entities, newMover, newMoverId);
 		if (fromBubble){
-			newMover.collisionFilter = matterFunctions.getInterBubbleCellFilter();
+			newMover.collisionFilter = this.matterFunctions.getInterBubbleCellFilter();
 		}
 	}
 

@@ -13,12 +13,14 @@ export const types = {
 	SAVEENTITIES: 'SAVEENTITIES',
 	COMPLETEDAY: 'COMPLETEDAY',
 	SHOWDETAIL: 'SHOWDETAIL',
+	EXITDETAIL: 'EXITDETAIL',
+	NEWDAY: 'NEWDAY',
 }
 
 const initialState = {
 	goals:[
-		{ id: 0, name: 'revolution', description: 'leave home', isTimed: false, time: {unit: 'hours', value: 15 } },
-		{ id: 1, name: '12 hours of programming' },
+		{ id: 0, name: 'revolution', score: 0, description: 'leave home', isTimed: true, time: {unit: 'minutes', duration: '30' } },
+		{ id: 1, name: 'programming', score: 0, description: 'do it', isTimed: true, time:{unit: 'hours', duration: '8' }},
 	],
 	entities: null,
 	completed:[],
@@ -33,7 +35,7 @@ const initialState = {
 	assessment: false,
 	score: .6,
 	difficulty: 1,
-	renderGame: true
+	dayComplete: false
 };
 
 
@@ -113,12 +115,20 @@ const actionCreators = {
 			type: types.COMPLETEDAY,
 			game: false,
 		}
+	},
+	exitDetail: function( ){
+		return {
+			type: types.EXITDETAIL,
+		}
+	},
+	newDay: function(){
+		return {
+			type: types.NEWDAY
+		}
 	}
 }
 
 export const reducer = function( state = initialState, action ){
-	
-
 	switch ( action.type ){
 		case types.ADD: 
 			return {
@@ -126,18 +136,14 @@ export const reducer = function( state = initialState, action ){
 				goals:[...state.goals, {id: state.goals.length, name: action.data}]
 			};
 		case types.UPDATE:
+			const goalToReplace = state.goals.find( goal => goal.id == action.data.id );
+			const indexOfGoalToReplace = state.goals.indexOf(goalToReplace);
+			const goals = [...state.goals]
+			goals.splice( indexOfGoalToReplace, 1, action.data)
+			
 			return {
 				...state,
-				goals: [
-					...state.goals,
-					state.goals.splice(
-						state.goals.indexOf(
-							state.goals.find( goal => goal.id == action.data.id )
-						),
-						1,
-						action.data
-					)
-				]
+				goals,
 			};
 		case types.SHOWDETAIL:
 			console.log(state.goals.find( goal => goal.id == action.data));
@@ -174,7 +180,7 @@ export const reducer = function( state = initialState, action ){
 		case types.STARTGAME:
 			return {
 				...state,
-				game: true
+				game: true,
 			}
 		case types.STARTASSESSMENT:
 			return {
@@ -192,13 +198,24 @@ export const reducer = function( state = initialState, action ){
 			return {
 				...state,
 				entities: action.data,
-				renderGame: false
+				dayComplete: true
 			}
 		case types.COMPLETEDAY: {
 			return {
 				...state,
 				game: false,
-				renderGame: true,
+			}
+		}
+		case types.NEWDAY: {
+			return {
+				...state,
+				dayComplete: false
+			}
+		}
+		case types.EXITDETAIL: {
+			return {
+				...state,
+				detail: null,
 			}
 		}
 		default:
@@ -206,7 +223,7 @@ export const reducer = function( state = initialState, action ){
 	}
 }
 
-export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, bubbleControl, entities, assessment, leuks, renderGame, detail }){
+export const mapStateToProps = function({ goals, difficulty, users, loggedIn, game, gameOver, completed, entities, assessment, leuks, detail, dayComplete}){
 	return {
 		difficulty,
 		goals: goals,
@@ -219,7 +236,7 @@ export const mapStateToProps = function({ goals, difficulty, users, loggedIn, ga
 		assessment,
 		leuks,
 		entities,
-		renderGame,
+		dayComplete,
 		detail,
 	};
 }
@@ -239,5 +256,7 @@ export const mapDispatchToProps = function( dispatch ){
 		completeDay: () => dispatch( actionCreators.completeDay()),
 		updateGoal: ( goal ) => dispatch( actionCreators.updateGoal( goal ) ),
 		showDetail: ( id ) => dispatch( actionCreators.showDetail( id )),
+		exitDetail: () => dispatch( actionCreators.exitDetail()),
+		newDay: () => dispatch( actionCreators.newDay()),
  	}
 }

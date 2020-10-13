@@ -4,14 +4,12 @@ import{ ListItem, Title, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 import constants from './constants';
-import GoalDetail from './GoalDetail';
-import Button from './Button';
 const { MAUVE, GRAYGREEN, SEAGREEN, GREEN, LIGHTBLUE, LIGHTGRAY } = constants;
 
-const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, startAssessment, removeGoal, showDetail }){
+const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, startAssessment, removeGoal, showDetail, navigation, newDay }){
 
     let [ addGoalInputVal, updateInputVal ] = useState('');
-
+    
     const getDate = () => {
         const today = new Date();
         const month = constants.MONTHS[today.getMonth()],
@@ -60,7 +58,7 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
       return(
         <View style={styles.listItem}>
           <Text style={[styles.text,styles.goalText]}>{item.name}</Text>
-          <TouchableOpacity style={[styles.panelButton, styles.editButton]} onPress={()=>showDetail(item.id)}>
+          <TouchableOpacity style={[styles.panelButton, styles.editButton]} onPress={()=>navigation.navigate('Detail',item)/*()=>showDetail(item.id)*/}>
             <Text style={[styles.text, styles.panelButtonText]}>Details</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.panelButton, styles.removeButton]} onPress={()=>removeGoal(item.id)}>
@@ -103,8 +101,14 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
         </View>
 
         <View style={styles.row}>
-          <TouchableOpacity style={[styles.button, styles.panelButton]} onPress={startAssessment}>
+          <TouchableOpacity style={[styles.button, styles.panelButton]} onPress={/*startAssessment*/()=>navigation.navigate('Assessment')}>
             <Text style={[styles.text, styles.panelButtonText]}>Start Assessment</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.row}>
+          <TouchableOpacity style={[styles.button, styles.panelButton]} onPress={newDay}>
+            <Text style={[styles.text, styles.panelButtonText]}>New Day</Text>
           </TouchableOpacity>
         </View>
 

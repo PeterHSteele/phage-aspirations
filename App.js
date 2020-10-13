@@ -7,6 +7,8 @@ import { mapStateToProps } from './goalGameRedux.js';
 import Input from './Input.js';
 import ErrorBoundary from './ErrorBoundary.js';
 import GoalGame from './src/Goal-Game.js';
+import 'react-native-gesture-handler';
+import { NavigationContainer } from '@react-navigation/native';
 
 /*
 Todo: 
@@ -31,9 +33,10 @@ computer realignments sometimes fly in the wrong direction
 export default function App( props ) {
 
   return (
-    <Provider store={store}>
-      <GoalGame />
-    </Provider>
+      <Provider store={store}>
+        <GoalGame />
+      </Provider>
+    
   );
 
 }

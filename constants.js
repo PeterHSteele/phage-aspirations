@@ -4,6 +4,7 @@ export default {
 	  ORANGE: '#974806',
 	  GRAYGREEN: '#b4e1d0',
 	  SEAGREEN: '#00c88d',
+	  SEAGREENRGBA: "rgba( 0, 200, 141, .5)",
 	  LIGHTBLUE: '#50e1dd',
 	  DARKPURPLE: '#0e0029',
 	  PURPLE: '#4A0837',

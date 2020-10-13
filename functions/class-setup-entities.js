@@ -1,6 +1,7 @@
 import React from 'react';
 import constants from '../constants';
 import { Bubble } from '../Bubble';
+import { Dimensions } from 'react-native';
 const { CONTROLSHEIGHT, STAGINGHEIGHT, GRAYGREEN, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
@@ -63,12 +64,12 @@ export default class SetUpEntities {
 	}
 
 	getMetaEntities( leuks, germs, saveEntities, bubbles ){
-		const { width, height, setUpBodies } = this,
+		const { setUpBodies, width, height } = this,
 		{ engine, world } 					 = setUpBodies,
 		controlsBody 						 = Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT ),
 		stagingAreaWidth 					 = .8 * width,
 		stagingAreaY 						 = height - CONTROLSHEIGHT - ( STAGINGHEIGHT + 10 );
-
+		
 		const stagingBody = Bodies.rectangle( 
 			width/2, 
 			stagingAreaY + STAGINGHEIGHT/2, 
@@ -143,7 +144,7 @@ export default class SetUpEntities {
 				germs: 20,
 				leuks: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
 			  }
-			
+		
 		let cellsToAdd = leuks + germs,
 			availableIds = this.getAvailableIds(
 				keys,
@@ -161,6 +162,7 @@ export default class SetUpEntities {
 			World.add( world, mCell);
 			newCells[e] = this.newCell( GERMR, mCell, type.slice(0,4), -1);
 		});
+		console.log('nLAG', Object.keys(newCells).filter(key=>newCells[key].type=='leuk').length);
 		return newCells;
 	
 	}
@@ -274,6 +276,7 @@ export default class SetUpEntities {
 			leuks,
 			newGerms: germs,
 			newLeuks: leuks,
+			phase: 'r',
 			pauseThreshold: this.getPauseThreshold( leuks + this.helpers.totalLeuksInGame(entities.controls.bubbleState)),
 			leuksAreAllocated: false,
 			germAllocations: {}

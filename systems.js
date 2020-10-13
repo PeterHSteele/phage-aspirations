@@ -232,7 +232,6 @@ const Fight = ( entities, { touches, time, dispatch } ) => {
 		//pick whether to remove germ or leuk
 		const type = Math.round( Math.random() * 100 ) > threshold ? GERMS : LEUKS;
 		helpers.removeCell( entities, bubble, type );
-
 	})
 
 	return entities;
@@ -324,6 +323,9 @@ const MoveGerm = ( entities, {touches} ) => {
 	const germs = keys.filter( key => entities[key].type == GERM );
 	//return if destination already set
 	let moverId = germs.find( germ => entities[germ].active );
+	if ( moverId ){
+		return entities;
+	}
 	let allocations = germAllocations;
 	//console.log('allos',allocations)
 	if ( ! Object.keys(allocations).length ) { 
@@ -335,13 +337,13 @@ const MoveGerm = ( entities, {touches} ) => {
 	let bubbleKeys = Object.keys( allocations );
 	//send new germs first
 	let newGermKeys = keys.filter( key => entities[key].type == GERM && entities[key].bubble < 0 )
-
+	if (newGermKeys.length<1)console.log('newGermKeys',newGermKeys);
 	if ( newGermKeys.length ){
 		helpers.prepareMover( entities, bubbleKeys, allocations, newGermKeys, false );
 	} else {
 		let overflowBubble = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length > allocations[bubbleKey] );
 		if ( overflowBubble ){
-			helpers.prepareMover( entities, bubbleKeys, allocations, overflowBubble.germs, true );
+			helpers.prepareMover( entities, bubbleKeys, allocations, entities[overflowBubble].germs, true );
 			/*let destId = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length < allocations[bubbleKey] )
 			let dest = entities[destId];
 			let newMoverId = entities[overflowBubble].germs[0]
@@ -368,6 +370,7 @@ const CheckContainerClose = ( entities ) => {
 	if (! entities.controls ){
 		return entities;
 	}
+
 	const { phase } = entities.controls; 
 	if ( phase != 'p' &&  phase != 'c' && phase != 'r' ){
 		return entities;
@@ -377,11 +380,13 @@ const CheckContainerClose = ( entities ) => {
 	if ( ! activeKey ){
 		return entities;
 	}
+
 	const active = entities[activeKey];
 	const destinationId = active.destination[2],
 		  destination 	= entities[destinationId];
 
 	if ( matterFunctions.isInside( destination.body, active.body ) ){
+		//console.log('isInside', activeKey);
 		helpers.updateBubbleContents( active, activeKey, destination, destinationId, entities );
 		entities.controls.leuksAreAllocated = helpers.checkIfLeuksAreAllocated( entities, keys );
 	} 
@@ -414,7 +419,7 @@ const Transition = ( entities, { dispatch } ) => {
 	}
 	
 	if ( entities.controls.transitionFrames == 1){
-		dispatch({ type: STOP });
+		dispatch({ type: STOP, data: entities });
 		entities.controls.saveEntities( entities );
 	}
 

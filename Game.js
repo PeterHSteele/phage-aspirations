@@ -34,9 +34,11 @@ class Game extends React.PureComponent{
 	constructor(props){
 		super(props);
 
-		this.width = Dimensions.get('window').width;
-		this.height = Dimensions.get('window').height;
-
+		/*this.width = props.route.params.width;
+		this.height = props.route.params.height;*/
+		this.width = Dimensions.get('screen').width;
+		this.height = Dimensions.get('screen').height;
+		console.log('height', this.height);
 		this.setUpBodies = new SetUpBodies( this.height, this.width, BUBBLER );
 		this.helpers = new SystemsHelpers( this.setUpBodies )
 		this.setUpEntities = new SetUpEntities(this.width, this.height, this.setUpBodies, this.helpers )
@@ -50,6 +52,7 @@ class Game extends React.PureComponent{
 			case STOP: this.refs.engine.stop();
 			case STOPPED: 
 				this.props.completeDay();
+				//this.props.navigation.navigate( 'Home' );
 			default: return;
 		}
 
@@ -58,16 +61,18 @@ class Game extends React.PureComponent{
 	render(){	
 		const { leuks, difficulty, saveEntities } = this.props,
 		germs = this.props.goals.length * 2 + this.props.difficulty;
-		let entities = this.props.entities;
-		if ( this.props.renderGame ){
+		let entities=this.props.entities;
+		if ( !this.props.dayComplete ){ 
 			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs, saveEntities );
 		}
-		
+		//console.log(Object.keys(entities).length);
+		//console.log('staging',entities['staging'].body.position)
 		return (
 			<GameEngine
 				style={styles.container}
 				systems={ [ Physics, PressGerm, MoveLeuk, MoveGerm, Fight, ToggleModal, DoubleGerms, CheckContainerClose, Transition ] }
 				ref='engine'
+				running={true}
 				onEvent={this.handleEvent}
 				entities={entities}>
 

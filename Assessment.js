@@ -4,15 +4,24 @@ import AssessmentInput from "./AssessmentInput";
 import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 import constants from './constants';
+import { ListItem, ListItemChevron } from 'react-native-elements';
 const { MAUVE } = constants;
 import store from './store';
 
-function Assessment({ goals, submitAssessment }){
+function Assessment({ route, goals, submitAssessment, navigation, dayComplete, updateGoal }){
     //const initScores = Object.fromEntries( goals.map( e => [ e.name, 0 ] ));
-    const initScores = goals.map( e => {
-        return { id: e.id, name: e.name, score: 0 }
-    });
+    
+    /* if we've updated a score, update the store*/
+    const scoreData = route.params,
+        id = scoreData?.id,
+        score = scoreData?.score;
 
+    if (  id > -1 ){
+        let goal = goals.find( goal  => goal.id == id );
+        let updated = Object.assign({}, goal, { score });
+        updateGoal( updated );
+    }
+    /*
     let [ scores, setScore ] = useState( initScores );
 
     const updateScore = ( id, score ) => {
@@ -22,23 +31,34 @@ function Assessment({ goals, submitAssessment }){
         newScores.splice( index, 1, {
             id,
             score,
-            name: goal.name
+            name: goal.name,
+            isTimed: goal.isTimed
         })
         setScore( newScores );
     } 
-
-    const renderItem = ({ item }) => <AssessmentInput updateScore={updateScore} goal={item}/>
+*/
+    //const renderItem = ({ item }) => <AssessmentInput updateScore={updateScore} goal={item}/>
+    const renderItem = ({ item }) => (
+        <ListItem bottomDivider onPress={()=>navigation.navigate('AssessmentInput', {goal: item})}>
+            <ListItem.Content>
+                <ListItem.Title>{item.name}</ListItem.Title>
+                <ListItem.Title>{item.score}</ListItem.Title>
+            </ListItem.Content>
+            <ListItem.Chevron color={'#444'}/>
+        </ListItem>
+    );
 
     const submit = () => {
         const leuks = scores.reduce((a,b) => a + b.score, 0 );
         submitAssessment( leuks );
+       //navigation.navigate("Game", {width, height});
     }
       
-    const disableSubmit = scores.find( e => e.score === 0) ? true : false;
+    const disableSubmit = goals.find( e => e.score === 0) || dayComplete;
     return(
-        <View>
+        <View style={styles.container}>
             <FlatList 
-                data={scores}
+                data={ goals }
                 renderItem={renderItem}
                 keyExtractor={item=>item.id.toString()}
             />
@@ -53,7 +73,6 @@ function Assessment({ goals, submitAssessment }){
                     <Text style={[styles.text, styles.buttonText]}>Submit Assessment</Text>
                 </TouchableOpacity>
             </View>
-
             <StatusBar hidden={true} />
         </View>
     )
@@ -62,6 +81,11 @@ function Assessment({ goals, submitAssessment }){
 export default connect( mapStateToProps, mapDispatchToProps )(Assessment);
 
 const styles = StyleSheet.create({
+    container:{
+        flex: 1,
+        justifyContent: 'flex-end',
+        justifyContent: 'space-around',
+    },
     text: {
         fontSize: 20,
         color: '#000'
@@ -76,3 +100,8 @@ const styles = StyleSheet.create({
         padding: 10
     }
 })
+
+/*<ListItem.Content>
+                <ListItem.Title>{item.name}</ListItem.Title>
+            </ListItem.Content>
+            <ListItem.Chevron />*/ 
