@@ -2,6 +2,7 @@ import React from 'react';
 import constants from '../constants';
 import { Bubble } from '../Bubble';
 import { Dimensions } from 'react-native';
+import { AnimatedTitle } from '../Texts';
 const { CONTROLSHEIGHT, STAGINGHEIGHT, GRAYGREEN, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
@@ -43,10 +44,12 @@ export default class SetUpEntities {
 			const [ bonusCells, cellArrays ] =  this.bonusCells(
 				entities,
 				bonusIds,
-			)
+			);
+			const alerts = this.bonusCellAlerts( entities );
 			Object.assign(
 				entities,
 				bonusCells,
+				alerts,
 				this.newLeuksAndGerms( leuks, germs, keys.concat(bonusIds), entities.physics.world )	
 			);
 			Object.keys(cellArrays).forEach( bubbleKey => {
@@ -291,6 +294,30 @@ export default class SetUpEntities {
 		Object.assign( entities.controls, controls);
 		Object.assign( entities.modal, modal )
 		return entities;
+	}
+
+	bonusCellAlerts( entities ){
+		const alerts = {};
+		const bubbleKeys = this.helpers.getBubbleKeys( entities );
+		bubbleKeys.forEach((e,i)=>{
+			const bubble = entities[e],
+				  {x,y} = bubble.body.position;
+			
+			const style = {
+				position: 'absolute',
+				top: y - BUBBLER, 
+				left: x + BUBBLER,
+				color: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE
+			}
+
+			alerts['alerts'+i]={
+				style,
+				y,
+				//renderer: () => <AnimatedTitle y={y} style={style}>{'+1'}</AnimatedTitle>
+				renderer: <AnimatedTitle />
+			}
+		})
+		return alerts;
 	}
 
 	getBubbles( bubbleCount, bubbles = {} ){
@@ -592,4 +619,14 @@ export default class SetUpEntities {
 		})*/
 	}
 
+}
+
+class EntityMaker {
+	constructor( value ){
+		this.value = value;
+	}
+
+	iterate( fn ){
+		new Array(this.val).map((e,i)=>i).forEach(e=>fn(e));
+	}
 }

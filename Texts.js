@@ -1,5 +1,5 @@
-import React from 'react';
-import { Text, StyleSheet } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { Text, StyleSheet, Animated } from 'react-native';
 import { mapDispatchToProps } from './goalGameRedux';
 
 const Title = ({ children, style }) => <Text style={[styles.title, style]}>{children}</Text>;
@@ -8,7 +8,29 @@ const Label = ({ children, style}) => <Text style={[styles.label, style]}>{child
 
 const Subtitle = ({ children, style}) => <Text style={[styles.subtitle, style]}>{children}</Text>;
 
-export { Title, Label, Subtitle };
+const AnimatedTitle = ({y, style, children}) => {
+    const translateUp = useRef( Animated.Value(y)).current;
+
+    useEffect(()=>{
+        Animated.timing(
+            translateUp,
+            {
+                toValue: y-50,
+                duration: 3000
+            },
+        ).start();
+    },[translateUp])
+    
+    return (
+        <Animated.Text
+        style={[styles.title, style, {top: translateUp}]} 
+        >
+        +1
+        </Animated.Text>
+    )
+}
+
+export { Title, Label, Subtitle, AnimatedTitle };
 
 const styles = StyleSheet.create({
     title: {
