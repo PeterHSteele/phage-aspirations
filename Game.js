@@ -39,6 +39,7 @@ class Game extends React.PureComponent{
 		this.width = Dimensions.get('screen').width;
 		this.height = Dimensions.get('screen').height;
 		console.log('height', this.height);
+		this.engine = React.createRef();
 		this.setUpBodies = new SetUpBodies( this.height, this.width, BUBBLER );
 		this.helpers = new SystemsHelpers( this.setUpBodies )
 		this.setUpEntities = new SetUpEntities(this.width, this.height, this.setUpBodies, this.helpers )
@@ -47,9 +48,9 @@ class Game extends React.PureComponent{
 	handleEvent = ( e ) => {
 		//alert(this.refs['engine']);
 		switch ( e.type ){
-			case WIN: this.refs.engine.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, LIGHTBLUE )); break;
-			case LOSE: this.refs.engine.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, DARKPURPLE )); break;
-			case STOP: this.refs.engine.stop();
+			case WIN: this.engine.current.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, LIGHTBLUE )); break;
+			case LOSE: this.engine.current.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, DARKPURPLE )); break;
+			case STOP: this.engine.current.stop();
 			case STOPPED: 
 				this.props.completeDay();
 				//this.props.navigation.navigate( 'Home' );
@@ -65,13 +66,15 @@ class Game extends React.PureComponent{
 		if ( !this.props.dayComplete ){ 
 			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs, saveEntities );
 		}
+
+		console.log(this.engine);
 		//console.log(Object.keys(entities).length);
 		//console.log('staging',entities['staging'].body.position)
 		return (
 			<GameEngine
 				style={styles.container}
 				systems={ [ Physics, PressGerm, MoveLeuk, MoveGerm, Fight, ToggleModal, DoubleGerms, CheckContainerClose, Transition ] }
-				ref='engine'
+				ref={this.engine}
 				running={true}
 				onEvent={this.handleEvent}
 				entities={entities}>
