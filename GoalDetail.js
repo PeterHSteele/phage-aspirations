@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, StatusBar, ScrollView, Keyboard, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, StatusBar, ScrollView, Keyboard, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import {Picker} from '@react-native-community/picker';
 import RadioInput from './RadioInput';
 import constants from './constants';
@@ -50,9 +50,13 @@ function GoalDetail({ route, updateGoal, navigation }){
         updateGoal({ id, name, description, isTimed, time });
         navigation.navigate('Home');
     }
-
+    //contentContainerStyle={[styles.container, { flex: 0}]}
+    /*<KeyboardAvoidingView 
+        contentContainerStyle={{height: '100%'}}
+        behavior='position'> */
     return(
-        <ScrollView contentContainerStyle={[styles.container, { flex: isTimed ? 0 : 1}]}>
+        
+        <ScrollView contentContainerStyle={[styles.container, {flex: isTimed? 0 : 1 }]}>
             <View style={styles.control}>
                 <Text style={[styles.text, styles.label]}>Add a description for this goal.</Text>
                 <TextInput 
@@ -109,9 +113,10 @@ function GoalDetail({ route, updateGoal, navigation }){
             </View>
             <StatusBar hidden={true} />
         </ScrollView>
+        
     )
 }
-
+//</KeyboardAvoidingView>
 export default connect(mapStateToProps, mapDispatchToProps)(GoalDetail);
 
 const styles = StyleSheet.create({
@@ -120,7 +125,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     container:{
-        paddingVertical: 10,
+        paddingVertical: 0,
     },
     text: {
         fontSize: 20
