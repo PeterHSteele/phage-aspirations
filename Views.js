@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, Animated, useRef } from 'react-native';
+import React, { useRef } from 'react';
+import { View, StyleSheet, Animated } from 'react-native';
 import { mapDispatchToProps } from './goalGameRedux';
 
 const Row = ({ children, style }) => <View style={[styles.row, style]}>{children}</View>;

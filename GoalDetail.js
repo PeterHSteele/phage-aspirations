@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, StatusBar, ScrollView, Keyboard, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TextInput, FlatList, StyleSheet, StatusBar, ScrollView, Keyboard, Animated, KeyboardAvoidingView } from 'react-native';
 import {Picker} from '@react-native-community/picker';
 import RadioInput from './RadioInput';
 import constants from './constants';
 import { connect } from 'react-redux';
-import { Control } from './Views';
+import { Control, SlideDown } from './Views';
 import { Subtitle } from './Texts';
 import { HomeButton } from './Inputs';
 import { mapStateToProps, mapDispatchToProps } from './goalGameRedux.js';
@@ -21,13 +21,44 @@ function GoalDetail({ route, updateGoal, navigation }){
         [ description, setDescription ] = useState( description );
         [ isTimed, setIsTimed ] = useState( isTimed ),
         [ unit, setUnit ] = useState( unit ),
-        [ duration, setDuration ] = useState( duration )  
-          
+        [ duration, setDuration ] = useState( duration ) 
+     
+    const TRANSLATION = -100, SCALE = 1;   
+     
+    const slideDownAnim = useRef(new Animated.Value( isTimed ? SCALE : 0)).current;
+    const translateAnim = useRef(new Animated.Value( isTimed ? 0 : TRANSLATION)).current;
+
+    const slide = ( toValueScale, toValueTranslate ) => {
+            Animated.parallel([
+                Animated.timing(
+                    slideDownAnim,
+                    {
+                        useNativeDriver: true,
+                        toValue: toValueScale,
+                        duration: 150
+                    }
+                ),
+                Animated.timing(
+                    translateAnim,
+                    {
+                        useNativeDriver: true,
+                        toValue: toValueTranslate,
+                        duration: 150
+                    }
+                )
+            ]).start()
+    } 
+
+    const handleIsTimedChange = ( val ) => {
+        slide( val? SCALE: 0, val ?  0:TRANSLATION);
+        setIsTimed(val);
+    }
+    
     const renderIsTimedChoices = ({item}) => {
         return (
             <RadioInput 
                 background={isTimed === item? SEAGREEN : '#fff'}
-                handlePress={setIsTimed}
+                handlePress={handleIsTimedChange}
                 containerStyle={{alignItems:'center', padding: 5}}
                 label={item === true ? 'yes' : 'no' }
                 value={item}
@@ -57,10 +88,10 @@ function GoalDetail({ route, updateGoal, navigation }){
     /* */
     return(
         <KeyboardAvoidingView 
-        contentContainerStyle={[styles.containerStyle,{height: isTimed? 'auto' : '100%' }]}
+        contentContainerStyle={[/*styles.containerStyle,{height: isTimed? 'auto' : '100%' }*/]}
         behavior='position'>
-        <ScrollView contentContainerStyle={{flex: isTimed? 0 : 1 }}>
-            <Control>
+        <ScrollView /*contentContainerStyle={[{flex: 1 }]}*/>
+          <Control>
                 <Text style={[styles.text, styles.label]}>Add a description for this goal.</Text>
                 <TextInput 
                 style={[styles.input, styles.text, styles.descInput]}
@@ -83,8 +114,8 @@ function GoalDetail({ route, updateGoal, navigation }){
                 keyExtractor={item=>item.toString()}
                 />
             </Control>
-            {isTimed && 
-            <View>
+            {
+            <Animated.View style={{transform: [{translateY: translateAnim},{scaleY: slideDownAnim}]}}>
                 <Control style={styles.timeControl}>
                     <Text style={[styles.text,styles.label, styles.durationLabel]}>Set duration:</Text>
                     <TextInput
@@ -108,10 +139,10 @@ function GoalDetail({ route, updateGoal, navigation }){
                 <Control>
                     <Subtitle>I will work on <Text style={styles.timeSentence}>{detail.name}</Text> for {duration} {unit} each day.</Subtitle>
                 </Control>
-            </View> }
+            </Animated.View> }
             <Control style={styles.saveControl}>
                 <HomeButton 
-                onPress={handleSave} 
+                handlePress={handleSave} 
                 style={styles.saveButton} 
                 backgroundColor={SEAGREEN} 
                 textStyle={styles.saveButtonText} 
@@ -122,7 +153,6 @@ function GoalDetail({ route, updateGoal, navigation }){
         </KeyboardAvoidingView>
     )
 }
-//</KeyboardAvoidingView>
 export default connect(mapStateToProps, mapDispatchToProps)(GoalDetail);
 
 const styles = StyleSheet.create({
@@ -130,7 +160,7 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 10,
     },
-    constainerStyle:{
+    containerStyle:{
         minHeight: '100%',
     },
     text: {
