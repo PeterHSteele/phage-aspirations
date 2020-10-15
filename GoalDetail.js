@@ -4,6 +4,8 @@ import {Picker} from '@react-native-community/picker';
 import RadioInput from './RadioInput';
 import constants from './constants';
 import { connect } from 'react-redux';
+import { Control } from './Views';
+import { Subtitle } from './Texts';
 import { mapStateToProps, mapDispatchToProps } from './goalGameRedux.js';
 import { render } from 'react-dom';
 const { SEAGREEN, MAUVE } = constants;
@@ -51,13 +53,13 @@ function GoalDetail({ route, updateGoal, navigation }){
         navigation.navigate('Home');
     }
     //contentContainerStyle={[styles.container, { flex: 0}]}
-    /*<KeyboardAvoidingView 
-        contentContainerStyle={{height: '100%'}}
-        behavior='position'> */
+    /* */
     return(
-        
-        <ScrollView contentContainerStyle={[styles.container, {flex: isTimed? 0 : 1 }]}>
-            <View style={styles.control}>
+        <KeyboardAvoidingView 
+        contentContainerStyle={[styles.containerStyle,{height: isTimed? 'auto' : '100%' }]}
+        behavior='position'>
+        <ScrollView contentContainerStyle={{flex: isTimed? 0 : 1 }}>
+            <Control>
                 <Text style={[styles.text, styles.label]}>Add a description for this goal.</Text>
                 <TextInput 
                 style={[styles.input, styles.text, styles.descInput]}
@@ -68,9 +70,9 @@ function GoalDetail({ route, updateGoal, navigation }){
                 onChangeText={setDescription}
                 onSubmitEditing={()=>Keyboard.dismiss()}
                 />
-            </View>
+            </Control>
 
-            <View style={styles.control}>
+            <Control>
                 <Text style={[styles.text, styles.label]}>{'This is a timed goal.'}</Text>
                 <FlatList 
                 data={[true, false]}
@@ -79,13 +81,10 @@ function GoalDetail({ route, updateGoal, navigation }){
                 renderItem={renderIsTimedChoices}
                 keyExtractor={item=>item.toString()}
                 />
-            </View>
+            </Control>
             {isTimed && 
             <View>
-                <View style={styles.control}>
-                    <Text style={styles.text}>I will work on <Text style={styles.timeSentence}>{detail.name}</Text> for {duration} {unit} each day.</Text>
-                </View>
-                <View style={[styles.control, styles.timeControl]}>
+                <Control style={styles.timeControl}>
                     <Text style={[styles.text,styles.label, styles.durationLabel]}>Set duration:</Text>
                     <TextInput
                     style={[styles.input, styles.text, styles.timeValueInput]}
@@ -94,26 +93,29 @@ function GoalDetail({ route, updateGoal, navigation }){
                     onBlur={()=>Keyboard.dismiss()}
                     onChangeText={setDuration}
                     />
-                </View>
-                <View style={[styles.control, styles.timeControl]}>
-                <Text style={[styles.text,styles.label, styles.unitLabel]}>Set Unit:</Text>
-                <FlatList 
-                data={['hours', 'minutes']}
-                horizontal={true}
-                contentContainerStyle={styles.inputRow}
-                keyExtractor={item=>item}
-                renderItem={renderUnitChoices}
-                />
-                </View>
+                </Control>
+                <Control style={styles.timeControl}>
+                    <Text style={[styles.text,styles.label, styles.unitLabel]}>Set Unit:</Text>
+                    <FlatList 
+                    data={['hours', 'minutes']}
+                    horizontal={true}
+                    contentContainerStyle={styles.inputRow}
+                    keyExtractor={item=>item}
+                    renderItem={renderUnitChoices}
+                    />
+                </Control>
+                <Control>
+                    <Subtitle>I will work on <Text style={styles.timeSentence}>{detail.name}</Text> for {duration} {unit} each day.</Subtitle>
+                </Control>
             </View> }
-            <View style={[styles.control, styles.saveControl]}>
+            <Control style={styles.saveControl}>
                 <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
                     <Text style={[styles.text, styles.saveButtonText]}>Save Changes</Text>
                 </TouchableOpacity>
-            </View>
+            </Control>
             <StatusBar hidden={true} />
         </ScrollView>
-        
+        </KeyboardAvoidingView>
     )
 }
 //</KeyboardAvoidingView>
@@ -124,8 +126,8 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 10,
     },
-    container:{
-        paddingVertical: 0,
+    constainerStyle:{
+        minHeight: '100%',
     },
     text: {
         fontSize: 20
