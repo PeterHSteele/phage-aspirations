@@ -6,6 +6,7 @@ import constants from './constants';
 import { connect } from 'react-redux';
 import { Control } from './Views';
 import { Subtitle } from './Texts';
+import { HomeButton } from './Inputs';
 import { mapStateToProps, mapDispatchToProps } from './goalGameRedux.js';
 import { render } from 'react-dom';
 const { SEAGREEN, MAUVE } = constants;
@@ -109,9 +110,12 @@ function GoalDetail({ route, updateGoal, navigation }){
                 </Control>
             </View> }
             <Control style={styles.saveControl}>
-                <TouchableOpacity onPress={handleSave} style={styles.saveButton}>
-                    <Text style={[styles.text, styles.saveButtonText]}>Save Changes</Text>
-                </TouchableOpacity>
+                <HomeButton 
+                onPress={handleSave} 
+                style={styles.saveButton} 
+                backgroundColor={SEAGREEN} 
+                textStyle={styles.saveButtonText} 
+                text='Save Changes' />
             </Control>
             <StatusBar hidden={true} />
         </ScrollView>
@@ -177,9 +181,8 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
     },
     saveButtonText:{
-        color: '#fff',
-        textAlign: 'center',
         fontWeight: '900',
+        fontSize: 20,
     },
 })
 

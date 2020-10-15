@@ -73,27 +73,35 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
       <Row>
         <Subtitle style={styles.date}>{getDate()} You { dayComplete ? 'have already': 'haven\'t' } played the game today.</Subtitle>
       </Row>
+      <Row>
       <HomeButton 
       text="Edit/Add Goals" 
       backgroundColor={SEAGREEN} 
       handlePress={()=>navigation.navigate('Goals')}
-      /> 
+      />
+      </Row>
+      <Row>
       <HomeButton 
       text="Start Assessment" 
       backgroundColor={dayComplete ? '#aaa' : MAUVE} 
       disabled={dayComplete}
       handlePress={()=>navigation.navigate('Assessment')}
       />
+      </Row>
+      <Row>
       <HomeButton 
       text="New Day" 
       backgroundColor={DARKPURPLE} 
       handlePress={newDay}
-      />  
+      /> 
+      </Row>
+      <Row>
       <HomeButton 
       text="Game Settings" 
       backgroundColor={LIGHTMAUVE} 
       handlePress={()=>navigation.navigate("Settings")}
-      />  
+      /> 
+      </Row> 
       <StatusBar hidden={true} />
     </View>
     )

@@ -1,20 +1,18 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const HomeButton = ({text, backgroundColor, handlePress, disabled}) => (
-    <View style={styles.row}>
+const HomeButton = ({text, textStyle, backgroundColor, handlePress, disabled}) => (
         <TouchableOpacity 
         style={[styles.panelButton, {backgroundColor}]} 
         disabled={disabled}
         onPress={handlePress}>
-            <Text style={[styles.panelButtonText]}>{text}</Text>
-        </TouchableOpacity>
-    </View> 
+            <Text style={[styles.panelButtonText, textStyle]}>{text}</Text>
+        </TouchableOpacity> 
 );
 
-const ActionButton = ({ style, children, handlePress }) => (
+const ActionButton = ({ style, textStyle, children, handlePress }) => (
     <TouchableOpacity style={[styles.panelButton, style]} onPress={handlePress}>
-        <Text style={[styles.panelButtonText]}>{children}</Text>
+        <Text style={[styles.panelButtonText, textStyle]}>{children}</Text>
     </TouchableOpacity>
 )
 
