@@ -23,34 +23,9 @@ function GoalDetail({ route, updateGoal, navigation }){
         [ unit, setUnit ] = useState( unit ),
         [ duration, setDuration ] = useState( duration ) 
      
-    const TRANSLATION = -100, SCALE = 1;   
-     
-    const slideDownAnim = useRef(new Animated.Value( isTimed ? SCALE : 0)).current;
-    const translateAnim = useRef(new Animated.Value( isTimed ? 0 : TRANSLATION)).current;
-
-    const slide = ( toValueScale, toValueTranslate ) => {
-            Animated.parallel([
-                Animated.timing(
-                    slideDownAnim,
-                    {
-                        useNativeDriver: true,
-                        toValue: toValueScale,
-                        duration: 150
-                    }
-                ),
-                Animated.timing(
-                    translateAnim,
-                    {
-                        useNativeDriver: true,
-                        toValue: toValueTranslate,
-                        duration: 150
-                    }
-                )
-            ]).start()
-    } 
+    const HEIGHT = 200;   
 
     const handleIsTimedChange = ( val ) => {
-        slide( val? SCALE: 0, val ?  0:TRANSLATION);
         setIsTimed(val);
     }
     
@@ -115,7 +90,7 @@ function GoalDetail({ route, updateGoal, navigation }){
                 />
             </Control>
             {
-            <Animated.View style={{transform: [{translateY: translateAnim},{scaleY: slideDownAnim}]}}>
+            <SlideDown isOpen={isTimed} height={HEIGHT} duration={150}>
                 <Control style={styles.timeControl}>
                     <Text style={[styles.text,styles.label, styles.durationLabel]}>Set duration:</Text>
                     <TextInput
@@ -139,7 +114,8 @@ function GoalDetail({ route, updateGoal, navigation }){
                 <Control>
                     <Subtitle>I will work on <Text style={styles.timeSentence}>{detail.name}</Text> for {duration} {unit} each day.</Subtitle>
                 </Control>
-            </Animated.View> }
+            </SlideDown> 
+            }
             <Control style={styles.saveControl}>
                 <HomeButton 
                 handlePress={handleSave} 

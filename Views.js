@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { mapDispatchToProps } from './goalGameRedux';
 
@@ -6,35 +6,56 @@ const Row = ({ children, style }) => <View style={[styles.row, style]}>{children
 
 const Control = ({ children, style }) => <View style={[styles.control, style ]}>{children}</View>
 
-const SlideDown = ({ chidren, initial }) => {
-    const slideDownAnim = useRef(new Animated.Value(initial)).current;
+const SlideDown = ({ children, style, height, isOpen, duration }) => {
+    const TRANSLATION = -1 * height / 2
+    const scaleAnim = useRef(new Animated.Value( isOpen ? 1 : 0)).current;
+    const translateAnim = useRef(new Animated.Value( isOpen ? 0 : TRANSLATION)).current;
 
-    const slideDown = () => {
-        Animated.timing(
-            slideDownAnim,
-            {
-                toValue: 1,
-                duration: 1000
-            }
-        ).start();
-    }
+    useEffect(()=>{
+        slide(
+            isOpen ? 1 : 0,
+            isOpen ? 0 : TRANSLATION
+        ); 
+    }, [isOpen]);
 
-    const slideUp = () => {
-        Animated.timing(
-            slideDownAnim,
-            {
-                toValue:0,
-                duration: 1000
-            }
-        ).start();
+    const slide = ( toValueScale, toValueTranslate ) => {
+            Animated.parallel([
+                Animated.timing(
+                    scaleAnim,
+                    {
+                        useNativeDriver: true,
+                        toValue: toValueScale,
+                        duration,
+                    }
+                ),
+                Animated.timing(
+                    translateAnim,
+                    {
+                        useNativeDriver: true,
+                        toValue: toValueTranslate,
+                        duration,
+                    }
+                )
+            ]).start()
     }
 
     return (
-        <Animated.View style={{ transform: [{scaleY: slideDownAnim}] }}>{children}</Animated.View>
+        <Animated.View 
+        style={
+            style,
+            {
+                transform: [
+                    {translateY: translateAnim},
+                    {scaleY: scaleAnim}
+                ]
+            }}
+        >
+            {children}
+        </Animated.View>
     )
 }
 
-export { Row, Control, SlideDown};
+export { Row, Control, SlideDown };
 
 const styles = StyleSheet.create({
     row:{
