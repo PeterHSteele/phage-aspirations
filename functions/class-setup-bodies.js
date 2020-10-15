@@ -11,10 +11,16 @@ export default class SetUpBodies {
 		this.world.gravity.y = 0;
 		this.height = height;
 		this.width = width;
+		this.checkFilters(this.getInterBubbleCellFilter());
 	}
 
 	clearWorld(){
 		World.clear( this.world );
+	}
+
+	checkFilters( toTest ){
+		const filters = [this.getContainerFilter(), this.getDetectionFilter(), this.getBubbleFilter(), this.getInnerCellFilter(), this.getOuterCellFilter(), this.getInterBubbleCellFilter]
+		filters.forEach( filter => console.log(Detector.canCollide(toTest, filter)));
 	}
 
 	getWalls(){

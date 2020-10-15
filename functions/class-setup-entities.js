@@ -67,7 +67,7 @@ export default class SetUpEntities {
 	}
 
 	getMetaEntities( leuks, germs, saveEntities, bubbles ){
-		const { setUpBodies, width, height } = this,
+		const { setUpBodies, width, height, helpers } = this,
 		{ engine, world } 					 = setUpBodies,
 		controlsBody 						 = Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT ),
 		stagingAreaWidth 					 = .8 * width,
@@ -128,6 +128,7 @@ export default class SetUpEntities {
 							history: ['p'],
 							gameOver: false,
 							saveEntities: ( obj ) => saveEntities(obj),
+							transitionCallback: helpers.stopGame,
 							renderer: <Controls /> 
 						},
 						modal: {
@@ -165,7 +166,7 @@ export default class SetUpEntities {
 			World.add( world, mCell);
 			newCells[e] = this.newCell( GERMR, mCell, type.slice(0,4), -1);
 		});
-		console.log('nLAG', Object.keys(newCells).filter(key=>newCells[key].type=='leuk').length);
+		
 		return newCells;
 	
 	}
@@ -274,12 +275,15 @@ export default class SetUpEntities {
 	*/
 
 	refreshMetaEntities( entities, leuks, germs ){
+		const clearBonusCellAlerts = this.clearBonusCellAlerts.bind(this);
 		const controls = {
 			germs,
 			leuks,
 			newGerms: germs,
 			newLeuks: leuks,
-			phase: 'r',
+			phase: 't',
+			transitionCallback: clearBonusCellAlerts,
+			transitionFrames: 240,
 			pauseThreshold: this.getPauseThreshold( leuks + this.helpers.totalLeuksInGame(entities.controls.bubbleState)),
 			leuksAreAllocated: false,
 			germAllocations: {}
@@ -318,6 +322,20 @@ export default class SetUpEntities {
 			}
 		})
 		return alerts;
+	}
+
+	clearBonusCellAlerts( entities ){
+		Object.keys(entities)
+			.filter( key => key.match(/alert/g))
+			.forEach( alertKey => delete entities[alertKey]);
+
+		const transitionCallback = this.helpers.stopGame.bind(this);
+		const controls = {
+			phase: 'r',
+			transitionCallback,
+		}
+
+		return Object.assign(entities.controls, controls );
 	}
 
 	getBubbles( bubbleCount, bubbles = {} ){

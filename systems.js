@@ -25,20 +25,7 @@ const helpers = new SystemsHelpers( matterFunctions );
 
 
 const logTwo = ( x ) => Math.log( x ) / Math.log( 2 );
-/*
-const modalUpdateStyle = {
-	width: 'auto',
-	height: 'auto',
-	borderRadius: 5,			        
-}
 
-const modalGameOverStyle = {
-	width: 'auto',
-	height: 'auto',
-	borderRadius: 0,
-	margin: 0
-}
-*/
 const Physics = (entities, { time }) => {
     let engine = entities.physics.engine;
     Matter.Engine.update(engine, time.delta);
@@ -50,10 +37,10 @@ export { Physics };
 const PressGerm = (entities, { touches, screen, dispatch }) => {
 	touches.filter( t => t.type === 'press' ).forEach( t => {
 		let { phase } = entities.controls ;
-		if ( phase == 'b' || phase == 'c' || entities.modal.visible ){
+		if ( phase != 'r' && phase != 'p' ){
 			return entities;
 		}
-
+		console.log('phase', phase);
 		let { pageX, pageY } = t.event,
 			center,
 			props,
@@ -266,7 +253,7 @@ const MoveLeuk = ( es, {touches} ) => {
 	if ( dest && startId && startId != 'staging' && !mover ){
 		next = es[ids.find( id =>es[id].type === LEUK && es[id].bubble == startId )];
 		if ( next ){
-			//Add the collisiong filter that allows the germ to travel through the bubble walls
+			//Add the collision filter that allows the germ to travel through the bubble walls
 			next.body.collisionFilter = matterFunctions.getInterBubbleCellFilter();
 			//tell the germ where to go
 			setDestCoords( next, dest, destId );
@@ -337,24 +324,12 @@ const MoveGerm = ( entities, {touches} ) => {
 	let bubbleKeys = Object.keys( allocations );
 	//send new germs first
 	let newGermKeys = keys.filter( key => entities[key].type == GERM && entities[key].bubble < 0 )
-	if (newGermKeys.length<1)console.log('newGermKeys',newGermKeys);
 	if ( newGermKeys.length ){
 		helpers.prepareMover( entities, bubbleKeys, allocations, newGermKeys, false );
 	} else {
 		let overflowBubble = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length > allocations[bubbleKey] );
 		if ( overflowBubble ){
 			helpers.prepareMover( entities, bubbleKeys, allocations, entities[overflowBubble].germs, true );
-			/*let destId = bubbleKeys.find( bubbleKey => entities[bubbleKey].germs.length < allocations[bubbleKey] )
-			let dest = entities[destId];
-			let newMoverId = entities[overflowBubble].germs[0]
-			let newMover = entities[newMoverId]
-
-			newMover.active = true;
-			let { x, y } = dest.body.position;
-			let adjustment = dest.radius - newMover.radius;
-			newMover.destination = [ y + adjustment, x + adjustment, destId ];
-			newMover.body.collisionFilter = matterFunctions.getInterBubbleCellFilter();
-			helpers.velocityMove( entities, newMover, newMoverId );*/
 		} else {
 		//console.log('right before', entities.controls.germAllocations)
 		entities.controls.phase = 'b';
@@ -419,8 +394,7 @@ const Transition = ( entities, { dispatch } ) => {
 	}
 	
 	if ( entities.controls.transitionFrames == 1){
-		dispatch({ type: STOP, data: entities });
-		entities.controls.saveEntities( entities );
+		entities.controls.transitionCallback( entities, dispatch )
 	}
 
 	entities.controls.transitionFrames--;

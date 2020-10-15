@@ -62,13 +62,14 @@ export default class SystemsHelpers{
 		newMover.destination = [ y , x , destId ];
 		this.velocityMove( entities, newMover, newMoverId);
 		if (fromBubble){
-			newMover.collisionFilter = this.matterFunctions.getInterBubbleCellFilter();
+			Body.set(newMover.body, 'collisionFilter', this.matterFunctions.getInterBubbleCellFilter());
+			console.log('should be intercell', newMover.body.collisionFilter)
 		}
 	}
 
 	velocityMove( es, mover ){
 		const { velocity }= mover.body;
-		if ( Math.abs( velocity.x ) > .005 || Math.abs( velocity.y ) > .005 ){
+		if ( Math.abs( velocity.x ) > .02 || Math.abs( velocity.y ) > .02 ){
 			return;
 		}
 
@@ -208,6 +209,7 @@ export default class SystemsHelpers{
 				colors:[],
 			}
 		}
+		if ( ! entities[removed]) console.log('entity to be removed does not exist', removed);
 		Composite.remove( entities.physics.world, entities[removed].body );
 		delete entities[removed];
 	}
@@ -274,6 +276,11 @@ export default class SystemsHelpers{
 	handleEndOfDay( data, dispatch, eodFn ){
 		dispatch({ type: STOP })
 		eodFn( data )
+	}
+
+	stopGame( entities, dispatch){
+		dispatch({ type: STOP, data: entities });
+		entities.controls.saveEntities( entities );
 	}
 
 	doubleGerms( entities ){
