@@ -11,7 +11,7 @@ export default class SetUpBodies {
 		this.world.gravity.y = 0;
 		this.height = height;
 		this.width = width;
-		this.checkFilters(this.getInterBubbleCellFilter());
+		//this.checkFilters(this.getInterBubbleCellFilter());
 	}
 
 	clearWorld(){
