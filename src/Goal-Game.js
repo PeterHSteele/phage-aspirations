@@ -16,6 +16,9 @@ const { GREEN, MAUVE } = constants
 
 const Stack = createStackNavigator();
 
+const headerPadding  = { paddingTop: 15 }
+const darkHeaderStyle = { backgroundColor: MAUVE}
+
 function GoalGame({ assessment, game, detail }) {
  /* if ( assessment ){
     return <Assessment />
@@ -44,18 +47,26 @@ function GoalGame({ assessment, game, detail }) {
   return(
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name={'Home'} component={Home} title={'Home'}/>
+        <Stack.Screen name={'Home'} component={Home} title={'Home'} options={{/*headerStyle:headerPadding*/}}/>
         <Stack.Screen name={'Detail'} component={GoalDetail} options={({route}) => ({title: route.params.name}) }/>
         <Stack.Screen name={'Goals'}  component={GoalList} options={{title: 'Edit/Add Goals'}} />
         <Stack.Screen 
         name="Assessment" 
         component={Assessment}
         options={{
-          headerStyle:{backgroundColor: MAUVE},
+          headerStyle: darkHeaderStyle,
           headerTintColor:"#fff"
         }}
         />
-        <Stack.Screen name={'AssessmentInput'} component={AssessmentInput} options={({route}) => ({title: route.params.goal.name}) }/>
+        <Stack.Screen 
+        name={'AssessmentInput'} 
+        component={AssessmentInput} 
+        options={
+          ({route}) => (
+            {
+              title: route.params.goal.name,
+              headerStyle: darkHeaderStyle
+            }) }/>
         <Stack.Screen name={'Settings'} component={Settings} />
       </Stack.Navigator>
     </NavigationContainer>

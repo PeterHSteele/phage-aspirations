@@ -102,7 +102,7 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
       handlePress={()=>navigation.navigate("Settings")}
       /> 
       </Row> 
-      <StatusBar hidden={true} />
+      
     </View>
     )
 }

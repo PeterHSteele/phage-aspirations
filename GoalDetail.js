@@ -79,7 +79,6 @@ function GoalDetail({ route, updateGoal, navigation }){
                 onSubmitEditing={()=>Keyboard.dismiss()}
                 />
             </Control>
-            <Text>{duration}</Text>
             <Control>
                 <Text style={[styles.text, styles.label]}>{'This is a timed goal.'}</Text>
                 <FlatList 
@@ -123,7 +122,7 @@ function GoalDetail({ route, updateGoal, navigation }){
                 textStyle={styles.saveButtonText} 
                 text='Save Changes' />
             </Control>
-            <StatusBar hidden={true} />
+            <StatusBar  />
         </ScrollView>
         </KeyboardAvoidingView>
     )

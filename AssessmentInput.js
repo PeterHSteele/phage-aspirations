@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FlatList, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import constants from './constants';
 import RadioInput from './RadioInput';
@@ -114,6 +114,7 @@ function AssessmentInput({ navigation, route, updateGoal, goals }){
                     <Text style={[styles.text, styles.submitButtonText]}>Submit</Text>
                 </TouchableOpacity>
             </View>
+            <StatusBar barStyle="light-content"/>
         </View>
     )
 }

@@ -75,7 +75,7 @@ function Assessment({ goals, submitAssessment, navigation, dayComplete }){
                     <Text style={[styles.text, styles.buttonText]}>Submit Assessment</Text>
                 </TouchableOpacity>
             </View>
-            <StatusBar hidden={true} />
+            <StatusBar barStyle={"light-content"} />
         </View>
     )
 }
