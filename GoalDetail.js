@@ -16,7 +16,7 @@ function GoalDetail({ route, updateGoal, navigation }){
     if ( ! detail.time ){
         detail.time = {duration: '15', unit: 'minutes'}
     }
-    let { description, isTimed, time, name, id } = detail,
+    let { description, isTimed, time, name, score, id } = detail,
         { duration, unit } = time;
         [ description, setDescription ] = useState( description );
         [ isTimed, setIsTimed ] = useState( isTimed ),
@@ -56,7 +56,8 @@ function GoalDetail({ route, updateGoal, navigation }){
     }
 
     const handleSave = () => {
-        updateGoal({ id, name, description, isTimed, time });
+        const newTime = { duration, unit }
+        updateGoal({ id, name, description, isTimed, score, time: newTime });
         navigation.navigate('Home');
     }
     //contentContainerStyle={[styles.container, { flex: 0}]}
@@ -78,7 +79,7 @@ function GoalDetail({ route, updateGoal, navigation }){
                 onSubmitEditing={()=>Keyboard.dismiss()}
                 />
             </Control>
-
+            <Text>{duration}</Text>
             <Control>
                 <Text style={[styles.text, styles.label]}>{'This is a timed goal.'}</Text>
                 <FlatList 
@@ -89,7 +90,6 @@ function GoalDetail({ route, updateGoal, navigation }){
                 keyExtractor={item=>item.toString()}
                 />
             </Control>
-            {
             <SlideDown isOpen={isTimed} height={HEIGHT} duration={150}>
                 <Control style={styles.timeControl}>
                     <Text style={[styles.text,styles.label, styles.durationLabel]}>Set duration:</Text>
@@ -115,7 +115,6 @@ function GoalDetail({ route, updateGoal, navigation }){
                     <Subtitle>I will work on <Text style={styles.timeSentence}>{detail.name}</Text> for {duration} {unit} each day.</Subtitle>
                 </Control>
             </SlideDown> 
-            }
             <Control style={styles.saveControl}>
                 <HomeButton 
                 handlePress={handleSave} 

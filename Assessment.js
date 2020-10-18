@@ -10,7 +10,7 @@ import store from './store';
 
 function Assessment({ goals, submitAssessment, navigation, dayComplete }){
     //const initScores = Object.fromEntries( goals.map( e => [ e.name, 0 ] ));
-    
+    console.log( 'programming time', goals[1].score );
     /* if we've updated a score, update the store*/
     /*const scoreData = route.params,
         id = scoreData?.id,
