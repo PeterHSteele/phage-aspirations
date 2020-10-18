@@ -13,7 +13,7 @@ import GameOver from '../GameOver';
 
 export default class SetUpEntities {
 	constructor( width, height, setUpBodies, helpers ){
-		Object.assign( this, { width, height, setUpBodies, helpers })
+		Object.assign( this, { width, height, setUpBodies, helpers });
 	}
 
 	buildEntitiesObject( entities, leuks, germs, saveEntities ){
@@ -45,11 +45,9 @@ export default class SetUpEntities {
 				entities,
 				bonusIds,
 			);
-			const alerts = this.bonusCellAlerts( entities );
 			Object.assign(
 				entities,
 				bonusCells,
-				alerts,
 				this.newLeuksAndGerms( leuks, germs, keys.concat(bonusIds), entities.physics.world )	
 			);
 			Object.keys(cellArrays).forEach( bubbleKey => {
@@ -109,6 +107,7 @@ export default class SetUpEntities {
 						},
 						controls: { 
 							transitionFrames: 0,
+							transitionHooks:{},
 							pauseThreshold: this.getPauseThreshold( leuks ),
 							type: CONTROLS,
 							body: controlsBody,
@@ -275,13 +274,15 @@ export default class SetUpEntities {
 	*/
 
 	refreshMetaEntities( entities, leuks, germs ){
-		const clearBonusCellAlerts = this.clearBonusCellAlerts.bind(this);
+		const clearBonusCellAlerts = this.clearBonusCellAlerts.bind(this),
+			  bonusCellAlerts = this.bonusCellAlerts.bind(this);
 		const controls = {
 			germs,
 			leuks,
 			newGerms: germs,
 			newLeuks: leuks,
 			phase: 't',
+			transitionHooks: {120: bonusCellAlerts },
 			transitionCallback: clearBonusCellAlerts,
 			transitionFrames: 240,
 			pauseThreshold: this.getPauseThreshold( leuks + this.helpers.totalLeuksInGame(entities.controls.bubbleState)),
@@ -310,8 +311,11 @@ export default class SetUpEntities {
 			const style = {
 				position: 'absolute',
 				top: 0, 
+				padding: 5,
+				color: '#fff',
+				borderRadius: 4,
 				left: x + BUBBLER,
-				color: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE
+				backgroundColor: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE
 			}
 
 			alerts['alerts'+i]={
@@ -321,9 +325,13 @@ export default class SetUpEntities {
 				renderer: <AnimatedTitle />
 			}
 		})
-		return alerts;
+		return Object.assign(entities, alerts);
 	}
-
+/*
+	getBonusCellAlerts( entities ){
+		return Object.assign(entities, this.bonusCellAlerts(entities));
+	}
+*/
 	clearBonusCellAlerts( entities ){
 		Object.keys(entities)
 			.filter( key => key.match(/alert/g))
@@ -333,6 +341,7 @@ export default class SetUpEntities {
 		const controls = {
 			phase: 'r',
 			transitionCallback,
+			transitionHooks: {},
 		}
 
 		return Object.assign(entities.controls, controls );

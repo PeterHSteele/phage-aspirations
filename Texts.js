@@ -39,7 +39,7 @@ const AnimatedTitle = (props) => {
         {
           useNativeDriver: true,
           toValue: props.y-50,
-          duration: 3000,
+          duration: 1200,
         }
       ).start();
     }, [translateUp])

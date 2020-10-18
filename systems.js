@@ -40,7 +40,7 @@ const PressGerm = (entities, { touches, screen, dispatch }) => {
 		if ( phase != 'r' && phase != 'p' ){
 			return entities;
 		}
-		console.log('phase', phase);
+		//console.log('phase', phase);
 		let { pageX, pageY } = t.event,
 			center,
 			props,
@@ -392,9 +392,16 @@ const Transition = ( entities, { dispatch } ) => {
 	if ( entities.controls.phase != 't' ){
 		return entities;
 	}
+
+	const { transitionHooks, transitionCallback } = entities.controls;
+	let transitionFrames = entities.controls;
+
+	if ( transitionHooks[entities.controls.transitionFrames] ){
+		entities = transitionHooks[entities.controls.transitionFrames](entities);
+	}
 	
 	if ( entities.controls.transitionFrames == 1){
-		entities.controls.transitionCallback( entities, dispatch )
+		transitionCallback( entities, dispatch )
 	}
 
 	entities.controls.transitionFrames--;
