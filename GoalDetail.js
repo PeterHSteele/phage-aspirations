@@ -1,38 +1,45 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, StatusBar, ScrollView, Keyboard, Animated, KeyboardAvoidingView } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { View, Text, TextInput, FlatList, StyleSheet, StatusBar, ScrollView, Keyboard, KeyboardAvoidingView } from 'react-native';
 import {Picker} from '@react-native-community/picker';
 import RadioInput from './RadioInput';
 import constants from './constants';
 import { connect } from 'react-redux';
 import { Control, SlideDown } from './Views';
-import { Subtitle } from './Texts';
+import { Subtitle, Error } from './Texts';
 import { HomeButton } from './Inputs';
 import { mapStateToProps, mapDispatchToProps } from './goalGameRedux.js';
 import { render } from 'react-dom';
 const { SEAGREEN, MAUVE } = constants;
 
-function GoalDetail({ route, updateGoal, navigation }){
-    const detail = route.params;
+function GoalDetail({ route, updateGoal, addGoal, navigation }){
+    const detail = route.params.goal,
+          isNew = route.params.isNew;
     if ( ! detail.time ){
         detail.time = {duration: '15', unit: 'minutes'}
     }
     let { description, isTimed, time, name, score, id } = detail,
-        { duration, unit } = time;
-        [ description, setDescription ] = useState( description );
-        [ isTimed, setIsTimed ] = useState( isTimed ),
-        [ unit, setUnit ] = useState( unit ),
-        [ duration, setDuration ] = useState( duration ) 
+        { duration, unit, spent } = time;
+    let [ localName, setName] = useState(name),
+        [ nameError, setNameError ] = useState(''),
+        [ localDescription, setDescription ] = useState( description ),
+        [ localIsTimed, setIsTimed ] = useState( isTimed ),
+        [ localUnit, setUnit ] = useState( unit ),
+        [ localDuration, setDuration ] = useState( duration )/*,
+        [ offset, setOffset ] = useState({x:0,y:0});*/
      
     const HEIGHT = 200;   
 
     const handleIsTimedChange = ( val ) => {
         setIsTimed(val);
     }
+
+   const container = useRef(null)
     
     const renderIsTimedChoices = ({item}) => {
         return (
             <RadioInput 
-                background={isTimed === item? SEAGREEN : '#fff'}
+                background={localIsTimed === item? SEAGREEN : '#fff'}
                 handlePress={handleIsTimedChange}
                 containerStyle={{alignItems:'center', padding: 5}}
                 label={item === true ? 'yes' : 'no' }
@@ -42,10 +49,16 @@ function GoalDetail({ route, updateGoal, navigation }){
         )
     }
 
+    const handleDurationInputFocus = () => {
+        //setOffset({x:0,y:300});
+        //console.log('scrollingtoEnd');
+        //container.current.scrollToEnd();
+    }
+
     const renderUnitChoices = ({item}) => {
         return (
             <RadioInput
-            background={unit === item? SEAGREEN : '#fff'}
+            background={localUnit === item? SEAGREEN : '#fff'}
             handlePress={setUnit}
             containerStyle={{alignItems:'center', padding: 5}}
             label={item[0].toUpperCase()+item.slice(1)}
@@ -56,31 +69,75 @@ function GoalDetail({ route, updateGoal, navigation }){
     }
 
     const handleSave = () => {
-        const newTime = { duration, unit }
-        updateGoal({ id, name, description, isTimed, score, time: newTime });
+        if ( ! localName.length ){
+            setNameError('Please enter a name');
+            return;
+        }
+        const newTime = { 
+            duration: localDuration, 
+            unit: localUnit, 
+            spent 
+        }
+        const goal = { 
+            id, 
+            name: localName, 
+            description: localDescription, 
+            isTimed: localIsTimed, 
+            score, 
+            time: newTime 
+        };
+        if ( isNew ){
+            addGoal(goal);
+        } else {
+            updateGoal(goal);
+        }
         navigation.navigate('Home');
     }
     //contentContainerStyle={[styles.container, { flex: 0}]}
     /* */
+    /*<KeyboardAvoidingView 
+        contentContainerStyle={[/*styles.containerStyle,{height: isTimed? 'auto' : '100%' }*//*]}
+        behavior='height'> <ScrollView 
+        ref={container}
+        contentContainerStyle={[/*{justifyContent:'center', alignItems: 'stretch',}*///]}>}
     return(
-        <KeyboardAvoidingView 
-        contentContainerStyle={[/*styles.containerStyle,{height: isTimed? 'auto' : '100%' }*/]}
-        behavior='position'>
-        <ScrollView /*contentContainerStyle={[{flex: 1 }]}*/>
-          <Control>
+        <KeyboardAwareScrollView>
+             <Control style={styles.saveControl}>
+                <HomeButton 
+                handlePress={handleSave} 
+                style={styles.saveButton} 
+                backgroundColor={SEAGREEN} 
+                textStyle={styles.saveButtonText} 
+                text='Save Changes' />
+            </Control>
+            {isNew && <Control>
+                <Text style={[styles.text, styles.label]}>Name for this goal</Text>
+                <TextInput 
+                style={[styles.input, styles.text]}
+                onBlur={()=>Keyboard.dismiss()} 
+                value={localName}
+                onChangeText={setName}
+                onSubmitEditing={()=>Keyboard.dismiss()}
+                returnKeyType={'done'}
+                />
+                <Error>{nameError}</Error>
+            </Control>
+            }
+            <Control>
                 <Text style={[styles.text, styles.label]}>Add a description for this goal.</Text>
                 <TextInput 
                 style={[styles.input, styles.text, styles.descInput]}
                 onBlur={()=>Keyboard.dismiss()} 
                 multiline={true} 
                 numberOfLines={4} 
-                value={description}
+                value={localDescription}
                 onChangeText={setDescription}
                 onSubmitEditing={()=>Keyboard.dismiss()}
+                returnKeyType={'done'}
                 />
             </Control>
             <Control>
-                <Text style={[styles.text, styles.label]}>{'This is a timed goal.'}</Text>
+                <Text style={[styles.text, styles.label]}>This is a timed goal.</Text>
                 <FlatList 
                 data={[true, false]}
                 horizontal={true}
@@ -89,15 +146,18 @@ function GoalDetail({ route, updateGoal, navigation }){
                 keyExtractor={item=>item.toString()}
                 />
             </Control>
-            <SlideDown isOpen={isTimed} height={HEIGHT} duration={150}>
+            <SlideDown isOpen={localIsTimed} height={HEIGHT} duration={150}>
                 <Control style={styles.timeControl}>
                     <Text style={[styles.text,styles.label, styles.durationLabel]}>Set duration:</Text>
                     <TextInput
                     style={[styles.input, styles.text, styles.timeValueInput]}
                     keyboardType='numeric'
-                    value={duration}
+                    maxLength={3}
+                    value={localDuration}
+                    onFocus={handleDurationInputFocus}
                     onBlur={()=>Keyboard.dismiss()}
                     onChangeText={setDuration}
+                    returnKeyType={'done'}
                     />
                 </Control>
                 <Control style={styles.timeControl}>
@@ -114,19 +174,13 @@ function GoalDetail({ route, updateGoal, navigation }){
                     <Subtitle>I will work on <Text style={styles.timeSentence}>{detail.name}</Text> for {duration} {unit} each day.</Subtitle>
                 </Control>
             </SlideDown> 
-            <Control style={styles.saveControl}>
-                <HomeButton 
-                handlePress={handleSave} 
-                style={styles.saveButton} 
-                backgroundColor={SEAGREEN} 
-                textStyle={styles.saveButtonText} 
-                text='Save Changes' />
-            </Control>
             <StatusBar  />
-        </ScrollView>
-        </KeyboardAvoidingView>
+       
+        </KeyboardAwareScrollView>
     )
 }
+
+ /* </ScrollView></KeyboardAvoidingView>*/
 export default connect(mapStateToProps, mapDispatchToProps)(GoalDetail);
 
 const styles = StyleSheet.create({

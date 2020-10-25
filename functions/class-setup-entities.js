@@ -314,6 +314,8 @@ export default class SetUpEntities {
 				padding: 5,
 				color: '#fff',
 				borderRadius: 4,
+				borderWidth: 1,
+				borderColor: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE,	
 				left: x + BUBBLER,
 				backgroundColor: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE
 			}

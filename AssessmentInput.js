@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { FlatList, View, Text, StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
+import { FlatList, View, Text, StyleSheet, TouchableOpacity, StatusBar, ViewBase } from 'react-native';
+import { Row } from './Views';
+import { Subtitle } from './Texts';
 import { TextInput } from 'react-native-gesture-handler';
 import constants from './constants';
 import RadioInput from './RadioInput';
@@ -9,26 +11,25 @@ import { ListItem } from 'react-native-elements';
 import NumericInput from 'react-native-numeric-input'
 const { SEAGREEN, GRAYGREEN, MAUVE } = constants;
 
-const convertTimeToScore = ( time, duration ) => Math.floor(time/duration * 5);
+const convertTimeToScore = ( time, duration ) => Math.min(Math.max(Math.floor(time/duration * 5),1), 5);
+
+const sanitizeTimeValue = (time, unit) => {
+    return (
+        time < 0 ? 0 : 
+        time > 180 && unit == 'minutes' ? 180 : 
+        time > 24 && unit === 'hours' ? 24 : 
+        time
+    )
+}
 
 function AssessmentInput({ navigation, route, updateGoal, goals }){
     const { goal } = route.params,
-          { isTimed, time, id } = goal;
+          { isTimed, time, id, score } = goal;
     
-    let initTimeSpent = 0, initScore = 0;
-    if ( isTimed ){
-        /*get initial time spent value*/
-        initTimeSpent = time.duration * 1;//convert string to number
-        initTimeSpent = initTimeSpent/2;
-        if ( time.unit == 'minutes' ){
-            initTimeSpent = Math.floor( initTimeSpent/15 ) * 15//round down to nearest multiple of 15
-        }
-        /*get initial score value*/
-        initScore = convertTimeToScore( initTimeSpent, time.duration );
-    }
-    
+    let initTimeSpent = time.spent;
+
     let [ timeSpent, updateTimeSpent ] = useState( initTimeSpent ),
-        [score, updateScore ] = useState( initScore ),
+        [currentScore, updateScore ] = useState( convertTimeToScore(time.spent, time.duration)),
         [scoreSyncedToTime, updateScoreSyncedToTime] = useState( true );
 
     const ratings = new Array(5).fill(false).map( (e,i) => {
@@ -36,8 +37,9 @@ function AssessmentInput({ navigation, route, updateGoal, goals }){
     });
 
     const handleTimeSpentChange = ( val ) => {
-        updateTimeSpent( val );
-        updateScore( convertTimeToScore( val, time.duration ));
+        const sanitizedTime = sanitizeTimeValue( val, time.unit );
+        updateTimeSpent( sanitizedTime );
+        updateScore( convertTimeToScore( sanitizedTime, time.duration ));
         updateScoreSyncedToTime(true);
     }
 
@@ -48,23 +50,23 @@ function AssessmentInput({ navigation, route, updateGoal, goals }){
 
     const handleSubmit = () =>{
         let goalToUpdate = goals.find( goal  => goal.id == id );
-        let updated = Object.assign({}, goalToUpdate, { score });
+        const newTimeObj = Object.assign(time, {spent: timeSpent})
+        let updated = Object.assign(
+            {}, 
+            goalToUpdate, 
+            { 
+                score: currentScore,    
+                time: newTimeObj
+            },
+        )
         updateGoal( updated );
         navigation.navigate('Assessment');
     }
     
     const renderItem = ({item}) => {
-        
-        /*return (
-            <View style={styles.control}> 
-                <TouchableOpacity style={[styles.bubble, { backgroundColor: item == goal.score ? SEAGREEN : '#fff' }]} onPress={()=>updateScore( goal.id, item )}></TouchableOpacity>
-                <Text style={styles.text}>{item}</Text>
-            </View>
-        );*/
-
         return (
             <RadioInput
-            background={item > score? '#fff' : scoreSyncedToTime ? GRAYGREEN : SEAGREEN}
+            background={item > currentScore? '#fff' : scoreSyncedToTime ? GRAYGREEN : SEAGREEN}
             containerStyle={{alignItems:'center', padding: 5}}
             checked={item==score}
             handlePress={()=>handleScoreChange(item)}
@@ -74,12 +76,13 @@ function AssessmentInput({ navigation, route, updateGoal, goals }){
             />
         )
     }
+
     return (
         <View>
-            <View style={[styles.row]}>
+            <Row>
                 <Text style={[ styles.text, styles.goalName ]}>{goal.name}</Text>
-            </View>
-            {goal.isTimed && <View style={[styles.row, styles.goalActual]}>
+            </Row>
+            {goal.isTimed && <Row style={styles.goalActual}>
                 <View style={[styles.box]}>
                     <Text style={[styles.text, styles.boxLabel]}>Goal:</Text>
                     <Text style={[styles.boxLabel]}>{goal.time.duration} {goal.time.unit}</Text>
@@ -92,15 +95,17 @@ function AssessmentInput({ navigation, route, updateGoal, goals }){
                     totalHeight={70}
                     valueType='real' 
                     onChange={handleTimeSpentChange} 
-                    step={ goal.time.unit === 'minutes' ? 15 : 1}
+                    step={ time.unit === 'minutes' ? 15 : 1}
+                    minValue={0}
+                    maxValue={ time.unit === 'minutes' ? 180 : 24 }
                     rounded/>
                     <Text style={[styles.numericInputText, styles.boxLabel]}>{goal.time.unit}</Text>
                 </View>
-            </View>}
-            <View style={[styles.row]}>
+            </Row>}
+            <Row>
                 <Text style={[styles.text]}>Score {scoreSyncedToTime ? '(suggested)' : ''}</Text>
-            </View>
-            <View style={styles.row}>
+            </Row>
+            <Row>
                 <FlatList
                     data={ratings}
                     horizontal={true}
@@ -108,13 +113,13 @@ function AssessmentInput({ navigation, route, updateGoal, goals }){
                     contentContainerStyle={styles.inputRow}
                     keyExtractor={item=>item.toString()}
                 />
-            </View>
-            <View style={[styles.row]}>
+           </Row>
+            <Row>
                 <TouchableOpacity style={[styles.submitButton]} onPress={handleSubmit}>
                     <Text style={[styles.text, styles.submitButtonText]}>Submit</Text>
                 </TouchableOpacity>
-            </View>
-            <StatusBar barStyle="light-content"/>
+            </Row>
+            <StatusBar barStyle="dark-content"/>
         </View>
     )
 }

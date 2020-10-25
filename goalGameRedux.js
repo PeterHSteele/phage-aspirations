@@ -19,8 +19,8 @@ export const types = {
 
 const initialState = {
 	goals:[
-		{ id: 0, name: 'revolution', score: 0, description: 'leave home', isTimed: true, time: {unit: 'minutes', duration: '30' } },
-		{ id: 1, name: 'programming', score: 0, description: 'do it', isTimed: true, time:{unit: 'hours', duration: '8' }},
+		{ id: 0, name: 'revolution', score: 0, description: 'leave home', isTimed: true, time: {unit: 'minutes', duration: '30', spent: 0 } },
+		{ id: 1, name: 'programming', score: 0, description: 'do it', isTimed: true, time:{unit: 'hours', duration: '8', spent: 0 }},
 	],
 	entities: null,
 	completed:[],
@@ -134,7 +134,7 @@ export const reducer = function( state = initialState, action ){
 		case types.ADD: 
 			return {
 				...state,
-				goals:[...state.goals, {id: state.goals.length, name: action.data}]
+				goals:[...state.goals, action.data]
 			};
 		case types.UPDATE:
 			const goalToReplace = state.goals.find( goal => goal.id == action.data.id );
@@ -147,13 +147,12 @@ export const reducer = function( state = initialState, action ){
 				goals,
 			};
 		case types.SHOWDETAIL:
-			console.log(state.goals.find( goal => goal.id == action.data));
 			return {
 				...state,
 				detail: state.goals.find( goal => goal.id == action.data ),
 			};
 		case types.CHANGEDIFFICULTY:
-			console.log('difficulty', action.data);
+			
 			return {
 				...state,
 				difficulty: action.data
@@ -203,7 +202,10 @@ export const reducer = function( state = initialState, action ){
 			}
 		case types.COMPLETEDAY: {
 			const goals = [...state.goals];
-			goals.forEach( e => e.score = 0 );
+			goals.forEach( e => {
+				e.score = 0;
+				e.time.spent=0; 
+			});
 			return {
 				...state,
 				goals,

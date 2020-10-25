@@ -1,12 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 import { Text, StyleSheet, Animated } from 'react-native';
 import { mapDispatchToProps } from './goalGameRedux';
+import constants from './constants';
+const { MIDNIGHTBLUE } = constants;
 
 const Title = ({ children, style }) => <Text style={[styles.title, style]}>{children}</Text>;
 
 const Label = ({ children, style}) => <Text style={[styles.label, style]}>{children}</Text>;
 
 const Subtitle = ({ children, style}) => <Text style={[styles.subtitle, style]}>{children}</Text>;
+
+const Error = ({children, style}) => <Text style={[styles.error, style]}>{children}</Text>
 
 /*const AnimatedTitle = ({y, style, children}) => {
     const translateUp = useRef( Animated.Value(y)).current;
@@ -59,7 +63,7 @@ const AnimatedTitle = (props) => {
     );
   }
 
-export { Title, Label, Subtitle, AnimatedTitle };
+export { Title, Label, Subtitle, AnimatedTitle, Error };
 
 const styles = StyleSheet.create({
     title: {
@@ -76,4 +80,8 @@ const styles = StyleSheet.create({
         color: '#666',
         fontSize: 16,
     },
+    error:{
+      color: MIDNIGHTBLUE,
+      fontSize: 16,
+    }
 })
