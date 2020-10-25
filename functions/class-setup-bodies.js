@@ -1,7 +1,8 @@
 import Matter, { Bodies, Body, Bounds, Composite, Detector, Engine, World } from 'matter-js';
+import SystemsHelpers from './class-systems-helpers';
 import Rect from '../Rect';
 import constants from '../constants';
-const { BUBBLER } = constants;
+const { BUBBLER, STAGINGHEIGHT, CONTROLSHEIGHT } = constants;
 
 export default class SetUpBodies {
 
@@ -11,6 +12,7 @@ export default class SetUpBodies {
 		this.world.gravity.y = 0;
 		this.height = height;
 		this.width = width;
+		this.bubbleCoords = [];
 		//this.checkFilters({ group: 2, });
 	}
 
@@ -89,8 +91,10 @@ export default class SetUpBodies {
 	}
 
 	matterBubble( index ){
-		let bubbleX = 25 + 134*index,//i == 0 ? 20 : Math.trunc( destControlR + Math.random() * ( width - 60 )),
-		bubbleY = 224 + 5 * index,//100 + Math.random() * (height - 2 * bubbleR - stagingHeight - 10 - controlsHeight - 100),
+		//let bubbleX = 25 + 134*index,//i == 0 ? 20 : Math.trunc( destControlR + Math.random() * ( width - 60 )),
+		//bubbleY = 224 + 5 * index;//100 + Math.random() * (height - 2 * bubbleR - stagingHeight - 10 - controlsHeight - 100),
+		const coords = this.getBubbleCoords( index );
+		const bubbleX = coords.x, bubbleY = coords.y;
 		mBubble = Matter.Bodies.circle( bubbleX, bubbleY, BUBBLER, {
 			collisionFilter: this.getBubbleFilter(),
 			isStatic: true,
@@ -124,6 +128,64 @@ export default class SetUpBodies {
 		//if ( index == 0) console.log( rects[0] );
 		//console.log( Detector.canCollide( this.getContainerFilter(), this.constructor.getInnerCellFilter() ) );
 		return mComposite;
+	}
+
+	getBubbleCoords( index ){
+		const random = SystemsHelpers.random,
+		bubbleCoords = this.bubbleCoords,
+		minX = 2 * BUBBLER,
+		maxX = this.width - BUBBLER,
+		maxY = this.height - CONTROLSHEIGHT - ( STAGINGHEIGHT + 10 ) - ( BUBBLER + 5 ),
+		minY = BUBBLER + 25,
+		bubbleCircumference = 2 * BUBBLER,
+		save = new Array(index);
+		
+		const getRandomPoint = () => {
+			let x = random( maxX, minX ),
+				y = random( maxY, minY );
+				
+			return { 
+				pt: { x, y },
+				bounds: {
+					min: {x: x - bubbleCircumference, y: y - bubbleCircumference}, 
+					max: {x: x + bubbleCircumference, y: y + bubbleCircumference}
+				}
+			}
+		}
+
+		const overlaps = ( bounds, pt ) => Bounds.contains( bounds, pt );
+
+		const causesOverlap = ( bounds ) => {
+			for ( i = 0; i<bubbleCoords.length; i++ ){
+				if ( overlaps( bounds, bubbleCoords[i]) ){
+					return true;
+				}
+				return false;
+			}
+		}
+
+		const randomPoint = getRandomPoint();
+
+		while ( causesOverlap(randomPoint.bounds) ){
+			randomPoint = getRandomPoint();
+		}
+
+		this.bubbleCoords.push( randomPoint.pt );
+		return randomPoint.pt;
+		/*
+		while (bubbleCoords[index-1] && !Bounds.contains(bounds,bubbleCoords[index-1])){
+			console.log('index', index);
+			index--;
+		}
+
+		if ( index == 0){
+			const coords = {x,y};
+			this.bubbleCoords.push(coords);
+			return coords;
+		} else {
+			return this.getBubbleCoords( save.length )
+		}
+		*/
 	}
 
 	makeDetector( x, y, octagon ){
