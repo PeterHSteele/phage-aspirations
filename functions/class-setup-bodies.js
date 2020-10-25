@@ -11,7 +11,7 @@ export default class SetUpBodies {
 		this.world.gravity.y = 0;
 		this.height = height;
 		this.width = width;
-		//this.checkFilters(this.getInterBubbleCellFilter());
+		//this.checkFilters({ group: 2, });
 	}
 
 	clearWorld(){
@@ -33,10 +33,10 @@ export default class SetUpBodies {
 		walls = {};
 		let left, right, top, bottom;
 
-		left = Matter.Bodies.rectangle(1,this.height/2,2,this.height,options );
-		right = Matter.Bodies.rectangle(this.width-1, this.height/2, 2, this.height, options );
-		top = Matter.Bodies.rectangle( this.width/2, 1, this.width, 2, options);
-		bottom = Matter.Bodies.rectangle( this.width/2, this.height-1, this.width, 2, options)
+		left = Matter.Bodies.rectangle(-1,this.height/2,2,this.height,options );
+		right = Matter.Bodies.rectangle(this.width+1, this.height/2, 2, this.height, options );
+		top = Matter.Bodies.rectangle( this.width/2, -1, this.width, 2, options);
+		bottom = Matter.Bodies.rectangle( this.width/2, this.height+1, this.width, 2, options)
 		const bodies = [ top, left, right, bottom ];
 		const height = this.height;
 		Matter.World.add( this.world, bodies );

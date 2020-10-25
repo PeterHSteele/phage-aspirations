@@ -56,6 +56,8 @@ const PressGerm = (entities, { touches, screen, dispatch }) => {
 		bubblesAndStaging.push( STAGING );
 		let currentStartKey = bubblesAndStaging.find( bubble => entities[bubble].start );
 
+		console.log('wall pos', entities.left.body.bounds.max.x );
+
 		if ( pageY > entities.controls.y ){
 			
 			if ( ( phase == 'p' || phase == 'r' ) && entities.controls.leuksAreAllocated ){

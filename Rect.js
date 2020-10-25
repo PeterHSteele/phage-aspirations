@@ -3,7 +3,7 @@ import { View, Text } from 'react-native';
 import constants from './constants';
 const { MAUVE, GREEN, ORANGE, tAlert } = constants
 
-export default function Rect ({ body, height, width, color, offset, radius, start, type }){
+export default function Rect ({ body, height, width, color, start, type }){
 	
 	return(
 		<View 
@@ -15,7 +15,7 @@ export default function Rect ({ body, height, width, color, offset, radius, star
 			borderColor: start ? MAUVE : type == 'staging' ? color : '',
 			borderWidth: type == 'staging' ? 4 : 0,
 			position: 'absolute',
-			backgroundColor: type == 'staging' ? ORANGE : '' ,
+			backgroundColor: type == 'staging' ? ORANGE : type == 'bound' ? GREEN : '' ,
 			zIndex:-1
 		}}>
 		</View>
