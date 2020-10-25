@@ -90,6 +90,14 @@ export default class SetUpBodies {
 		return walls;
 	}
 
+	/**
+	 * creates the physics engine representation of a bubble and adds it to the world
+	 * 
+	 * @param {number} index the entity key for the bubble
+	 * 
+	 * @return {object} an object of type Matter.Composite representing the bubble.
+	 */
+
 	matterBubble( index ){
 		//let bubbleX = 25 + 134*index,//i == 0 ? 20 : Math.trunc( destControlR + Math.random() * ( width - 60 )),
 		//bubbleY = 224 + 5 * index;//100 + Math.random() * (height - 2 * bubbleR - stagingHeight - 10 - controlsHeight - 100),
@@ -129,6 +137,15 @@ export default class SetUpBodies {
 		//console.log( Detector.canCollide( this.getContainerFilter(), this.constructor.getInnerCellFilter() ) );
 		return mComposite;
 	}
+
+	/**
+	 * getBubbleCoords
+	 * gets a point at which a bubble will be created at the beginning of the game.
+	 * 
+	 * @param {number} index the bubble index
+	 * 
+	 * @return {object} the coordinates in {x,y} form.
+	 */
 
 	getBubbleCoords( index ){
 		const random = SystemsHelpers.random,
@@ -172,20 +189,6 @@ export default class SetUpBodies {
 
 		this.bubbleCoords.push( randomPoint.pt );
 		return randomPoint.pt;
-		/*
-		while (bubbleCoords[index-1] && !Bounds.contains(bounds,bubbleCoords[index-1])){
-			console.log('index', index);
-			index--;
-		}
-
-		if ( index == 0){
-			const coords = {x,y};
-			this.bubbleCoords.push(coords);
-			return coords;
-		} else {
-			return this.getBubbleCoords( save.length )
-		}
-		*/
 	}
 
 	makeDetector( x, y, octagon ){
