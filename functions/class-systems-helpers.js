@@ -25,11 +25,11 @@ export default class SystemsHelpers{
 		return ( y2 - y1 ) / ( x2 - x1 );
 	}
 
-	random( max ){
-		return Math.random() * max;
+	static random( max, min = 0 ){
+		return min + Math.random() * ( max - min );
 	}
 
-	randomBool(){
+	static randomBool(){
 		return Math.random() < .5;
 	}
 
@@ -37,15 +37,17 @@ export default class SystemsHelpers{
 		return Math.hypot(Math.abs(y2-y1),Math.abs(x2-x1));
 	}
 
-	/*
+	/** 
 	Selects the next germ to move and sets its destination
 	and collisionFilter properties to allow it to do so.
 
-	entities       Object      the game entities
-	bubbleKeys     Array       keys for the bubble entities
-	allocations    Object      Instructions for how many germs should go to each bubble. Takes form of { bubbleKey: int }
-	source 	       Array	   the germs eligible to move
-	fromBubble	   Bool 	   whether germ is already located in a bubble, in which case its collision filter must be changed.
+	@param entities       Object      the game entities
+	@param bubbleKeys     Array       keys for the bubble entities
+	@param allocations    Object      Instructions for how many germs should go to each bubble. Takes form of { bubbleKey: int }
+	@param source 	       Array	   the germs eligible to move
+	@param fromBubble	   Bool 	   whether germ is already located in a bubble, in which case its collision filter must be changed.
+	
+	@return void
 	*/
 
 	prepareMover( entities, bubbleKeys, allocations, source, fromBubble ){
@@ -288,7 +290,7 @@ export default class SystemsHelpers{
 			.filter( key =>  entities[key].type === 'germ' )
 			.map( key => key * 1),
 		
-			{ random, randomBool } = this;
+			{ random, randomBool } = this.constructor;
 		
 		let currentLength = germKeys.length, 
 			newEntities = {}
