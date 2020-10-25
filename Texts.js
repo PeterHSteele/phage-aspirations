@@ -35,7 +35,7 @@ const Error = ({children, style}) => <Text style={[styles.error, style]}>{childr
 }*/
 
 const AnimatedTitle = (props) => {
-    const translateUp= useRef(new Animated.Value(props.y)).current  // Initial value for opacity: 0
+    const translateUp= useRef(new Animated.Value(props.y)).current  
   
     React.useEffect(() => {
       Animated.timing(
@@ -43,19 +43,19 @@ const AnimatedTitle = (props) => {
         {
           useNativeDriver: true,
           toValue: props.y-50,
-          duration: 1200,
+          duration: 600,
         }
       ).start();
     }, [translateUp])
   
     return (
-      <Animated.Text                 // Special animatable View
+      <Animated.Text                 
         style={[
         styles.title,
         {
           ...props.style,
           transform: [{
-              translateY: translateUp         // Bind opacity to animated value
+              translateY: translateUp         
         }]}]}
       >
         +1
