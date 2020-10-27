@@ -11,8 +11,10 @@ import { HomeButton } from './Inputs';
 import { mapStateToProps, mapDispatchToProps } from './goalGameRedux.js';
 import { render } from 'react-dom';
 const { SEAGREEN, MAUVE } = constants;
+import { firebase } from './firebase/firebaseConfig';
+import { addGoal } from './firebase/index';
 
-function GoalDetail({ route, updateGoal, addGoal, navigation }){
+function GoalDetail({ route, updateGoal, navigation }){
     const detail = route.params.goal,
           isNew = route.params.isNew;
     if ( ! detail.time ){
