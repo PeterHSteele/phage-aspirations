@@ -7,11 +7,20 @@ import { HomeButton } from './Inputs';
 import { Title, Subtitle } from './Texts';
 import { Row } from './Views';
 import constants from './constants';
-const { MAUVE, GRAYGREEN, SEAGREEN, DARKPURPLE, LIGHTMAUVE, LIGHTGRAY, ORANGE } = constants;
+import { firebase } from './firebase/firebaseConfig';
+const { MAUVE, GRAYGREEN, SEAGREEN, DARKPURPLE, MIDNIGHTBLUE, LIGHTMAUVE, LIGHTGRAY, ORANGE } = constants;
 
-const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, startAssessment, removeGoal, dayComplete, navigation, newDay, user }){
+const getButtonProps = ( text, backgroundColor, handlePress ) => {
+  return { text, backgroundColor, handlePress };
+}
+
+
+
+const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, logout, removeGoal, dayComplete, navigation,route, newDay, user }){
 
     let [ addGoalInputVal, updateInputVal ] = useState('');
+    /*const { user }= route.params;
+    console.log( 'home user' , user );*/
     
     const getDate = () => {
         const today = new Date();
@@ -65,43 +74,48 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
           </View>
       </View>
     );
+
+    const isUser = null !== user;
+
+    const handleLogInOut = () => {
+      if ( isUser ){
+        firebase.auth().signOut();
+        logout();
+      } else {
+        navigation.navigate('Login')
+      }
+    }
+
+    const logInOutText = isUser ? 'Log Out' : 'Log In';
+
+    const buttonProps = [
+      getButtonProps('Edit/Add Goals', SEAGREEN, ()=>navigation.navigate('Goals', )),
+      getButtonProps('Start Assessment',dayComplete ? '#aaa' : MAUVE, ()=>navigation.navigate('Assessment')),
+      getButtonProps('New Day', DARKPURPLE, newDay),
+      getButtonProps('Game Settings',LIGHTMAUVE,()=>navigation.navigate("Settings")),
+      getButtonProps( logInOutText, MIDNIGHTBLUE, handleLogInOut ),
+    ];
+
+
+    let greeting = isUser ? 'Welcome, ' + user.username+'.' : 'Welcome.';
+
     return (
     <View style={styles.container}>
       <Row>
-        <Title style={[styles.date]}>Welcome, {user}.{/*</Text><Text style={[styles.text,styles.userText]}>{user}</Text><Text>.*/}</Title>
+        <Title style={[styles.date]}>{greeting}{/*</Text><Text style={[styles.text,styles.userText]}>{user}</Text><Text>.*/}</Title>
       </Row>
       <Row>
         <Subtitle style={styles.date}>{getDate()} You { dayComplete ? 'have already': 'haven\'t' } played the game today.</Subtitle>
       </Row>
-      <Row>
-      <HomeButton 
-      text="Edit/Add Goals" 
-      backgroundColor={SEAGREEN} 
-      handlePress={()=>navigation.navigate('Goals')}
-      />
-      </Row>
-      <Row>
-      <HomeButton 
-      text="Start Assessment" 
-      backgroundColor={dayComplete ? '#aaa' : MAUVE} 
-      disabled={dayComplete}
-      handlePress={()=>navigation.navigate('Assessment')}
-      />
-      </Row>
-      <Row>
-      <HomeButton 
-      text="New Day" 
-      backgroundColor={DARKPURPLE} 
-      handlePress={newDay}
-      /> 
-      </Row>
-      <Row>
-      <HomeButton 
-      text="Game Settings" 
-      backgroundColor={LIGHTMAUVE} 
-      handlePress={()=>navigation.navigate("Settings")}
-      /> 
-      </Row> 
+      {
+        buttonProps.map(e => {
+          return (
+            <Row key={e.text}>
+              <HomeButton {...e} />
+            </Row>
+          )
+        })
+      }
       
     </View>
     )

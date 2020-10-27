@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { mapStateToProps, mapDispatchToProps } from '../goalGameRedux.js';
 import Game from '../Game';
 import Assessment from '../Assessment';
 import AssessmentInput from '../AssessmentInput';
 import constants from '../constants';
-import GoalDetail from '../GoalDetail.js';  
+import GoalDetail from '../GoalDetail.js'; 
+import LogIn from '../LogIn'; 
+import Registration from '../Registration';
 import Home from '../Home';
 import { Settings } from '../Settings';
+import { Loading } from '../Loading';
 import { GoalList } from '../GoalList';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { DefaultTouchProcessor } from 'react-native-game-engine';
+import { firebase } from '../firebase/firebaseConfig.js';
 const { GREEN, MAUVE } = constants
 
 const Stack = createStackNavigator();
@@ -22,34 +26,49 @@ const darkHeaderStyle = {
   headerTintColor: '#fff',
 }
 
-function GoalGame({ assessment, game, detail }) {
- /* if ( assessment ){
-    return <Assessment />
-  }
+function GoalGame({ assessment, game, detail, user }) {
+  const [loading, setLoading] = useState(true);
 
-  if ( game ){
-    return <Game />
-  }
+  useEffect(()=>{
+    firebase.auth().onAuthStateChanged( data => {
+      if (data){
+        //console.log('oldway',data)
+        const uid = data.uid;
+        const user = firebase.database().ref('users/' + uid );
+        console.log('loading user',user);
+       user
+        .once('value')
+        .then( snapshot => {
+          const value  = snapshot.val();
+          setLoading( false );
+          if ( value ){
+            //navigation.navigate('Home', {user:value})
+            console.log('loading b4 login', value);
+            login( value );
+            //navigation.navigate('Home')
+          } else {
+            console.log('couldn\'t find data for that user');
+            //navigation.navigate('Login',{login});
+          }
+        })
+        .catch( error =>{
+          console.log('db error: ' + error.message );
+        })
+      } else {
+        setLoading(false);
+        //navigation.navigate('Login',{login});
+      }
+    })
+  },[])
 
-  if ( detail && detail.id+1 ){
-    return <GoalDetail />
-  }
+  if ( loading ) return <></>
 
-
-  <Stack.Screen
-        name="Game"
-        component={Game}
-        options={{headerShown: false, animationEnabled: false}} />
-
-  return (
-    <Home />
-  );
-  */
   if (!game){
-
   return(
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="Home"> 
+        <Stack.Screen name={'Login'} component={LogIn} title={'Log In'} />
+        <Stack.Screen name={'Register'} component={Registration} /> 
         <Stack.Screen name={'Home'} component={Home} title={'Home'} options={{/*headerStyle:headerPadding*/}}/>
         <Stack.Screen name={'Detail'} component={GoalDetail} options={({route}) => ({title: route.params.goal.name || 'New'}) }/>
         <Stack.Screen name={'Goals'}  component={GoalList} options={{title: 'Edit/Add Goals'}} />

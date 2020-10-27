@@ -15,6 +15,8 @@ export const types = {
 	SHOWDETAIL: 'SHOWDETAIL',
 	EXITDETAIL: 'EXITDETAIL',
 	NEWDAY: 'NEWDAY',
+	LOGIN: 'LOGIN',
+	LOGOUT: 'LOGOUT',
 }
 
 const initialState = {
@@ -27,7 +29,7 @@ const initialState = {
 	users:{
 		Bernie: 'M4a'
 	},
-	user: 'Bernie',
+	user: null,
 	detail: null,
 	leuks: 0,
 	loggedIn:true,
@@ -36,7 +38,7 @@ const initialState = {
 	assessment: false,
 	score: .6,
 	difficulty: 1,
-	dayComplete: false
+	dayComplete: false,
 };
 
 
@@ -45,6 +47,17 @@ const actionCreators = {
 		return {
 			type: types.CHANGEDIFFICULTY,
 			data: difficulty
+		}
+	},
+	login: function( user ){
+		return {
+			type: types.LOGIN,
+			data: user
+		}
+	},
+	logout: function(){
+		return {
+			type: types.LOGOUT
 		}
 	},
 	addGoal: function( goal ){
@@ -136,6 +149,16 @@ export const reducer = function( state = initialState, action ){
 				...state,
 				goals:[...state.goals, action.data]
 			};
+		case types.LOGIN:
+			return {
+				...state,
+				user: action.data,
+			};
+		case types.LOGOUT:
+			return {
+				...state,
+				user: null,
+			}
 		case types.UPDATE:
 			const goalToReplace = state.goals.find( goal => goal.id == action.data.id );
 			const indexOfGoalToReplace = state.goals.indexOf(goalToReplace);
@@ -265,5 +288,7 @@ export const mapDispatchToProps = function( dispatch ){
 		showDetail: ( id ) => dispatch( actionCreators.showDetail( id )),
 		exitDetail: () => dispatch( actionCreators.exitDetail()),
 		newDay: () => dispatch( actionCreators.newDay()),
+		login: ( user ) => dispatch( actionCreators.login( user )),
+		logout: () => dispatch( actionCreators.logout()),
  	}
 }

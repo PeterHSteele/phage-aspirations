@@ -14,3 +14,5 @@ web-report/
 .DS_Store
 
 scraps.js
+config.js
+Loading.js
