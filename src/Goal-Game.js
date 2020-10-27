@@ -45,7 +45,6 @@ function GoalGame({ assessment, game, login, detail, user,fetch }) {
           if ( value ){
             //navigation.navigate('Home', {user:value})
             //console.log('loading b4 login', value);
-            fetchGoals( value.id, fetch );
             login( value );
             //navigation.navigate('Home')
           } else {
@@ -63,7 +62,11 @@ function GoalGame({ assessment, game, login, detail, user,fetch }) {
     })
   },[])
 
-  if ( loading ) return <></>
+  useEffect(()=>{
+    if (null !== user){
+      fetchGoals( user.id, fetch);
+    }
+  },[user])
 
   if (!game){
   return(

@@ -179,7 +179,7 @@ export const reducer = function( state = initialState, action ){
 		case types.FETCH:{
 			return {
 				...state,
-				goals,
+				goals: action.data,
 			}
 		};
 		case types.SHOWDETAIL:

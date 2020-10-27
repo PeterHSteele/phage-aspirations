@@ -16,9 +16,11 @@ const addGoal = ( uid, goal ) => {
 const fetchGoals = ( uid, dispatch ) => {
     database
         .ref('userGoals/'+uid)
-        .on('value', goals=>{
-            console.log('on callback',goals)
-            //dispatch(goals)
+        .on('value', snapshot=>{
+            const goals = snapshot.val();
+            const formatted = Object.keys(goals).map( key => goals[key] );
+            //console.log('on callback \n', formatted);
+            dispatch(formatted);
         })
 }
 
