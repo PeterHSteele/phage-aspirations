@@ -5,6 +5,7 @@ const FETCH = 'FETCH';
 const database = firebase.database();
 
 const addGoal = ( uid, goal ) => {
+    console.log('add goal', uid, goal );
     const key = database.ref().child('goals').push().key;
     const updates = {}
     updates['userGoals/'+uid+'/'+key]=goal;
@@ -15,15 +16,9 @@ const addGoal = ( uid, goal ) => {
 const fetchGoals = ( uid, dispatch ) => {
     database
         .ref('userGoals/'+uid)
-        .on('value')
-        .then(goals=>{
-            dispatch({
-                type: FETCH,
-                data: goals
-            })
-        })
-        .catch(error=>{
-            console.log('fetch goal error: ' + error.message)
+        .on('value', goals=>{
+            console.log('on callback',goals)
+            //dispatch(goals)
         })
 }
 

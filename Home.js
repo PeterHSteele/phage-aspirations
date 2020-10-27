@@ -22,6 +22,7 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
     /*const { user }= route.params;
     console.log( 'home user' , user );*/
     
+
     const getDate = () => {
         const today = new Date();
         const month = constants.MONTHS[today.getMonth()],

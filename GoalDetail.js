@@ -14,7 +14,7 @@ const { SEAGREEN, MAUVE } = constants;
 import { firebase } from './firebase/firebaseConfig';
 import { addGoal } from './firebase/index';
 
-function GoalDetail({ route, updateGoal, navigation }){
+function GoalDetail({ route, updateGoal, navigation, user }){
     const detail = route.params.goal,
           isNew = route.params.isNew;
     if ( ! detail.time ){
@@ -89,7 +89,7 @@ function GoalDetail({ route, updateGoal, navigation }){
             time: newTime 
         };
         if ( isNew ){
-            addGoal(goal);
+            addGoal(user.id, goal);
         } else {
             updateGoal(goal);
         }

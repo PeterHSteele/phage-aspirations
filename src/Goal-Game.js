@@ -16,6 +16,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { DefaultTouchProcessor } from 'react-native-game-engine';
 import { firebase } from '../firebase/firebaseConfig.js';
+import { fetchGoals } from '../firebase/index';
 const { GREEN, MAUVE } = constants
 
 const Stack = createStackNavigator();
@@ -26,7 +27,7 @@ const darkHeaderStyle = {
   headerTintColor: '#fff',
 }
 
-function GoalGame({ assessment, game, detail, user }) {
+function GoalGame({ assessment, game, login, detail, user,fetch }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(()=>{
@@ -35,7 +36,7 @@ function GoalGame({ assessment, game, detail, user }) {
         //console.log('oldway',data)
         const uid = data.uid;
         const user = firebase.database().ref('users/' + uid );
-        console.log('loading user',user);
+        //console.log('loading user',user);
        user
         .once('value')
         .then( snapshot => {
@@ -43,11 +44,12 @@ function GoalGame({ assessment, game, detail, user }) {
           setLoading( false );
           if ( value ){
             //navigation.navigate('Home', {user:value})
-            console.log('loading b4 login', value);
+            //console.log('loading b4 login', value);
+            fetchGoals( value.id, fetch );
             login( value );
             //navigation.navigate('Home')
           } else {
-            console.log('couldn\'t find data for that user');
+            //console.log('couldn\'t find data for that user');
             //navigation.navigate('Login',{login});
           }
         })

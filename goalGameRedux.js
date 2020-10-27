@@ -17,6 +17,7 @@ export const types = {
 	NEWDAY: 'NEWDAY',
 	LOGIN: 'LOGIN',
 	LOGOUT: 'LOGOUT',
+	FETCH: 'FETCH',
 }
 
 const initialState = {
@@ -64,6 +65,12 @@ const actionCreators = {
 		return {
 			type: types.ADD,
 			data: goal
+		}
+	},
+	fetchGoals: function(goals){
+		return {
+			type: types.FETCH,
+			data: goals,
 		}
 	},
 	showDetail: function( id ){
@@ -169,6 +176,12 @@ export const reducer = function( state = initialState, action ){
 				...state,
 				goals,
 			};
+		case types.FETCH:{
+			return {
+				...state,
+				goals,
+			}
+		};
 		case types.SHOWDETAIL:
 			return {
 				...state,
@@ -261,7 +274,7 @@ export const mapStateToProps = function({ goals, difficulty, users, loggedIn, ga
 		loggedIn: loggedIn,
 		game: game,
 		gameOver: gameOver,
-		score: completed.length/goals.length,
+		score: 0,
 		assessment,
 		leuks,
 		entities,
@@ -290,5 +303,6 @@ export const mapDispatchToProps = function( dispatch ){
 		newDay: () => dispatch( actionCreators.newDay()),
 		login: ( user ) => dispatch( actionCreators.login( user )),
 		logout: () => dispatch( actionCreators.logout()),
+		fetch: ( goals ) => dispatch( actionCreators.fetchGoals( goals )),
  	}
 }
