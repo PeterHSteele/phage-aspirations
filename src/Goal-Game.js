@@ -16,7 +16,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { DefaultTouchProcessor } from 'react-native-game-engine';
 import { firebase } from '../firebase/firebaseConfig.js';
-import { fetchGoals } from '../firebase/index';
+import { fetchGoals, saveEntitiesToDatabase, fetchEntities } from '../firebase/index';
 const { GREEN, MAUVE } = constants
 
 const Stack = createStackNavigator();
@@ -27,7 +27,7 @@ const darkHeaderStyle = {
   headerTintColor: '#fff',
 }
 
-function GoalGame({ assessment, game, login, detail, user,fetch }) {
+function GoalGame({ assessment, game, login, detail, user,fetch, saveEntities }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(()=>{
@@ -65,8 +65,11 @@ function GoalGame({ assessment, game, login, detail, user,fetch }) {
   useEffect(()=>{
     if (null !== user){
       fetchGoals( user.id, fetch);
+      //fetchEntities( user.id, saveEntities);//Rename saveEntities saveEntitiesToStore
     }
   },[user])
+
+  if ( loading ) return <></>;
 
   if (!game){
   return(
@@ -101,7 +104,7 @@ function GoalGame({ assessment, game, login, detail, user,fetch }) {
     </NavigationContainer>
   )
       }
-  return <Game />
+  return <Game saveEntitiesToDatabase={saveEntitiesToDatabase(user.id)}/>
   
 }
 

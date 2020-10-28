@@ -20,7 +20,7 @@ function GoalDetail({ route, updateGoal, navigation, user }){
     if ( ! detail.time ){
         detail.time = {duration: '15', unit: 'minutes'}
     }
-    let { description, isTimed, time, name, score, id } = detail,
+    let { description, isTimed, time, name, score, id, key } = detail,
         { duration, unit, spent } = time;
     let [ localName, setName] = useState(name),
         [ nameError, setNameError ] = useState(''),
@@ -88,11 +88,12 @@ function GoalDetail({ route, updateGoal, navigation, user }){
             score, 
             time: newTime 
         };
-        if ( isNew ){
+        addGoal( user.id, goal, key || null);
+        /*if ( isNew ){
             addGoal(user.id, goal);
         } else {
-            updateGoal(goal);
-        }
+            addGoal(goal);
+        }*/
         navigation.navigate('Home');
     }
     //contentContainerStyle={[styles.container, { flex: 0}]}
