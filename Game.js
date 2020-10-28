@@ -59,7 +59,8 @@ class Game extends React.PureComponent{
 	}
 
 	render(){	
-		const { leuks, difficulty, saveEntities } = this.props,
+		const { leuks, difficulty, saveEntitiesToDatabase, saveEntities } = this.props,
+		//uid = user.id,
 		germs = this.props.goals.length * 2  + this.props.difficulty * 3;
 		let entities=this.props.entities;
 		if ( !this.props.dayComplete ){ 
