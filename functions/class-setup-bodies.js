@@ -12,7 +12,8 @@ export default class SetUpBodies {
 		this.world.gravity.y = 0;
 		this.height = height;
 		this.width = width;
-		this.bubbleCoords = [];
+		//this.bubbleCoords = [{x:50,y:100},{x:100,y:150},{x:250, y:400}, {x:200, y:300},{x:100,y:460}];
+		this.bubbleCoords=[{x: 202, y: 390}];
 		//this.checkFilters({ group: 2, });
 	}
 
@@ -177,13 +178,15 @@ export default class SetUpBodies {
 				if ( overlaps( bounds, bubbleCoords[i]) ){
 					return true;
 				}
-				return false;
 			}
+			console.log('bubbleCoords',bubbleCoords);
+			return false;
 		}
 
-		const randomPoint = getRandomPoint();
+		let randomPoint = getRandomPoint();
 
 		while ( causesOverlap(randomPoint.bounds) ){
+			console.log('has overlap' )
 			randomPoint = getRandomPoint();
 		}
 
