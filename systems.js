@@ -265,6 +265,7 @@ const MoveLeuk = ( es, {touches} ) => {
 		if (! next){
 			return es;
 		}
+		next.body.collisionFilter = matterFunctions.getInterBubbleCellFilter();
 		setDestCoords( next, dest, destId );
 	} 
 

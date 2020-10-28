@@ -62,11 +62,8 @@ export default class SystemsHelpers{
 		newMover.active = true;
 		let { x, y } = dest.body.position;
 		newMover.destination = [ y , x , destId ];
+		Body.set(newMover.body, 'collisionFilter', this.matterFunctions.getInterBubbleCellFilter());
 		this.velocityMove( entities, newMover, newMoverId);
-		if (fromBubble){
-			Body.set(newMover.body, 'collisionFilter', this.matterFunctions.getInterBubbleCellFilter());
-			console.log('should be intercell', newMover.body.collisionFilter)
-		}
 	}
 
 	velocityMove( es, mover ){
@@ -135,7 +132,7 @@ export default class SystemsHelpers{
 		mover.bubble = bubbleId;
 
 		//scale body if need be
-		if ( bubble.leuks.length + bubble.germs.length === SIZES[bubble.size + 1] ){
+		if ( bubble.leuks.length + bubble.germs.length >= SIZES[bubble.size + 1] ){
 			this.scaleBody( bubble, true );
 		}
 		mover.destination = [];
