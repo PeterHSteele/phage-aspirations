@@ -1,12 +1,12 @@
 import {firebase} from './firebaseConfig';
-
-const FETCH = 'FETCH';
+import { Composite } from 'matter-js'
 
 const database = firebase.database();
 
-const addGoal = ( uid, goal ) => {
-    console.log('add goal', uid, goal );
-    const key = database.ref().child('goals').push().key;
+const addGoal = ( uid, goal, key = null ) => {
+    if (!key){
+        key = database.ref().child('goals').push().key;
+    }
     const updates = {}
     updates['userGoals/'+uid+'/'+key]=goal;
     updates['goals/'+key]=goal;
@@ -18,10 +18,40 @@ const fetchGoals = ( uid, dispatch ) => {
         .ref('userGoals/'+uid)
         .on('value', snapshot=>{
             const goals = snapshot.val();
-            const formatted = Object.keys(goals).map( key => goals[key] );
-            //console.log('on callback \n', formatted);
+            const formatted = Object.keys(goals).map( key => Object.assign(goals[key], { key }));
             dispatch(formatted);
         })
 }
+/*
+const saveEntitiesToDatabase =  uid => entities => {
+    const updates = {}
+    updates['entities/' + uid]=entities;
+    database.ref().update(updates);
+}
+*/
+const saveEntitiesToDatabase =  uid => entities => {
+    const updates = {}
+    const keys = Object.keys(entities);
+    keys.forEach(key=>{
+        const body = null == entities[key].body ? null : entities[key].body.position;
+        if ( entities[key].composite ){
+            const bubble = Composite.get( entities[key].composite, 'bubble', 'body');
+            console.log('retrieved', bubble.position )
+            entities[key].composite = bubble.position;
+        }
+        entities[key].body = body;
+    })
+    updates['entities/' + uid]=entities;
+    database.ref().update(updates);
+}
 
-export { addGoal, fetchGoals };
+const fetchEntities =  (uid , dispatch) => {
+    database
+        .ref('entities/' + uid)
+        .on('value', snapshot => {
+            const entities = snapshot.val();
+            dispatch( entities );
+        })
+}
+
+export { addGoal, fetchGoals, saveEntitiesToDatabase, fetchEntities };
