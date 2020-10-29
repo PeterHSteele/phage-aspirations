@@ -29,19 +29,21 @@ const saveEntitiesToDatabase =  uid => entities => {
     database.ref().update(updates);
 }
 */
-const saveEntitiesToDatabase =  uid => entities => {
+const saveEntitiesToDatabase = uid => entities => {
     const updates = {}
+    const dataToSave = {}
     const keys = Object.keys(entities);
     keys.forEach(key=>{
-        const body = null == entities[key].body ? null : entities[key].body.position;
-        if ( entities[key].composite ){
+        const position = null == entities[key].body ? null : entities[key].body.position;
+        const type = entities[key].type;
+        /*if ( entities[key].composite ){
             const bubble = Composite.get( entities[key].composite, 'bubble', 'body');
             console.log('retrieved', bubble.position )
             entities[key].composite = bubble.position;
-        }
-        entities[key].body = body;
+        }*/
+        dataToSave[key] = { type, position }
     })
-    updates['entities/' + uid]=entities;
+    updates['entities/' + uid]=dataToSave;
     database.ref().update(updates);
 }
 

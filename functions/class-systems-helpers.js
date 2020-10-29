@@ -214,7 +214,7 @@ export default class SystemsHelpers{
 	}
 
 	startRealignment( entities, dispatch ){
-		const { controls, draw } = entities,
+		const { controls } = entities,
 			  bubbleState = this.getBubbleState( entities ),
 		 	  leuksInGame = this.totalLeuksInGame( bubbleState );
 		
@@ -222,10 +222,10 @@ export default class SystemsHelpers{
 
 		/*if number of leuks has decreased or increased by 40% today, end today's session.*/
 		if ( leuksInGame <= controls.pauseThreshold[0] || leuksInGame >= controls.pauseThreshold[2] ){
-			const [modal, newControls] = this.prepareGamePauseTransition( controls, leuksInGame );
-			Object.assign(entities.modal, modal), 
-			Object.assign(entities.controls,newControls)
-			entities.controls.phase = 't';
+			const [modal, newControls, newTransition] = this.prepareGamePauseTransition( controls, leuksInGame );
+			Object.assign(entities.modal, modal); 
+			Object.assign(entities.controls,newControls);
+			Object.assign(entities.transition, newTransition);
 			//console.log('tFrames', entities.controls.transitionFrames);
 			return entities;
 		}
@@ -238,7 +238,7 @@ export default class SystemsHelpers{
 
 		const newControls = {
 			phase: 'r',
-			history: controls.history.concat('r'),
+			//history: controls.history.concat('r'),
 			leuksAreAllocated: false,
 			bubbleState,
 			germAllocations: placeGerms( controls.newGerms, bubbleState )
@@ -249,7 +249,7 @@ export default class SystemsHelpers{
 		
 		return Object.assign(
 			entities,
-			draw.newLeuksAndGerms( controls.newLeuks, controls.newGerms, Object.keys(entities) )
+			controls.newLeuksAndGerms( controls.newLeuks, controls.newGerms, Object.keys(entities) )
 		);
 	}
 
@@ -264,12 +264,11 @@ export default class SystemsHelpers{
 			frames: 150 
 		};
 
-		const newControls = {
-			transitionFrames: 200,
-			phase: 't'
-		}
+		const newControls = { phase: 't' }
 
-		return [modal, newControls];
+		const newTransition = { transitionFrames: 200 };
+
+		return [modal, newControls, newTransition];
 	}
 
 	handleEndOfDay( data, dispatch, eodFn ){

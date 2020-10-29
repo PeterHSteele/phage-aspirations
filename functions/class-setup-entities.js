@@ -65,79 +65,127 @@ export default class SetUpEntities {
 	}
 
 	getMetaEntities( leuks, germs, saveEntities, bubbles ){
-		const { setUpBodies, width, height, helpers } = this,
-		{ engine, world } 					 = setUpBodies,
-		controlsBody 						 = Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT ),
-		stagingAreaWidth 					 = .8 * width,
-		stagingAreaY 						 = height - CONTROLSHEIGHT - ( STAGINGHEIGHT + 10 );
-		
-		const stagingBody = Bodies.rectangle( 
-			width/2, 
-			stagingAreaY + STAGINGHEIGHT/2, 
-			stagingAreaWidth, 
-			STAGINGHEIGHT, 
-			{ 
-				collisionFilter: { 
-					group: 2 
-				} 
-			} 
-		);
+		//const { setUpBodies} = this,
+			   const physics = this.getPhysicsEntity(),
+					 staging = this.getStagingEntity(),
+					controls = this.getControlsEntity(leuks, germs, saveEntities, bubbles),
+				  transition = this.getTransitionEntity(),
+				  	   modal = this.getModalEntity( leuks );
 
 		return {
-						physics: {
-							type: 'physics',
-							engine,
-							world
-						},
-						draw:{
-							type: 'draw',
-							newLeuksAndGerms: this.newLeuksAndGerms.bind(this),
-						},
-						staging:{
-							type: 'staging',
-							body: stagingBody,
-							height: STAGINGHEIGHT,
-							width: stagingAreaWidth,
-							offset: { x: 0, y: 0 },
-							y: stagingAreaY,
-							radius: 0,
-							start: false,
-							color: PURPLE,
-							renderer: <Rect />
-						},
-						controls: { 
-							transitionFrames: 0,
-							transitionHooks:{},
-							pauseThreshold: this.getPauseThreshold( leuks ),
-							type: CONTROLS,
-							body: controlsBody,
-							width: width,
-							y: height - CONTROLSHEIGHT,
-							height: CONTROLSHEIGHT,
-							leuks, 
-							germs,
-							newLeuks: leuks,
-							newGerms: germs,
-							bubbleState: this.helpers.getBubbleState( bubbles ),
-							germAllocations:{},
-							bubbleCount: BUBBLECOUNT,
-							leuksAreAllocated: false,
-							width,
-							phase: 'p',
-							history: ['p'],
-							gameOver: false,
-							saveEntities: ( obj ) => saveEntities(obj),
-							transitionCallback: helpers.stopGame,
-							renderer: <Controls /> 
-						},
-						modal: {
-							type: 'modal',
-							message: 'You get ' + leuks + ' leuks!' ,
-							visible: false,
-							frames: 0,
-							renderer: <StatusModal />
-						},
-						...setUpBodies.getWalls()		
+			physics,
+			staging,
+			controls,
+			transition,		
+			modal, 
+			//...setUpBodies.getWalls()		
+		}
+	}
+
+	/**
+	 * @method getPhysicsEntity
+	 * Gets a physics entity to keep track of and update the game simulation.
+	 * 
+	 * @used by getMetaEntities.
+	 * 
+	 * @return {object} the physics entitiy
+	 */
+
+	getPhysicsEntity(){
+		const { engine, world } = this.setUpBodies;
+
+		return {
+			type: 'physics',
+			engine,
+			world
+		}
+	}
+
+	/**
+	 * @method getStagingEntity
+	 * gets an entity that defines an area of the screen where the players pieces (leuks)
+	 * will initially display and where touch events will select those pieces for movement.
+	 * 
+	 * @used by getMetaEntities.
+	 * 
+	 * @return {object} the staging entitiy
+	 */
+
+	getStagingEntity(){
+		const { height, width } = this,
+		stagingAreaWidth  		= .8 * width,
+		stagingAreaY 		    = height - CONTROLSHEIGHT - ( STAGINGHEIGHT + 10 ) + STAGINGHEIGHT/2,
+		stagingAreaX 			= width/2,
+		options 				= { collisionFilter: {group: 2 }},
+		stagingBody 			= Bodies.rectangle( stagingAreaX, stagingAreaY, stagingAreaWidth, STAGINGHEIGHT, options );
+								
+		return {
+			type: 'staging',
+			body: stagingBody,
+			height: STAGINGHEIGHT,
+			width: stagingAreaWidth,
+			offset: { x: 0, y: 0 },
+			y: stagingAreaY,
+			radius: 0,
+			start: false,
+			color: PURPLE,
+			renderer: <Rect />
+		}
+	}
+
+	/**
+	 * @method getTransitionEntity
+	 * gets an entity that defines the duration of a transition between two phases of
+	 * the game, timings for functions calls during those transitions, and a callback 
+	 * to handle setup of the next phase.
+	 * 
+	 * @used by getMetaEntities.
+	 * 
+	 * @return {object} the transition entitiy
+	 */
+
+	getTransitionEntity(){
+		return {
+			transitionFrames: 0,
+			transitionHooks:{},
+			transitionCallback: this.helpers.stopGame,
+		}
+
+	}
+
+	getModalEntity( leuks ){
+		return {
+			type: 'modal',
+			message: 'You get ' + leuks + ' leuks!' ,
+			visible: false,
+			frames: 0,
+			renderer: <StatusModal />
+		}
+	}
+
+	getControlsEntity( leuks, germs, saveEntities, bubbles ){
+		const { width,  height, helpers } = this;
+		controlsBody = Bodies.rectangle( 0, height - CONTROLSHEIGHT, width, CONTROLSHEIGHT );
+
+		return { 
+			pauseThreshold: this.getPauseThreshold( leuks ),
+			type: CONTROLS,
+			body: controlsBody,
+			y: height - CONTROLSHEIGHT,
+			height: CONTROLSHEIGHT,
+			leuks, 
+			germs,
+			newLeuks: leuks,
+			newGerms: germs,
+			bubbleState: this.helpers.getBubbleState( bubbles ),
+			germAllocations:{},
+			bubbleCount: BUBBLECOUNT,
+			leuksAreAllocated: false,
+			newLeuksAndGerms: this.newLeuksAndGerms.bind(this),
+			phase: 'p',
+			gameOver: false,
+			saveEntities: ( obj ) => saveEntities(obj),
+			renderer: <Controls /> 
 		}
 	}
 

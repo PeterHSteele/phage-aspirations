@@ -13,7 +13,7 @@ export default class SetUpBodies {
 		this.height = height;
 		this.width = width;
 		//this.bubbleCoords = [{x:50,y:100},{x:100,y:150},{x:250, y:400}, {x:200, y:300},{x:100,y:460}];
-		this.bubbleCoords=[{x: 202, y: 390}];
+		this.bubbleCoords=[];
 		//this.checkFilters({ group: 2, });
 	}
 
@@ -141,9 +141,9 @@ export default class SetUpBodies {
 
 	/**
 	 * getBubbleCoords
-	 * gets a point at which a bubble will be created at the beginning of the game.
+	 * gets an x and y coordinate for a new bubble at the beginning of the game.
 	 * 
-	 * @param {number} index the bubble index
+	 * @param {number} index To generate bubbles, a loop is run X times, generating X bubbles. This is the current iteration in that loop.
 	 * 
 	 * @return {object} the coordinates in {x,y} form.
 	 */
@@ -179,7 +179,7 @@ export default class SetUpBodies {
 					return true;
 				}
 			}
-			console.log('bubbleCoords',bubbleCoords);
+			//console.log('bubbleCoords',bubbleCoords);
 			return false;
 		}
 

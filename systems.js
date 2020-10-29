@@ -56,7 +56,7 @@ const PressGerm = (entities, { touches, screen, dispatch }) => {
 		bubblesAndStaging.push( STAGING );
 		let currentStartKey = bubblesAndStaging.find( bubble => entities[bubble].start );
 
-		console.log('wall pos', entities.left.body.bounds.max.x );
+		//console.log('wall pos', entities.left.body.bounds.max.x );
 
 		if ( pageY > entities.controls.y ){
 			
@@ -69,7 +69,7 @@ const PressGerm = (entities, { touches, screen, dispatch }) => {
 					if ( currentDest ) entities[currentDest].dest = false;
 					if ( currentStart ) entities[currentStart].start = false;
 					entities.controls.phase = 'c';
-					entities.controls.history.push('c');
+					//entities.controls.history.push('c');
 					return entities;
 				
 			}
@@ -396,18 +396,18 @@ const Transition = ( entities, { dispatch } ) => {
 		return entities;
 	}
 
-	const { transitionHooks, transitionCallback } = entities.controls;
-	let transitionFrames = entities.controls;
+	const transition = entities.transition,
+	{ transitionHooks, transitionCallback, transitionFrames } = transition;
 
-	if ( transitionHooks[entities.controls.transitionFrames] ){
-		entities = transitionHooks[entities.controls.transitionFrames](entities);
+	if ( transitionHooks[transitionFrames] ){
+		entities = transitionHooks[transitionFrames](entities);
 	}
 	
-	if ( entities.controls.transitionFrames == 1){
+	if ( transitionFrames == 1){
 		transitionCallback( entities, dispatch )
 	}
 
-	entities.controls.transitionFrames--;
+	entities.transition.transitionFrames--;
 	return entities;
 }
 
