@@ -214,7 +214,6 @@ export default class SetUpBodies {
 		} 
 		const detector = Matter.Bodies.circle( x, y, 1, {...opts, id: 'detector' } ); 
 		Body.setParts( detector, rects );
-		console.log( 'do parts have same filter?', detector );
 		return detector;
 	}
 
