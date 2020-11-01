@@ -15,7 +15,7 @@ export default function Rect ({ body, height, width, color, start, type }){
 			borderColor: start ? MAUVE : type == 'staging' ? color : '',
 			borderWidth: type == 'staging' ? 4 : 0,
 			position: 'absolute',
-			backgroundColor: type == 'staging' ? ORANGE : type == 'bound' ? GREEN : '' ,
+			backgroundColor: type == 'staging' ? ORANGE : '' ,
 			zIndex:-1
 		}}>
 		</View>

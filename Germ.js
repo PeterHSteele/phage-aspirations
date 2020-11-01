@@ -16,7 +16,7 @@ export const Germ = function({ background, active, radius, body, freeToMove, typ
 			style={[
 				style.germ, 
 				{
-					backgroundColor: active ? '#ff4500' : background,
+					backgroundColor: background,
 					top: body.position.y,
 					left: body.position.x,
 					width: radius * 2,

@@ -4,7 +4,7 @@ import { Bubble } from '../Bubble';
 import { Dimensions } from 'react-native';
 import { FloatUp } from '../Views';
 import { Title } from '../Texts';
-const { BUBBLESCALEFACTOR, CONTROLSHEIGHT, STAGINGHEIGHT, SIZES, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE, SCALEFACTORS } = constants;
+const { CONTROLSHEIGHT, STAGINGHEIGHT, SIZES, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE, SCALEFACTORS } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
 import Controls from '../Controls';
@@ -449,7 +449,7 @@ export default class SetUpEntities {
 				padding: 5,
 				borderRadius: 8,
 				borderWidth: 1,
-				borderColor: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE,	
+				borderColor: bubble[LEUKS].length ? LIGHTBLUE: DARKPURPLE,	
 				left: x + BUBBLER,
 				backgroundColor: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE
 			};

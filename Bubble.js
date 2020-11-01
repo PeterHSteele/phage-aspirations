@@ -6,8 +6,7 @@ const { MAUVE, ORANGE, SEAGREEN, GRAYGREEN, LIGHTMAUVE, LIGHTBLUE } = constants
 
 const RADIUS = 30;
 
-const scalesFacts = [0,1,2].map(e=>1+.2*e)
-console.log(scalesFacts)
+const scalesFacts = [1,1.2,1.4];
 
 export const Bubble = function({ body, active, radius, dest, border, start, flashFrames, germs, leuks }){
 	//if ( flashFrames.colors.length ) console.log( flashFrames.colors[0] );
