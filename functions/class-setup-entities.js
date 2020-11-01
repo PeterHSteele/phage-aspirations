@@ -481,7 +481,7 @@ export default class SetUpEntities {
 	}
 
 	getBubbles( bubbleCount, bubbles = {}, ...args ){
-
+		let floo;
 		const getBubbleSizeFromContents = ( cellsInside ) => {
 			let current = 0;
 			while ( cellsInside > SIZES[current]){
