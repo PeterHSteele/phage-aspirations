@@ -1,5 +1,7 @@
 import {firebase} from './firebaseConfig';
-import { Composite } from 'matter-js'
+import { Composite } from 'matter-js';
+import constants from '../constants';
+const { LEUK, GERM, CONTROLS, BUBBLE } = constants;
 
 const database = firebase.database();
 
@@ -35,13 +37,27 @@ const saveEntitiesToDatabase = uid => entities => {
     const keys = Object.keys(entities);
     keys.forEach(key=>{
         const position = null == entities[key].body ? null : entities[key].body.position;
+        dataToSave[key]={};
         const type = entities[key].type;
+        if ( CONTROLS == key){
+            dataToSave[key].bubbleState = entities[key].bubbleState;
+        }
+        if ( LEUK == type || GERM == type ){
+            dataToSave[key].bubble = entities[key].bubble
+        }
+        if (BUBBLE == type){
+            //console.log('arrays exist',)
+            dataToSave[key].leuks=entities[key].leuks;
+            dataToSave[key].germs=entities[key].germs;
+        }
         /*if ( entities[key].composite ){
             const bubble = Composite.get( entities[key].composite, 'bubble', 'body');
             console.log('retrieved', bubble.position )
             entities[key].composite = bubble.position;
         }*/
-        dataToSave[key] = { type, position }
+        //console.log( dataToSave[key]);
+        dataToSave[key].type = type;
+        dataToSave[key].position = position;
     })
     updates['entities/' + uid]=dataToSave;
     database.ref().update(updates);

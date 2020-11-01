@@ -58,13 +58,17 @@ class Game extends React.PureComponent{
 
 	}
 
+	componentWillUnmount(){
+		this.setUpBodies.clearEngine();
+	}
+
 	render(){	
 		const { leuks, difficulty, saveEntitiesToDatabase, saveEntities } = this.props,
 		//uid = user.id,
 		germs = this.props.goals.length * 2  + this.props.difficulty * 3;
 		let entities=this.props.entities;
 		if ( !this.props.dayComplete ){
-			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs, saveEntities );
+			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs, saveEntitiesToDatabase );
 		}
 		//console.log(Object.keys(entities).length);
 		//console.log('staging',entities['staging'].body.position)

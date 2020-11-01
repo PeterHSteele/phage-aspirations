@@ -65,7 +65,7 @@ function GoalGame({ assessment, game, login, detail, user,fetch, saveEntities })
   useEffect(()=>{
     if (null !== user){
       fetchGoals( user.id, fetch);
-      //fetchEntities( user.id, saveEntities);//Rename saveEntities saveEntitiesToStore
+      fetchEntities( user.id, saveEntities);//Rename saveEntities saveEntitiesToStore
     }
   },[user])
 

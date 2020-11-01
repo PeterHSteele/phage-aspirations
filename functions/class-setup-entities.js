@@ -3,7 +3,7 @@ import constants from '../constants';
 import { Bubble } from '../Bubble';
 import { Dimensions } from 'react-native';
 import { AnimatedTitle } from '../Texts';
-const { CONTROLSHEIGHT, STAGINGHEIGHT, GRAYGREEN, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE } = constants;
+const { BUBBLESCALEFACTOR, CONTROLSHEIGHT, STAGINGHEIGHT, SIZES, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
 import Controls from '../Controls';
@@ -40,7 +40,34 @@ export default class SetUpEntities {
 					keys,
 					BUBBLECOUNT
 				  );
+			//console.log('keys', keys)
+			const oldBubbleData =Object.fromEntries( 
+				Object
+				  .keys(entities)
+				  .filter( key => entities[key].type==BUBBLE )
+				  .map( key => [key, entities[key]])
+				  .map( pair => [pair[0], this.addMissingList(pair[1])])
+			);
+
+			//console.log('obd', oldBubbleData);
 			
+			const metaEntities = Object.assign(
+				{},
+				this.getMetaEntities( leuks, germs, saveEntities,  oldBubbleData), 
+			);
+			
+			const oldLeuksAndGerms = this.oldLeuksAndGerms(entities);
+			
+			const bubbles = this.getBubbles( BUBBLECOUNT, {}, ...Object.keys(oldBubbleData).map(key=>oldBubbleData[key]) );
+			//('before merge bubble', bubbles[0])
+
+			entities = Object.assign(
+				{},
+				metaEntities,
+				bubbles,
+				oldLeuksAndGerms,
+			);
+
 			const [ bonusCells, cellArrays ] =  this.bonusCells(
 				entities,
 				bonusIds,
@@ -58,6 +85,16 @@ export default class SetUpEntities {
 			entities.controls.bubbleState = this.helpers.getBubbleState( entities );
 			return this.refreshMetaEntities(entities, leuks, germs);
 		}
+	}
+
+	addMissingList( bubble ){
+		//console.log('bubble', bubble.leuks, bubble.germs);
+		if (!bubble.hasOwnProperty(LEUKS)){
+			bubble.leuks=[];
+		} else {
+			bubble.germs=[];
+		}
+		return bubble;
 	}
 
 	mapLog(obj,prop){
@@ -136,7 +173,7 @@ export default class SetUpEntities {
 	/**
 	 * @method getTransitionEntity
 	 * gets an entity that defines the duration of a transition between two phases of
-	 * the game, timings for functions calls during those transitions, and a callback 
+	 * the game, timings for function calls during those transitions, and a callback 
 	 * to handle setup of the next phase.
 	 * 
 	 * @used by getMetaEntities.
@@ -146,6 +183,7 @@ export default class SetUpEntities {
 
 	getTransitionEntity(){
 		return {
+			type:"transition",
 			transitionFrames: 0,
 			transitionHooks:{},
 			transitionCallback: this.helpers.stopGame,
@@ -189,6 +227,33 @@ export default class SetUpEntities {
 		}
 	}
 
+	/**
+	 * @method oldLeuksAndGerms
+	 * The physics engine bodies are not saved in firebase because they exceed max nesting 
+	 * depth. Remake them using their former position and type (leuk or germ).
+	 * 
+	 * @param {object} savedEntities collection of data about pre-existing leuks/germs, keyed by their entity keys
+	 * 
+	 * @return {object} the reconstituted entities from the previous day
+	 */
+
+	oldLeuksAndGerms( savedEntities ){
+		const { setUpBodies } = this; 
+		const oldCells = {};
+		const newCell = this.newCell;
+		Object.keys(savedEntities).forEach((key)=>{
+			const entity = savedEntities[key];
+			if ( entity.type != LEUK && entity.type!=GERM ){
+				return;
+			}
+			const { x, y } = entity.position;
+			const mCell=setUpBodies.matterCell( x, y, false );
+			oldCells[key]=newCell(GERMR, mCell, entity.type, entity.bubble );
+		})
+
+		return oldCells;
+	}
+
 	newLeuksAndGerms( leuks, germs, keys, world = this.setUpBodies.world ){
 		const { width, height, setUpBodies } = this,
 			  yS = {
@@ -207,10 +272,12 @@ export default class SetUpEntities {
 			let type = i < germs ? GERMS : LEUKS;
 			let x = width/2,
 			y = yS[type]; 
+			/*
 			let mCell = Bodies.circle( x, y, GERMR, {
 				collisionFilter: setUpBodies.getOuterCellFilter(),
 			});
-			World.add( world, mCell);
+			World.add( world, mCell);*/
+			const mCell = setUpBodies.matterCell( x, y, true );
 			newCells[e] = this.newCell( GERMR, mCell, type.slice(0,4), -1);
 		});
 		
@@ -232,13 +299,13 @@ export default class SetUpEntities {
 		}
 	}
 
-	/*
+	/**
 	getAvailableIds
 
 	Finds lowest `count` integers with no game entity assigned to them.
 
-	keys 	Array		game entity keys
-	count 	Number 		number of new ids needed
+	@param keys 	Array		game entity keys
+	@param count 	Number 		number of new ids needed
 
 	@return ids 	Array		the lowest ids available for assignment
 	*/
@@ -271,7 +338,7 @@ export default class SetUpEntities {
 			  collisionFilter = this.setUpBodies.getInnerCellFilter(),
 			  options = { collisionFilter };
 		Object.keys(bubbleState).forEach( (key, index) => {
-			const bubble = bubbleState[key],
+			const bubble = entities[key],
 			{ x, y } = bubble.body.position,
 			mCell = Bodies.circle( x -GERMR, y -GERMR, GERMR, options ),
 			id = ids[index],
@@ -324,19 +391,23 @@ export default class SetUpEntities {
 	refreshMetaEntities( entities, leuks, germs ){
 		const clearBonusCellAlerts = this.clearBonusCellAlerts.bind(this),
 			  bonusCellAlerts = this.bonusCellAlerts.bind(this);
+		//console.log('refreshing', Object.keys(bubbleState).map(key=>bubbleState[key].leuks))
 		const controls = {
 			germs,
 			leuks,
 			newGerms: germs,
 			newLeuks: leuks,
 			phase: 't',
-			transitionHooks: {120: bonusCellAlerts },
-			transitionCallback: clearBonusCellAlerts,
-			transitionFrames: 240,
 			pauseThreshold: this.getPauseThreshold( leuks + this.helpers.totalLeuksInGame(entities.controls.bubbleState)),
 			leuksAreAllocated: false,
 			germAllocations: {}
 		};
+
+		const transition = {
+			transitionFrames: 240,
+			transitionHooks: {120: bonusCellAlerts },
+			transitionCallback: clearBonusCellAlerts,
+		}
 
 		const modal = {
 			visible: true,
@@ -344,8 +415,14 @@ export default class SetUpEntities {
 			frames: 120
 		};
 
+		Object.assign(entities.modal, modal);
 		Object.assign( entities.controls, controls);
-		Object.assign( entities.modal, modal )
+		Object.assign( entities.transition, transition)
+		
+		//Object.assign( entities, { controls, transition, modal })
+	
+		//console.log(Object.keys(entities).map(key=>entities[key].body && entities[key].body.position));
+		
 		return entities;
 	}
 
@@ -386,28 +463,59 @@ export default class SetUpEntities {
 		Object.keys(entities)
 			.filter( key => key.match(/alert/g))
 			.forEach( alertKey => delete entities[alertKey]);
-
+		
 		const transitionCallback = this.helpers.stopGame.bind(this);
+		console.log('clearing');
 		const controls = {
 			phase: 'r',
+		}
+
+		const transition = {
 			transitionCallback,
 			transitionHooks: {},
 		}
 
-		return Object.assign(entities.controls, controls );
+		Object.assign(entities.controls, controls );
+		Object.assign(entities.transition, transition)
+		return entities;
 	}
 
-	getBubbles( bubbleCount, bubbles = {} ){
+	getBubbles( bubbleCount, bubbles = {}, ...args ){
+
+		const getBubbleSizeFromContents = ( cellsInside ) => {
+			let current = 0;
+			while ( cellsInside > SIZES[current]){
+				current++;
+			}
+			return current;
+		}
+
+		const oldBubbleData = args,
+			  isNewGame 	= oldBubbleData.length == 0;
+			  //console.log( 'oBD', oldBubbleData );
 		let mBubbles= [];
 			new Array( bubbleCount ).fill(false).map((e,i)=>i).forEach((e,i)=>{
-					const setup = this.setUpBodies,
-						  mComposite = setup.matterBubble( i );
+					const setup = this.setUpBodies;
+
+					let mComposite, size, radius = BUBBLER;
+					if (!isNewGame){
+						const {position} = oldBubbleData[i],
+						{x,y}			 = position,
+						cellsInside=oldBubbleData[i].leuks.length + oldBubbleData[i].germs.length;	
+						//console.log('position', position);
+						size = getBubbleSizeFromContents( cellsInside );
+						const scaleFactor = Math.pow( BUBBLESCALEFACTOR, size);
+						radius 			  = BUBBLER * scaleFactor,
+						mComposite = setup.matterBubble( i, radius, {x, y});
+					} else {
+						mComposite = setup.matterBubble( i );
+					}
 	
 					mBubbles.push( mComposite );
 					
 					bubbles[e] = {
 						size: 0,
-						radius: BUBBLER,
+						radius,
 						body: Composite.get( mBubbles[i], BUBBLE, 'body' ),
 						composite: mBubbles[i],
 						flashFrames: {
@@ -418,8 +526,8 @@ export default class SetUpEntities {
 						border: PURPLE,
 						dest: false,
 						start: false,
-						germs: [],
-						leuks: [],
+						germs: isNewGame ? [] : oldBubbleData[i].germs,
+						leuks: isNewGame ? [] : oldBubbleData[i].leuks,
 						type: BUBBLE,
 						renderer: <Bubble />
 					}

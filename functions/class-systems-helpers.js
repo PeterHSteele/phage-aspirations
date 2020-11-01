@@ -9,7 +9,7 @@ import constants from '../constants';
 import placeGerms from '../placeGerms';
 import SetUpEntities from './class-setup-entities';
 import { ListViewComponent } from 'react-native';
-const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE, BUBBLE, STOP, LIGHTMAUVE, LIGHTBLUE } = constants;
+const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE, BUBBLE, STOP, LIGHTMAUVE, LIGHTBLUE, BUBBLESCALEFACTOR } = constants;
 
 export default class SystemsHelpers{
 	constructor( setUpBodies ){
@@ -132,7 +132,7 @@ export default class SystemsHelpers{
 		mover.bubble = bubbleId;
 
 		//scale body if need be
-		if ( bubble.leuks.length + bubble.germs.length >= SIZES[bubble.size + 1] ){
+		if ( bubble.leuks.length + bubble.germs.length >= SIZES[bubble.size] ){
 			this.scaleBody( bubble, true );
 		}
 		mover.destination = [];
@@ -145,9 +145,10 @@ export default class SystemsHelpers{
 	getBubbleState( entities ){
 		let bubbleState = {},
 			bubbleKeys = this.getBubbleKeys(entities);
+			//console.log('get bubble state', Object.keys(entities).filter(key=>entities[key].type==BUBBLE));
 		bubbleKeys.forEach( e => {
 			bubbleState[e] = {
-				...entities[e], 
+				//...entities[e], 
 				leuks: entities[e].leuks.slice(), 
 				germs: entities[e].germs.slice()
 			}
@@ -156,8 +157,8 @@ export default class SystemsHelpers{
 	}
 
 	scaleBody( bubble, increase ){
-		Body.scale( bubble.body, 1.2, 1.2 );
-		bubble.radius *= 1.2;
+		Body.scale( bubble.body, BUBBLESCALEFACTOR, BUBBLESCALEFACTOR );
+		bubble.radius *= BUBBLESCALEFACTOR;
 		bubble.size += 1;
 		Composite.allBodies( bubble.composite ).forEach( body => {
 			if ( body.id != 'bubble' ) {
@@ -187,6 +188,7 @@ export default class SystemsHelpers{
 	}
 
 	totalLeuksInGame( bubbleState ){
+		//console.log('tlig', Object.keys(bubbleState).map(key => bubbleState[key].leuks));
 		return Object.keys( bubbleState ).reduce((a,b)=>a + bubbleState[b].leuks.length, 0)
 	}
 
@@ -254,6 +256,7 @@ export default class SystemsHelpers{
 	}
 
 	prepareGamePauseTransition( controls, leuksInGame ){
+		console.log('game pause t')
 		const start = controls.pauseThreshold[1],
 			  dir = start < leuksInGame ? 'up' : 'down',
 			  message = `Leuks have gone ${dir} today, from ${start} to ${leuksInGame}. We\'ll pick this up tomorrow.`;
@@ -277,6 +280,7 @@ export default class SystemsHelpers{
 	}
 
 	stopGame( entities, dispatch){
+		console.log('stopGame');
 		dispatch({ type: STOP, data: entities });
 		entities.controls.saveEntities( entities );
 	}

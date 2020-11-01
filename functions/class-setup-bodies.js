@@ -2,7 +2,7 @@ import Matter, { Bodies, Body, Bounds, Composite, Detector, Engine, World } from
 import SystemsHelpers from './class-systems-helpers';
 import Rect from '../Rect';
 import constants from '../constants';
-const { BUBBLER, STAGINGHEIGHT, CONTROLSHEIGHT } = constants;
+const { BUBBLER, STAGINGHEIGHT, CONTROLSHEIGHT, GERMR } = constants;
 
 export default class SetUpBodies {
 
@@ -15,6 +15,10 @@ export default class SetUpBodies {
 		//this.bubbleCoords = [{x:50,y:100},{x:100,y:150},{x:250, y:400}, {x:200, y:300},{x:100,y:460}];
 		this.bubbleCoords=[];
 		//this.checkFilters({ group: 2, });
+	}
+
+	clearEngine(){
+		Engine.clear(this.engine);
 	}
 
 	clearWorld(){
@@ -92,6 +96,27 @@ export default class SetUpBodies {
 	}
 
 	/**
+	 * @method matterCell
+	 * 
+	 * creates a body representing the cell (leuk or germ) in the physics simulation.
+	 * Adds the body to the world and returns a reference to the body.
+	 * 
+	 * @param {number} x x-coordinate for the leuk or germ
+	 * @param {number} y y-coordinate for the leuk or germ
+	 * @param {string} location whether the cell is located outside or inside a bubble 
+	 * 
+	 * @return {object} A reference to the entity's body.
+	 */
+
+	matterCell( x, y, outside ){
+		const collisionFilter = outside ? this.getOuterCellFilter() : this.getInnerCellFilter();
+		const options = { collisionFilter };
+		const body = Bodies.circle( x, y, GERMR, options );
+		World.add( this.world, body );
+		return body;
+	}
+
+	/**
 	 * creates the physics engine representation of a bubble and adds it to the world
 	 * 
 	 * @param {number} index the entity key for the bubble
@@ -99,12 +124,15 @@ export default class SetUpBodies {
 	 * @return {object} an object of type Matter.Composite representing the bubble.
 	 */
 
-	matterBubble( index ){
+	matterBubble( index, radius, coords ){
 		//let bubbleX = 25 + 134*index,//i == 0 ? 20 : Math.trunc( destControlR + Math.random() * ( width - 60 )),
 		//bubbleY = 224 + 5 * index;//100 + Math.random() * (height - 2 * bubbleR - stagingHeight - 10 - controlsHeight - 100),
-		const coords = this.getBubbleCoords( index );
-		const bubbleX = coords.x, bubbleY = coords.y;
-		mBubble = Matter.Bodies.circle( bubbleX, bubbleY, BUBBLER, {
+		coords = coords || this.getBubbleCoords( index );
+		radius = radius || BUBBLER;
+		const { x, y }		  = coords;
+		//console.log('bubbleX', bubbleX, 'bY', bubbleY);
+		//console.log('coords', coords);
+		mBubble = Matter.Bodies.circle( x, y, radius, {
 			collisionFilter: this.getBubbleFilter(),
 			isStatic: true,
 			id: 'bubble'
@@ -113,7 +141,7 @@ export default class SetUpBodies {
 			  rectLength = Math.sqrt( 2 ) * this.bubbleR,
 			  rectOffset = rectLength/2;
 
-		const octagon = this.octagon( BUBBLER );
+		const octagon = this.octagon( radius );
 		/*const left = Bodies.rectangle( bubbleX - .9 * this.bubbleR, bubbleY, 1, rectLength, {
 						collisionFilter: this.getContainerFilter(),
 						isStatic: true,
@@ -131,7 +159,7 @@ export default class SetUpBodies {
 						collisionFilter: this.getContainerFilter(),
 						isStatic: true
 					} );*/
-		rects = this.makeOctagonRects( bubbleX, bubbleY, octagon )
+		rects = this.makeOctagonRects( x, y, octagon );
 		//detectorOct = this.makeDetector( bubbleX, bubbleY, octagon )
 		Matter.Composite.add( mComposite, [mBubble].concat( rects ) );
 		//if ( index == 0) console.log( rects[0] );

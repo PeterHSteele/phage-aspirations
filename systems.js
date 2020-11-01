@@ -404,6 +404,7 @@ const Transition = ( entities, { dispatch } ) => {
 	}
 	
 	if ( transitionFrames == 1){
+		console.log('transition callback')
 		transitionCallback( entities, dispatch )
 	}
 
