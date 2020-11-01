@@ -181,8 +181,8 @@ export default class SetUpBodies {
 		bubbleCoords = this.bubbleCoords,
 		minX = 2 * BUBBLER,
 		maxX = this.width - BUBBLER,
-		maxY = this.height - CONTROLSHEIGHT - ( STAGINGHEIGHT + 10 ) - ( BUBBLER + 5 ),
-		minY = BUBBLER + 25,
+		maxY = this.height - CONTROLSHEIGHT - ( STAGINGHEIGHT + 10 ) - ( BUBBLER + 5 ) - 2 * BUBBLER,
+		minY = BUBBLER + 50,
 		bubbleCircumference = 2 * BUBBLER,
 		save = new Array(index);
 		

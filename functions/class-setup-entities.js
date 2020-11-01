@@ -3,7 +3,7 @@ import constants from '../constants';
 import { Bubble } from '../Bubble';
 import { Dimensions } from 'react-native';
 import { AnimatedTitle } from '../Texts';
-const { BUBBLESCALEFACTOR, CONTROLSHEIGHT, STAGINGHEIGHT, SIZES, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE } = constants;
+const { BUBBLESCALEFACTOR, CONTROLSHEIGHT, STAGINGHEIGHT, SIZES, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE, SCALEFACTORS } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
 import Controls from '../Controls';
@@ -481,7 +481,7 @@ export default class SetUpEntities {
 	}
 
 	getBubbles( bubbleCount, bubbles = {}, ...args ){
-		let floo;
+		/*
 		const getBubbleSizeFromContents = ( cellsInside ) => {
 			let current = 0;
 			while ( cellsInside > SIZES[current]){
@@ -489,32 +489,43 @@ export default class SetUpEntities {
 			}
 			return current;
 		}
+		*/
+
+		const getScale = (size) => {
+			let scale = 1;
+			for ( let i=0; i < size; i++ ){
+				scale*=SCALEFACTORS[i]
+			}
+			return scale;
+		}
 
 		const oldBubbleData = args,
 			  isNewGame 	= oldBubbleData.length == 0;
 			  //console.log( 'oBD', oldBubbleData );
 		let mBubbles= [];
-			new Array( bubbleCount ).fill(false).map((e,i)=>i).forEach((e,i)=>{
+			new Array( bubbleCount ).fill(false).forEach((e,i)=>{
 					const setup = this.setUpBodies;
-
-					let mComposite, size, radius = BUBBLER;
+				
+					let mComposite, size=0, radius = BUBBLER, key;
 					if (!isNewGame){
 						const {position} = oldBubbleData[i],
 						{x,y}			 = position,
-						cellsInside=oldBubbleData[i].leuks.length + oldBubbleData[i].germs.length;	
+						//cellsInside=oldBubbleData[i].leuks.length + oldBubbleData[i].germs.length;	
 						//console.log('position', position);
-						size = getBubbleSizeFromContents( cellsInside );
-						const scaleFactor = Math.pow( BUBBLESCALEFACTOR, size);
-						radius 			  = BUBBLER * scaleFactor,
+						key = 
+						size = oldBubbleData[i].size;
+						const scale = getScale(size);
+						radius 			  = BUBBLER * scale,
 						mComposite = setup.matterBubble( i, radius, {x, y});
+						//console.log('size',size)
 					} else {
 						mComposite = setup.matterBubble( i );
 					}
 	
 					mBubbles.push( mComposite );
 					
-					bubbles[e] = {
-						size: 0,
+					bubbles[i] = {
+						size,
 						radius,
 						body: Composite.get( mBubbles[i], BUBBLE, 'body' ),
 						composite: mBubbles[i],

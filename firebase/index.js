@@ -49,6 +49,7 @@ const saveEntitiesToDatabase = uid => entities => {
             //console.log('arrays exist',)
             dataToSave[key].leuks=entities[key].leuks;
             dataToSave[key].germs=entities[key].germs;
+            dataToSave[key].size =entities[key].size;
         }
         /*if ( entities[key].composite ){
             const bubble = Composite.get( entities[key].composite, 'bubble', 'body');

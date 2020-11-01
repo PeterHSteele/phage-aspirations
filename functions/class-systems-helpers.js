@@ -132,7 +132,8 @@ export default class SystemsHelpers{
 		mover.bubble = bubbleId;
 
 		//scale body if need be
-		if ( bubble.leuks.length + bubble.germs.length >= SIZES[bubble.size] ){
+		//console.log( 'checkresize', bubble.leuks.length + bubble.germs.length, bubble.size);
+		if ( bubble.leuks.length + bubble.germs.length === SIZES[bubble.size] ){
 			this.scaleBody( bubble, true );
 		}
 		mover.destination = [];
@@ -256,7 +257,6 @@ export default class SystemsHelpers{
 	}
 
 	prepareGamePauseTransition( controls, leuksInGame ){
-		console.log('game pause t')
 		const start = controls.pauseThreshold[1],
 			  dir = start < leuksInGame ? 'up' : 'down',
 			  message = `Leuks have gone ${dir} today, from ${start} to ${leuksInGame}. We\'ll pick this up tomorrow.`;
@@ -280,7 +280,6 @@ export default class SystemsHelpers{
 	}
 
 	stopGame( entities, dispatch){
-		console.log('stopGame');
 		dispatch({ type: STOP, data: entities });
 		entities.controls.saveEntities( entities );
 	}
