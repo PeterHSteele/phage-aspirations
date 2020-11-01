@@ -14,10 +14,10 @@ const { SIZES, LEUK, GRAYGREEN, BLUE, ORANGE, BUBBLE, STOP, LIGHTMAUVE, LIGHTBLU
 export default class SystemsHelpers{
 	constructor( setUpBodies ){
 		this.matterFunctions = setUpBodies
-		this.animiationColors = [ 
-			[ GRAYGREEN, LIGHTBLUE, LIGHTMAUVE ],
-			[ LIGHTMAUVE, GRAYGREEN, LIGHTBLUE ],
-			[ LIGHTBLUE, LIGHTMAUVE, GRAYGREEN ]
+		this.animationScales = [ 
+			[ 0,1,2 ],
+			[ 1,2,0 ],
+			[ 2,0,1 ] 
 		];
 	}
 
@@ -176,13 +176,21 @@ export default class SystemsHelpers{
 	}
 
 	animateRings( bubble, time, index ){
-			if  ( bubble.flashFrames.colors.length == 0  ){
+			if  ( bubble.flashFrames.scales.length == 0  ){
 				bubble.flashFrames.time = 0;
-				bubble.flashFrames.colors = this.animiationColors[index % 3];
+				bubble.flashFrames.scales = this.animationScales[index % 3];
+				bubble.flashFrames.isAnimated = true;
+				//bubble.flashFrames.scale = index % 3;
  			} else if ( bubble.flashFrames.time > 150 ) {
- 				let last = bubble.flashFrames.colors.pop();
- 				bubble.flashFrames.colors.unshift( last );
- 				bubble.flashFrames.time=0;
+ 				let last = bubble.flashFrames.scales.pop();
+ 				bubble.flashFrames.scales.unshift( last );
+				bubble.flashFrames.time=0;
+				bubble.flashFrames.isAnimated = false;
+				bubble.flashFrames.scales=[]
+				/*bubble.flashFrames.scale++;
+				if (bubble.flashFrames.scale===3){
+					bubble.flashFrames.scale = 0
+				}*/
  			} else {
  				bubble.flashFrames.time += time.delta
  			}
@@ -208,7 +216,7 @@ export default class SystemsHelpers{
 		if ( ! bubble[type].length ){
 			bubble.flashFrames = {
 				time: 0,
-				colors:[],
+				scales:[],
 			}
 		}
 		if ( ! entities[removed]) console.log('entity to be removed does not exist', removed);

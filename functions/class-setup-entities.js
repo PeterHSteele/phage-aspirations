@@ -539,7 +539,8 @@ export default class SetUpEntities {
 						composite: mBubbles[i],
 						flashFrames: {
 							time: 0,
-							colors:[],
+							scales: [],
+							isAnimated: false
 						},
 						//active: false,
 						border: PURPLE,
