@@ -2,7 +2,8 @@ import React from 'react';
 import constants from '../constants';
 import { Bubble } from '../Bubble';
 import { Dimensions } from 'react-native';
-import { AnimatedTitle } from '../Texts';
+import { FloatUp } from '../Views';
+import { Title } from '../Texts';
 const { BUBBLESCALEFACTOR, CONTROLSHEIGHT, STAGINGHEIGHT, SIZES, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE, SCALEFACTORS } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
@@ -404,15 +405,15 @@ export default class SetUpEntities {
 		};
 
 		const transition = {
-			transitionFrames: 240,
-			transitionHooks: {120: bonusCellAlerts },
+			transitionFrames: 180,
+			transitionHooks: {90: bonusCellAlerts },
 			transitionCallback: clearBonusCellAlerts,
 		}
 
 		const modal = {
 			visible: true,
 			message: "Bonuses awarded for holding a bubble overnight",
-			frames: 120
+			frames: 90
 		};
 
 		Object.assign(entities.modal, modal);
@@ -433,23 +434,31 @@ export default class SetUpEntities {
 			const bubble = entities[e],
 				  {x,y} = bubble.body.position;
 			
-			const style = {
+			/*const style = {
 				position: 'absolute',
 				top: 0, 
 				padding: 5,
 				color: '#fff',
-				borderRadius: 4,
+				
+			}*/
+
+			const textStyle={ color: '#fff' };
+
+			const containerStyle = {
+				position: 'absolute',
+				top: 0,
+				padding: 5,
+				borderRadius: 8,
 				borderWidth: 1,
 				borderColor: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE,	
 				left: x + BUBBLER,
 				backgroundColor: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE
-			}
+			};
 
 			alerts['alerts'+i]={
-				style,
 				y: y - 2 * BUBBLER,
 				//renderer: () => <AnimatedTitle y={y} style={style}>{'+1'}</AnimatedTitle>
-				renderer: <AnimatedTitle />
+				renderer: ()=><FloatUp y={y} style={containerStyle}><Title style={textStyle}>+1</Title></FloatUp>
 			}
 		})
 		return Object.assign(entities, alerts);

@@ -106,7 +106,7 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
         <Title style={[styles.date]}>{greeting}{/*</Text><Text style={[styles.text,styles.userText]}>{user}</Text><Text>.*/}</Title>
       </Row>
       <Row>
-        <Subtitle style={styles.date}>{getDate()} You { dayComplete ? 'have already': 'haven\'t' } played the game today.</Subtitle>
+        <Subtitle style={[styles.text,styles.date]}>{getDate()} You { dayComplete ? 'have already': 'haven\'t' } played the game today.</Subtitle>
       </Row>
       {
         buttonProps.map(e => {
@@ -150,7 +150,10 @@ const styles = StyleSheet.create({
     text:{
       fontSize: 18,
       color: "#404040",
-      fontWeight: "300"
+      fontWeight: "300",
+      /*backgroundColor: 'orange',
+      borderWidth: 1,
+      borderRadius: 20*/
     },
     button:{
       padding: 10,

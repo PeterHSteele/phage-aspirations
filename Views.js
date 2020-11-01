@@ -6,6 +6,34 @@ const Row = ({ children, style }) => <View style={[styles.row, style]}>{children
 
 const Control = ({ children, style }) => <View style={[styles.control, style ]}>{children}</View>
 
+const FloatUp = ({children, style, y}) => {
+    const animation = useRef(new Animated.Value(y)).current;
+
+    useEffect(()=>{
+        Animated.timing(
+            animation,
+            {
+                useNativeDriver: true,
+                toValue: y-50,
+                duration: 1000,
+            }
+        ).start()
+    }, [animation]);
+
+    return (
+        <Animated.View 
+        style={[
+            style, 
+            {
+                transform: [
+                    {translateY: animation}
+                ]
+            }
+        ]}
+        >{children}</Animated.View>
+    )
+}
+
 const SlideDown = ({ children, style, height, isOpen, duration }) => {
     const TRANSLATION = -1 * height / 2
     const scaleAnim = useRef(new Animated.Value( isOpen ? 1 : 0)).current;
@@ -55,7 +83,7 @@ const SlideDown = ({ children, style, height, isOpen, duration }) => {
     )
 }
 
-export { Row, Control, SlideDown };
+export { Row, Control, SlideDown, FloatUp };
 
 const styles = StyleSheet.create({
     row:{

@@ -33,7 +33,7 @@ const Error = ({children, style}) => <Text style={[styles.error, style]}>{childr
         </Animated.Text>
     )
 }*/
-
+/*
 const AnimatedTitle = (props) => {
     const translateUp= useRef(new Animated.Value(props.y)).current  
   
@@ -52,8 +52,8 @@ const AnimatedTitle = (props) => {
       <Animated.Text                 
         style={[
         styles.title,
+        props.style,
         {
-          ...props.style,
           transform: [{
               translateY: translateUp         
         }]}]}
@@ -62,8 +62,8 @@ const AnimatedTitle = (props) => {
       </Animated.Text>
     );
   }
-
-export { Title, Label, Subtitle, AnimatedTitle, Error };
+*/
+export { Title, Label, Subtitle, Error };
 
 const styles = StyleSheet.create({
     title: {
