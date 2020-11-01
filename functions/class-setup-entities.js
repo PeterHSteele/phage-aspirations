@@ -288,7 +288,6 @@ export default class SetUpEntities {
 
 	newCell( radius, body, type, bubble ){
 		return {
-			pos: [50, 50],
 			radius,
 			body,
 			active: false,
