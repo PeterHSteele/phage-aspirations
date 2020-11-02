@@ -8,16 +8,15 @@ const RADIUS = 30;
 
 const scalesFacts = [1,1.2,1.4];
 
-export const Bubble = function({ body, active, radius, dest, border, start, flashFrames, germs, leuks }){
-	//if ( flashFrames.colors.length ) console.log( flashFrames.colors[0] );
+export const Bubble = function({ body, active, radius, dest, border, start, flashFrames }){
+	
 	const { isAnimated, scales } = flashFrames,
-	top							 = body.position.y - radius,
-	left						 = body.position.x - radius
+	top							 = body.position.y - 1.2 * radius,
+	left						 = body.position.x - 1.2 * radius,
+	dimensionsBubble 			 = radius * 2.4,
+	dimensionsInner  			 = radius * 2.8,
+	dimensionsOuter 			 = radius * 3.2; 
 
-
-	const dimensionsBubble = radius * 2.4,
-		  dimensionsInner  = radius * 2.8,
-		  dimensionsOuter  = radius * 3.2; 
 	return (
 		<View style={[style.container,{top,left}]}>
 			<View style={[

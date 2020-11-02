@@ -137,7 +137,7 @@ const actionCreators = {
 			game: false,
 		}
 	},
-	exitDetail: function( ){
+	exitDetail: function(){
 		return {
 			type: types.EXITDETAIL,
 		}
@@ -206,7 +206,6 @@ export const reducer = function( state = initialState, action ){
 			return {
 				...state,
 				game: false,
-				gameOver: true
 			}
 		case types.COMPLETE:
 			return {
@@ -234,7 +233,7 @@ export const reducer = function( state = initialState, action ){
 			return {
 				...state,
 				entities: action.data,
-				dayComplete: true
+				dayComplete: true,
 			}
 		case types.COMPLETEDAY: {
 			const goals = [...state.goals];

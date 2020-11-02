@@ -17,8 +17,8 @@ export const Germ = function({ background, active, radius, body, freeToMove, typ
 				style.germ, 
 				{
 					backgroundColor: background,
-					top: body.position.y,
-					left: body.position.x,
+					top: body.position.y - radius,
+					left: body.position.x - radius,
 					width: radius * 2,
 					height: radius * 2,
 					borderRadius: radius

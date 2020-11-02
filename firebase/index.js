@@ -24,13 +24,7 @@ const fetchGoals = ( uid, dispatch ) => {
             dispatch(formatted);
         })
 }
-/*
-const saveEntitiesToDatabase =  uid => entities => {
-    const updates = {}
-    updates['entities/' + uid]=entities;
-    database.ref().update(updates);
-}
-*/
+
 const saveEntitiesToDatabase = uid => entities => {
     const updates = {}
     const dataToSave = {}
@@ -46,17 +40,10 @@ const saveEntitiesToDatabase = uid => entities => {
             dataToSave[key].bubble = entities[key].bubble
         }
         if (BUBBLE == type){
-            //console.log('arrays exist',)
             dataToSave[key].leuks=entities[key].leuks;
             dataToSave[key].germs=entities[key].germs;
             dataToSave[key].size =entities[key].size;
         }
-        /*if ( entities[key].composite ){
-            const bubble = Composite.get( entities[key].composite, 'bubble', 'body');
-            console.log('retrieved', bubble.position )
-            entities[key].composite = bubble.position;
-        }*/
-        //console.log( dataToSave[key]);
         dataToSave[key].type = type;
         dataToSave[key].position = position;
     })
@@ -64,13 +51,21 @@ const saveEntitiesToDatabase = uid => entities => {
     database.ref().update(updates);
 }
 
+const removeEntities = ( uid, dispatch ) => {
+    database
+        .ref('entities/'+uid)
+        .set({});
+}
+
 const fetchEntities =  (uid , dispatch) => {
     database
         .ref('entities/' + uid)
         .on('value', snapshot => {
             const entities = snapshot.val();
-            dispatch( entities );
+            if ( entities ){
+                dispatch( entities );
+            }
         })
 }
 
-export { addGoal, fetchGoals, saveEntitiesToDatabase, fetchEntities };
+export { addGoal, fetchGoals, saveEntitiesToDatabase, fetchEntities, removeEntities };

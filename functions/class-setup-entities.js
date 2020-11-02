@@ -4,7 +4,7 @@ import { Bubble } from '../Bubble';
 import { Dimensions } from 'react-native';
 import { FloatUp } from '../Views';
 import { Title } from '../Texts';
-const { CONTROLSHEIGHT, STAGINGHEIGHT, SIZES, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE, SCALEFACTORS } = constants;
+const { MAUVE, SEAGREEN, GREEN, CONTROLSHEIGHT, STAGINGHEIGHT, WIN, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE, SCALEFACTORS } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
 import Controls from '../Controls';
@@ -42,6 +42,7 @@ export default class SetUpEntities {
 					BUBBLECOUNT
 				  );
 			//console.log('keys', keys)
+			//console.log('entities',entities)
 			const oldBubbleData =Object.fromEntries( 
 				Object
 				  .keys(entities)
@@ -259,7 +260,7 @@ export default class SetUpEntities {
 		const { width, height, setUpBodies } = this,
 			  yS = {
 				germs: 20,
-				leuks: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2 - 4,
+				leuks: height - CONTROLSHEIGHT - 10 - STAGINGHEIGHT/2,
 			  }
 		
 		let cellsToAdd = leuks + germs,
@@ -473,7 +474,6 @@ export default class SetUpEntities {
 			.forEach( alertKey => delete entities[alertKey]);
 		
 		const transitionCallback = this.helpers.stopGame.bind(this);
-		console.log('clearing');
 		const controls = {
 			phase: 'r',
 		}
@@ -557,10 +557,14 @@ export default class SetUpEntities {
 		return bubbles;
 	}
 
-	getGameOverEntities( gameOverFn, color = MIDNIGHTBLUE ){
+	getGameOverEntities( gameOverFn, outcome, uid ){
 		const { width, height, setUpBodies } = this,
-		{ engine, world}  = setUpBodies, 
-		radius = width/30;
+		{ engine, world }  					 = setUpBodies, 
+		radius 								 = width/30,
+		weWon 								 = outcome == WIN,
+		color 								 = weWon ? LIGHTBLUE : DARKPURPLE,
+		centerBlockWidth					 = 3*width/5,
+		centerBlockHeight					 = height/2; 
 		
 		Matter.World.clear( world, false, true );
 		let newEntities = {
@@ -573,82 +577,36 @@ export default class SetUpEntities {
 			}
 		}
 
-		let options = {collisionFilter: { group: 1}, isStatic: true};
-		
-		const rect = Matter.Bodies.rectangle( width/2, height/2, width/2, height/2, options)
+		let options = {collisionFilter: { group: 1}, isStatic: true}; 
 
-		rect.render.strokeStyle="#ff4500"
-		rect.render.lineWidth=4
+		const rect = Matter.Bodies.rectangle( width/2, height/2, centerBlockWidth, centerBlockHeight, options);
+		World.add( world, rect );
 
-		newEntities.gameOver =  {
-			handlePress: gameOverFn,
+		const heading = weWon ? 'Victory' : 'Game Over',
+		message		  = weWon ? 'Sun shining, hay made' : 'The albatross hangs heavy',
+		buttonColor   = weWon ? SEAGREEN : MAUVE;
+
+
+		newEntities.gameOver = {
+			gameOverFn,
 			radius,
 			doubleTime: null,
-			width: width/2,
-			height: height/2,
+			width: centerBlockWidth,
+			height: centerBlockHeight,
 			count: 2,
-			message:'game over',
+			heading,
+			message,
+			buttonColor,
 			body: rect,
+			uid,
 			renderer: GameOver,
 		}
 
-		let left, right, top, bottom;
-
-		left = Matter.Bodies.rectangle(-1,height/2,2,height,options);
-		right = Matter.Bodies.rectangle(width+1, height/2,2, height, options);
-		top = Matter.Bodies.rectangle( width/2, -1, width, 2, options);
-		bottom = Matter.Bodies.rectangle( width/2, height + 1, width, 2, options)
-
-		newEntities.left = {
-			type: 'bound',
-			radius,
-			body: left,
-			height: height,
-			width: 1,
-			color: 'purple',
-			renderer: Rect,
-		}
-		newEntities.top = {
-			type: 'bound',
-			radius,
-			body: top,
-			height: 1,
-			width: width,
-			color: '#ff4500',
-			renderer: Rect,
-		}
-		newEntities.right = {
-			type: 'bound',
-			radius,
-			body: right,
-			height: height,
-			width: 1,
-			color: '#ff4500',
-			renderer: Rect,
-		}
-
-		newEntities.bottom = {
-			type: 'bound',
-			radius,
-			body: right,
-			height: 1,
-			width: width,
-			color: '',
-			renderer: Rect,
-		}
-
-		let bodies = [rect, left, right, top, bottom];
-
-		bodies.forEach(body=>{
-			Matter.World.add( world, body );
-		})
-
-			
+		Object.assign( newEntities, this.setUpBodies.getWalls() );
 
 		new Array( 2 ).fill(false).forEach((e,i)=>{
 
-			let x = Math.random() * width - radius,
-			//y = i == 0 ? .125 * height - radius : .875 * height - radius ;
+			let x = radius + Math.random() * (width - 2*radius),
 			y = ( .125 * height ) + ( .75 * height * i ) - radius;
 
 			let body = Bodies.circle( x, y, radius, {
@@ -657,7 +615,6 @@ export default class SetUpEntities {
 				}
 			})
 
-			bodies.push( body );
 			World.add( world, body ); 
 
 			newEntities[i] = this.constructor.gameOverGerm( color, body, radius);
@@ -676,23 +633,18 @@ export default class SetUpEntities {
 		
 		function getTotal( type ){
 			let keys = Object.keys(bubbleState);
-			//alert(bubbleState[0].germs)
-			let lists = keys.map( key=>bubbleState[key][type] )
-			let counts = lists.map( list => list.length)
-			if ( type == LEUKS ){
-				//alert(counts);
-			}
+			let lists = keys.map(key=>bubbleState[key][type]);
 			return Object.keys(bubbleState)
-						.map( bubbleKey => bubbleState[bubbleKey][type].length )
-						.reduce(( totalCount, nextBubbleCount )  => totalCount + nextBubbleCount, 0  );
+				.map( bubbleKey => bubbleState[bubbleKey][type].length )
+				.reduce(( totalCount, nextBubbleCount )  => totalCount + nextBubbleCount, 0  );
 		}
-		const germsInBubbles = getTotal( GERMS )
-		const totalGerms = newGerms + germsInBubbles;
-		const leuksInBubbles = getTotal( LEUKS );
-		const totalCells = germsInBubbles + leuksInBubbles;
-		const overallDiff = germsInBubbles -leuksInBubbles;
-		const germPercent = germsInBubbles / totalCells;
-		const diffVsTotal = Math.abs( overallDiff / totalCells );
+		const germsInBubbles = getTotal( GERMS ),
+		totalGerms 			 = newGerms + germsInBubbles,
+		leuksInBubbles 		 = getTotal( LEUKS ),
+		totalCells 			 = germsInBubbles + leuksInBubbles,
+		overallDiff 		 = germsInBubbles -leuksInBubbles,
+		germPercent 		 = germsInBubbles / totalCells,
+		diffVsTotal 		 = Math.abs( overallDiff / totalCells );
 		const bubbleKeys = Object.keys(bubbleState);
 		const baseline = Math.floor( totalGerms  / bubbleKeys.length )
 		//const remainder = totalGerms % bubbleKeys.length;
@@ -822,16 +774,5 @@ export default class SetUpEntities {
 	
 			
 		})*/
-	}
-
-}
-
-class EntityMaker {
-	constructor( value ){
-		this.value = value;
-	}
-
-	iterate( fn ){
-		new Array(this.val).map((e,i)=>i).forEach(e=>fn(e));
 	}
 }

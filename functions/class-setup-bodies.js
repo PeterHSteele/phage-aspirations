@@ -40,56 +40,44 @@ export default class SetUpBodies {
 		walls = {};
 		let left, right, top, bottom;
 
-		left = Matter.Bodies.rectangle(-1,this.height/2,2,this.height,options );
-		right = Matter.Bodies.rectangle(this.width+1, this.height/2, 2, this.height, options );
-		top = Matter.Bodies.rectangle( this.width/2, -1, this.width, 2, options);
-		bottom = Matter.Bodies.rectangle( this.width/2, this.height+1, this.width, 2, options)
+		left = Bodies.rectangle(-1,this.height/2,2,this.height,options );
+		right = Bodies.rectangle(this.width+1, this.height/2, 2, this.height, options );
+		top = Bodies.rectangle( this.width/2, -1, this.width, 2, options);
+		bottom = Bodies.rectangle( this.width/2, this.height+1, this.width, 2, options)
 		const bodies = [ top, left, right, bottom ];
 		const height = this.height;
-		Matter.World.add( this.world, bodies );
+		World.add( this.world, bodies );
 
 		walls.left = {
 			type: 'bound',
-			radius: 0,
 			body: left,
 			height: height,
 			width: 1,
-			color: 'purple',
 			renderer: Rect,
-			offset: Matter.Vector.sub(left.bounds.min, left.position)
 		}
 
 		walls.top = {
 			type: 'bound',
-			radius: 0,
 			body: top,
 			height: 1,
 			width: this.width,
-			color: '#ff4500',
 			renderer: Rect,
-			offset: Matter.Vector.sub(top.bounds.min, top.position)
 		}
 
 		walls.right = {
 			type: 'bound',
-			radius: 0,
 			body: right,
 			height: this.height,
 			width: 1,
-			color: '#ff4500',
 			renderer: Rect,
-			offset: Matter.Vector.sub(right.bounds.min, right.position)
 		}
 
 		walls.bottom = {
 			type: 'bound',
-			radius: 0,
 			body: bottom,
 			height: 1,
 			width: this.width,
-			color: '',
 			renderer: Rect,
-			offset: Matter.Vector.sub(bottom.bounds.min, bottom.position)
 		}
 
 		return walls;

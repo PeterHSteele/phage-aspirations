@@ -1,30 +1,16 @@
-import React, { Component } from 'react';
-import { AppRegistry, StyleSheet, StatusBar, Dimensions, useWindowDimensions } from 'react-native';
+import React from 'react';
+import { StyleSheet, StatusBar, Dimensions, TouchableHighlightBase } from 'react-native';
 import { GameEngine } from 'react-native-game-engine';
 import { PressGerm, MoveGerm, MoveLeuk, Fight, ToggleModal, DoubleGerms, CheckContainerClose, Physics, Transition } from './systems';
-import { Bubble } from './Bubble';
-import DestinationControl from './DestinationControl';
-import { Germ } from './Germ';
-import Matter from 'matter-js';
-import Controls from './Controls';
-import GameOver from './GameOver';
-import BubbleControl from './BubbleControl';
 import constants from './constants';
-import Rect from './Rect';
-import InscribedOctagon from './InscribedOctagon';
 import SetUpBodies from './functions/class-setup-bodies';
 import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 import SetUpEntities from './functions/class-setup-entities';
 import SystemsHelpers from './functions/class-systems-helpers';
-const { MIDNIGHTBLUE , STOP, STOPPED, GREEN, GERMR, GRAYGREEN, SEAGREEN , CONTROLSHEIGHT, STAGINGHEIGHT, BUBBLER, MAUVE, LIGHTBLUE, DARKPURPLE, ORANGE, PURPLE, GERM , BUBBLE, LEUK, DESTCONTROL, LEUKS, GERMS, WIN, LOSE, BUBBLEPRESS, CONTROLS } = constants;
+const { STOP, STOPPED, GRAYGREEN, BUBBLER, LIGHTBLUE, DARKPURPLE, WIN, LOSE, } = constants;
 
 //simplify allocations algorithm
-	//allow for bubble - to - bubble transfers
-//winner of cell at end of turn gets extra germ
-//vary number of new leuks by round
-//animation for when fights are taking place
-//vary bubblesize ( with animation)
 //instructions
 //velocity varies by distance
 //prevent germs from ever overflowing container ( might need to alter collision filter )
@@ -34,8 +20,6 @@ class Game extends React.PureComponent{
 	constructor(props){
 		super(props);
 
-		/*this.width = props.route.params.width;
-		this.height = props.route.params.height;*/
 		this.width = Dimensions.get('screen').width;
 		this.height = Dimensions.get('screen').height;
 		this.engine = React.createRef();
@@ -45,33 +29,28 @@ class Game extends React.PureComponent{
 	}
 
 	handleEvent = ( e ) => {
-		//alert(this.refs['engine']);
 		switch ( e.type ){
-			case WIN: this.engine.current.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, LIGHTBLUE )); break;
-			case LOSE: this.engine.current.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, DARKPURPLE )); break;
+			case WIN: this.engine.current.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, WIN, this.props.user.id )); break;
+			case LOSE: this.engine.current.swap( this.setUpEntities.getGameOverEntities( this.props.endGame, LOSE, this.props.user.id )); break;
 			case STOP: this.engine.current.stop();
-			case STOPPED: 
-				this.props.completeDay();
-				//this.props.navigation.navigate( 'Home' );
+			case STOPPED: this.props.completeDay();
 			default: return;
 		}
-
 	}
 
 	componentWillUnmount(){
 		this.setUpBodies.clearEngine();
+		this.props.newDay();
 	}
 
 	render(){	
 		const { leuks, difficulty, saveEntitiesToDatabase, saveEntities } = this.props,
-		//uid = user.id,
 		germs = this.props.goals.length * 2  + this.props.difficulty * 3;
 		let entities=this.props.entities;
 		if ( !this.props.dayComplete ){
 			entities = this.setUpEntities.buildEntitiesObject( entities, leuks, germs, saveEntitiesToDatabase );
 		}
-		//console.log(Object.keys(entities).length);
-		//console.log('staging',entities['staging'].body.position)
+		
 		return (
 			<GameEngine
 				style={styles.container}
@@ -96,6 +75,3 @@ const styles = StyleSheet.create({
     backgroundColor: GRAYGREEN,
   }, 
 })
-
-/*animationIn={this.state.bubbleControl.location === 'bottom' ? 'slideInBottom' : 'slideInLeft' }>
-				animationOut={this.state.bubbleControl.location === 'bottom' ? 'slideOutBottom' : 'slideOutLeft' }*/
