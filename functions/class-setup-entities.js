@@ -4,7 +4,7 @@ import { Bubble } from '../Bubble';
 import { Dimensions } from 'react-native';
 import { FloatUp } from '../Views';
 import { Title } from '../Texts';
-const { MAUVE, SEAGREEN, GREEN, CONTROLSHEIGHT, STAGINGHEIGHT, WIN, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, DARKPURPLE, SCALEFACTORS } = constants;
+const { MAUVE, SEAGREEN, LIGHTMAUVE, DARKPURPLE, LIGHTORANGE, CONTROLSHEIGHT, STAGINGHEIGHT, WIN, LIGHTBLUE, PURPLE, CONTROLS, GERM, LEUK, BUBBLECOUNT, GERMR, BUBBLE, BUBBLER, GERMS, LEUKS, MIDNIGHTBLUE, SCALEFACTORS } = constants;
 import Rect from '../Rect';
 import { Germ } from '../Germ';
 import Controls from '../Controls';
@@ -167,7 +167,7 @@ export default class SetUpEntities {
 			y: stagingAreaY,
 			radius: 0,
 			start: false,
-			color: PURPLE,
+			color: MAUVE,
 			renderer: <Rect />
 		}
 	}
@@ -295,7 +295,7 @@ export default class SetUpEntities {
 			destination: [],
 			type,
 			bubble,
-			background: type == GERM ? DARKPURPLE : LIGHTBLUE,
+			background: type == GERM ? MIDNIGHTBLUE : SEAGREEN,
 			renderer: <Germ />
 		}
 	}
@@ -450,9 +450,9 @@ export default class SetUpEntities {
 				padding: 5,
 				borderRadius: 8,
 				borderWidth: 1,
-				borderColor: bubble[LEUKS].length ? LIGHTBLUE: DARKPURPLE,	
+				borderColor: bubble[LEUKS].length ? SEAGREEN: MIDNIGHTBLUE,	
 				left: x + BUBBLER,
-				backgroundColor: bubble[LEUKS].length ? LIGHTBLUE : DARKPURPLE
+				backgroundColor: bubble[LEUKS].length ? SEAGREEN : MIDNIGHTBLUE
 			};
 
 			alerts['alerts'+i]={
@@ -543,7 +543,7 @@ export default class SetUpEntities {
 							isAnimated: false
 						},
 						//active: false,
-						border: PURPLE,
+						border: MAUVE,
 						dest: false,
 						start: false,
 						germs: isNewGame ? [] : oldBubbleData[i].germs,
@@ -562,7 +562,7 @@ export default class SetUpEntities {
 		{ engine, world }  					 = setUpBodies, 
 		radius 								 = width/30,
 		weWon 								 = outcome == WIN,
-		color 								 = weWon ? LIGHTBLUE : DARKPURPLE,
+		color 								 = weWon ? SEAGREEN : MIDNIGHTBLUE,
 		centerBlockWidth					 = 3*width/5,
 		centerBlockHeight					 = height/2; 
 		
@@ -584,7 +584,7 @@ export default class SetUpEntities {
 
 		const heading = weWon ? 'Victory' : 'Game Over',
 		message		  = weWon ? 'Sun shining, hay made' : 'The albatross hangs heavy',
-		buttonColor   = weWon ? SEAGREEN : MAUVE;
+		buttonColor   = weWon ? SEAGREEN : MIDNIGHTBLUE;
 
 
 		newEntities.gameOver = {

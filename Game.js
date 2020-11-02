@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { mapDispatchToProps, mapStateToProps } from './goalGameRedux';
 import SetUpEntities from './functions/class-setup-entities';
 import SystemsHelpers from './functions/class-systems-helpers';
-const { STOP, STOPPED, GRAYGREEN, BUBBLER, LIGHTBLUE, DARKPURPLE, WIN, LOSE, } = constants;
+const { STOP, STOPPED, GRAYGREEN, BUBBLER, LIGHTBLUE, LIGHTMAUVE, DARKPURPLE, WIN, LOSE, } = constants;
 
 //simplify allocations algorithm
 //instructions
@@ -72,6 +72,6 @@ export default connect( mapStateToProps, mapDispatchToProps )( Game );
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: GRAYGREEN,
+    backgroundColor: '#fff',
   }, 
 })

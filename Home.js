@@ -19,10 +19,7 @@ const getButtonProps = ( text, backgroundColor, handlePress ) => {
 const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, logout, removeGoal, dayComplete, navigation,route, newDay, user }){
 
     let [ addGoalInputVal, updateInputVal ] = useState('');
-    /*const { user }= route.params;
-    console.log( 'home user' , user );*/
     
-
     const getDate = () => {
         const today = new Date();
         const month = constants.MONTHS[today.getMonth()],
@@ -92,7 +89,7 @@ const Home = function({ difficulty, changeDifficulty, addGoal, goals, loggedIn, 
     const buttonProps = [
       getButtonProps('Edit/Add Goals', SEAGREEN, ()=>navigation.navigate('Goals', )),
       getButtonProps('Start Assessment',dayComplete ? '#aaa' : MAUVE, ()=>navigation.navigate('Assessment')),
-      getButtonProps('New Day', DARKPURPLE, newDay),
+      //getButtonProps('New Day', DARKPURPLE, newDay),
       getButtonProps('Game Settings',LIGHTMAUVE,()=>navigation.navigate("Settings")),
       getButtonProps( logInOutText, MIDNIGHTBLUE, handleLogInOut ),
     ];

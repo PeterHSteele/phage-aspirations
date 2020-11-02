@@ -2,7 +2,7 @@ import React from 'react';
 //import DestinationControl from './DestinationControl';
 import { View, StyleSheet } from 'react-native';
 import constants from './constants';
-const { MAUVE, ORANGE, SEAGREEN, GRAYGREEN, LIGHTMAUVE, LIGHTBLUE } = constants
+const { DARKPURPLE, LIGHTORANGE, SEAGREEN, GRAYGREEN, LIGHTMAUVE, LIGHTBLUE } = constants
 
 const RADIUS = 30;
 
@@ -29,7 +29,7 @@ export const Bubble = function({ body, active, radius, dest, border, start, flas
 					radius: dimensionsBubble,
 					borderRadius: dimensionsOuter,
 					transform: isAnimated ? [{scale: scalesFacts[scales[2]]}] : [],
-					borderColor: isAnimated ? LIGHTMAUVE : GRAYGREEN
+					borderColor: isAnimated ?  LIGHTORANGE : GRAYGREEN
 				}
 			]}/>
 			<View style={[
@@ -42,7 +42,7 @@ export const Bubble = function({ body, active, radius, dest, border, start, flas
 				radius: dimensionsBubble,
 				borderRadius: dimensionsInner,
 				transform: isAnimated ? [{scale: scalesFacts[scales[1]]}] : [],
-				borderColor: isAnimated ? LIGHTBLUE : GRAYGREEN
+				borderColor: isAnimated ? LIGHTMAUVE : GRAYGREEN
 			}]}/>
 			<View 
 			style={[
@@ -53,7 +53,7 @@ export const Bubble = function({ body, active, radius, dest, border, start, flas
 					width: dimensionsBubble,
 					height: dimensionsBubble,
 					borderRadius: dimensionsBubble,
-					borderColor: dest ? SEAGREEN : start ? MAUVE : border,
+					borderColor: dest ? SEAGREEN : start ? LIGHTORANGE : border,
 				}
 			]} />
 			
@@ -68,7 +68,7 @@ const style = StyleSheet.create({
 	},
 	bubble:{
 		position: "absolute",
-		backgroundColor: ORANGE,
+		backgroundColor: '#fff',
 		borderWidth: 5,
 		borderColor: '#40e0d0'
 	},
